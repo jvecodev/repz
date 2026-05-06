@@ -1,8 +1,11 @@
 package repz.app.service.personal;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import repz.app.dto.request.PersonalCreateRequest;
 import repz.app.dto.request.PersonalUpdateRequest;
 import repz.app.dto.response.AlunoResponse;
@@ -10,10 +13,12 @@ import repz.app.dto.response.PersonalAlunosResponse;
 import repz.app.dto.response.PersonalResponse;
 import repz.app.message.Mensagens;
 import repz.app.persistence.entity.Academia;
+import repz.app.persistence.entity.Aluno;
 import repz.app.persistence.entity.Personal;
 import repz.app.persistence.entity.User;
 import repz.app.persistence.entity.UserRole;
 import repz.app.persistence.repository.AcademiaRepository;
+import repz.app.persistence.repository.AlunoRepository;
 import repz.app.persistence.repository.PersonalRepository;
 import repz.app.persistence.repository.UserRepository;
 import repz.app.service.academia.AcademiaContextService;
@@ -28,6 +33,7 @@ public class PersonalServiceImpl implements PersonalService {
     private final PersonalRepository personalRepository;
     private final UserRepository userRepository;
     private final AcademiaRepository academiaRepository;
+    private final AlunoRepository alunoRepository;
     private final AcademiaContextService academiaContextService;
     private final Mensagens mensagens;
 
@@ -49,6 +55,12 @@ public class PersonalServiceImpl implements PersonalService {
 
         User user = userRepository.findById(Math.toIntExact(request.getUserId()))
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
+        if (user.getRole() != UserRole.PERSONAL) {
+            throw new AccessDeniedException(mensagens.get("personal.usuario.role.invalida"));
+        }
+        if (personalRepository.findByUserId(user.getId()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, mensagens.get("personal.usuario.ja.vinculado"));
+        }
 
         Academia academia = academiaRepository.findById(academiaId)
                 .orElseThrow(() -> new RuntimeException(mensagens.get("academia.nao.encontrada")));
@@ -195,8 +207,8 @@ public class PersonalServiceImpl implements PersonalService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(mensagens.get("personal.nao.encontrado")));
 
-        List<AlunoResponse> alunos = userRepository.findAll().stream()
-                .filter(u -> u.getRole() == UserRole.USUARIO)
+        List<AlunoResponse> alunos = alunoRepository.findByPersonalId(personal.getId()).stream()
+                .map(Aluno::getUsuario)
                 .map(u -> new AlunoResponse(u.getId(), u.getName(), u.getEmail()))
                 .collect(Collectors.toList());
 

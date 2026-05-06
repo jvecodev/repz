@@ -38,6 +38,9 @@ public class AlunoServiceImpl implements AlunoService {
 
         User usuario = userRepository.findByIdAndDeletedAtIsNull(Math.toIntExact(request.userId()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("usuario.nao.encontrado")));
+        if (usuario.getRole() != UserRole.USUARIO) {
+            throw new AccessDeniedException(mensagens.get("aluno.usuario.role.invalida"));
+        }
 
         if (alunoRepository.existsByUsuarioIdAndAcademiaId(request.userId(), academiaId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, mensagens.get("aluno.ja.matriculado"));
@@ -48,11 +51,13 @@ public class AlunoServiceImpl implements AlunoService {
 
         Plano plano = planoRepository.findById(request.planoId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("plano.nao.encontrado")));
+        validatePlanoAcademia(plano, academia);
 
         Personal personal = null;
         if (request.personalId() != null) {
             personal = personalRepository.findById(request.personalId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("personal.nao.encontrado")));
+            validatePersonalAcademia(personal, academia);
         }
 
         Aluno aluno = new Aluno();
@@ -122,16 +127,19 @@ public class AlunoServiceImpl implements AlunoService {
         if (!aluno.getAcademia().getId().equals(academiaId)) {
             throw new AccessDeniedException(mensagens.get("aluno.academia.editar.apenas.propria"));
         }
+        Academia academia = aluno.getAcademia();
 
         if (request.planoId() != null) {
             Plano plano = planoRepository.findById(request.planoId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("plano.nao.encontrado")));
+            validatePlanoAcademia(plano, academia);
             aluno.setPlano(plano);
         }
 
         if (request.personalId() != null) {
             Personal personal = personalRepository.findById(request.personalId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("personal.nao.encontrado")));
+            validatePersonalAcademia(personal, academia);
             aluno.setPersonal(personal);
         }
 
@@ -192,6 +200,18 @@ public class AlunoServiceImpl implements AlunoService {
     private User getCurrentUser(Authentication auth) {
         return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, mensagens.get("usuario.nao.encontrado")));
+    }
+
+    private void validatePlanoAcademia(Plano plano, Academia academia) {
+        if (plano.getAcademia() == null || !plano.getAcademia().getId().equals(academia.getId())) {
+            throw new AccessDeniedException(mensagens.get("aluno.plano.nao.pertence.academia"));
+        }
+    }
+
+    private void validatePersonalAcademia(Personal personal, Academia academia) {
+        if (personal.getAcademia() == null || !personal.getAcademia().getId().equals(academia.getId())) {
+            throw new AccessDeniedException(mensagens.get("aluno.personal.nao.pertence.academia"));
+        }
     }
 
     private AlunoDetalheResponse toResponse(Aluno aluno) {

@@ -64,21 +64,9 @@ public class User extends AuditoriaBase implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return switch (this.role) {
-            case ADMIN -> List.of(
-                    new SimpleGrantedAuthority("ROLE_ADMIN"),
-                    new SimpleGrantedAuthority("ROLE_ACADEMIA"),
-                    new SimpleGrantedAuthority("ROLE_PERSONAL"),
-                    new SimpleGrantedAuthority("ROLE_USUARIO")
-            );
-            case ACADEMIA -> List.of(
-                    new SimpleGrantedAuthority("ROLE_ACADEMIA"),
-                    new SimpleGrantedAuthority("ROLE_PERSONAL"),
-                    new SimpleGrantedAuthority("ROLE_USUARIO")
-            );
-            case PERSONAL -> List.of(
-                    new SimpleGrantedAuthority("ROLE_PERSONAL"),
-                    new SimpleGrantedAuthority("ROLE_USUARIO")
-            );
+            case ADMIN -> List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            case ACADEMIA -> List.of(new SimpleGrantedAuthority("ROLE_ACADEMIA"));
+            case PERSONAL -> List.of(new SimpleGrantedAuthority("ROLE_PERSONAL"));
             case USUARIO -> List.of(new SimpleGrantedAuthority("ROLE_USUARIO"));
         };
     }

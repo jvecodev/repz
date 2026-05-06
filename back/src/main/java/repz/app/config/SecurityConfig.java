@@ -61,9 +61,20 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/users/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/users/*/ativar", "/api/users/*/desativar").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/academias/me").hasRole("ACADEMIA")
+                        .requestMatchers(HttpMethod.PUT, "/api/academias/me").hasRole("ACADEMIA")
+                        .requestMatchers(HttpMethod.GET, "/api/academias/dashboard").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/academias").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/academias").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/academias/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/academias/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/academias/*/ativar", "/api/academias/*/desativar").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/api/personais/me", "/api/personais/me/alunos").hasRole("PERSONAL")
                         .requestMatchers(HttpMethod.PUT, "/api/personais/me").hasRole("PERSONAL")
                         .requestMatchers("/api/personais/**").hasAnyRole("ADMIN", "ACADEMIA")
+
+                        .requestMatchers("/api/planos/**").hasAnyRole("ADMIN", "ACADEMIA")
 
                         .requestMatchers(HttpMethod.GET, "/api/alunos/me").hasRole("USUARIO")
                         .requestMatchers(HttpMethod.PUT, "/api/alunos/me").hasRole("USUARIO")

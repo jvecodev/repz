@@ -6,8 +6,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import repz.app.dto.request.PersonalCreateRequest;
 import repz.app.dto.request.PersonalUpdateRequest;
+import repz.app.persistence.entity.Aluno;
+import repz.app.persistence.entity.Plano;
 import repz.app.persistence.entity.UserRole;
+import repz.app.persistence.repository.AlunoRepository;
+import repz.app.persistence.repository.PlanoRepository;
 import repz.app.service.personal.PersonalService;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,6 +25,12 @@ class PersonalServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Autowired
     private PersonalService personalService;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
+
+    @Autowired
+    private PlanoRepository planoRepository;
 
     @Test
     void adminCriaEListaPersonalComFiltroDeAcademia() {
@@ -82,8 +95,25 @@ class PersonalServiceTestIntegration extends ServiceIntegrationSupport {
         var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-perfil");
         var academia = criarAcademia(academiaUser, "perfil");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-perfil");
-        criarPersonal(personalUser, academia);
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-perfil");
+        var personal = criarPersonal(personalUser, academia);
+        var alunoUser = criarUsuario(UserRole.USUARIO, "aluno-perfil");
+        var plano = Plano.builder()
+                .nome("Mensal")
+                .duracaoDias(30)
+                .valor(BigDecimal.valueOf(99.90))
+                .ativo(true)
+                .academia(academia)
+                .build();
+        planoRepository.saveAndFlush(plano);
+
+        Aluno aluno = new Aluno();
+        aluno.setUsuario(alunoUser);
+        aluno.setAcademia(academia);
+        aluno.setPersonal(personal);
+        aluno.setPlano(plano);
+        aluno.setDataInicio(LocalDate.now());
+        aluno.setAtivo(true);
+        alunoRepository.saveAndFlush(aluno);
 
         var perfil = personalService.obterMeuPerfil(autenticar(personalUser));
         assertThat(perfil.getUserId()).isEqualTo(personalUser.getId());
@@ -94,6 +124,6 @@ class PersonalServiceTestIntegration extends ServiceIntegrationSupport {
         assertThat(atualizado.getEspecialidade()).isEqualTo("Hipertrofia");
 
         var alunos = personalService.obterMeusAlunos(autenticar(personalUser));
-        assertThat(alunos.getAlunos()).extracting("id").contains(aluno.getId());
+        assertThat(alunos.getAlunos()).extracting("id").contains(alunoUser.getId());
     }
 }

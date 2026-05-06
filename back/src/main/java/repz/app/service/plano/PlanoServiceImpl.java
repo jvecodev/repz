@@ -1,34 +1,35 @@
 package repz.app.service.plano;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import repz.app.dto.request.PlanoPostRequest;
 import repz.app.dto.request.PlanoPutRequest;
 import repz.app.dto.response.PlanoResponse;
+import repz.app.message.Mensagens;
+import repz.app.persistence.entity.Academia;
 import repz.app.persistence.entity.Plano;
-import repz.app.persistence.entity.User;
+import repz.app.persistence.repository.AcademiaRepository;
 import repz.app.persistence.repository.PlanoRepository;
+import repz.app.service.academia.AcademiaContextService;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class PlanoServiceImpl implements PlanoService {
 
     private final PlanoRepository planoRepository;
-
-    private User usuarioLogado() {
-        return (User) Objects.requireNonNull(SecurityContextHolder.getContext()
-                        .getAuthentication())
-                .getPrincipal();
-    }
+    private final AcademiaRepository academiaRepository;
+    private final AcademiaContextService academiaContextService;
+    private final Mensagens mensagens;
 
     @Override
-    public void criar(PlanoPostRequest dto) {
+    public void criar(PlanoPostRequest dto, Long academiaHeaderId, Authentication auth) {
 
-        User academia = usuarioLogado();
+        Academia academia = resolveRequiredAcademia(academiaHeaderId, auth);
 
         Plano plano = Plano.builder()
                 .nome(dto.nome())
@@ -42,33 +43,31 @@ public class PlanoServiceImpl implements PlanoService {
     }
 
     @Override
-    public List<PlanoResponse> findAll() {
+    public List<PlanoResponse> findAll(Long academiaHeaderId, Authentication auth) {
 
-        User academia = usuarioLogado();
+        Long academiaId = academiaContextService.resolveOptional(auth, academiaHeaderId);
 
-        return planoRepository.findByAcademia(academia)
+        List<Plano> planos = academiaId == null
+                ? planoRepository.findAll()
+                : planoRepository.findByAcademiaId(academiaId);
+
+        return planos
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     @Override
-    public PlanoResponse findById(Integer id) {
-        User academia = usuarioLogado();
-
-        Plano plano = planoRepository.findByIdAndAcademia(id, academia)
-                .orElseThrow();
+    public PlanoResponse findById(Integer id, Long academiaHeaderId, Authentication auth) {
+        Plano plano = findPlanoInScope(id, academiaHeaderId, auth);
 
         return toResponse(plano);
     }
 
     @Override
-    public void atualizar(Integer id, PlanoPutRequest dto) {
+    public void atualizar(Integer id, PlanoPutRequest dto, Long academiaHeaderId, Authentication auth) {
 
-        User academia = usuarioLogado();
-
-        Plano plano = planoRepository.findByIdAndAcademia(id, academia)
-                .orElseThrow();
+        Plano plano = findPlanoInScope(id, academiaHeaderId, auth);
 
         plano.setNome(dto.nome());
         plano.setDuracaoDias(dto.duracaoDias());
@@ -78,25 +77,38 @@ public class PlanoServiceImpl implements PlanoService {
     }
 
     @Override
-    public void ativar(Integer id) {
-        alterarStatus(id, true);
+    public void ativar(Integer id, Long academiaHeaderId, Authentication auth) {
+        alterarStatus(id, academiaHeaderId, auth, true);
     }
 
     @Override
-    public void desativar(Integer id) {
-        alterarStatus(id, false);
+    public void desativar(Integer id, Long academiaHeaderId, Authentication auth) {
+        alterarStatus(id, academiaHeaderId, auth, false);
     }
 
-    private void alterarStatus(Integer id, boolean ativo) {
+    private void alterarStatus(Integer id, Long academiaHeaderId, Authentication auth, boolean ativo) {
 
-        User academia = usuarioLogado();
-
-        Plano plano = planoRepository.findByIdAndAcademia(id, academia)
-                .orElseThrow();
+        Plano plano = findPlanoInScope(id, academiaHeaderId, auth);
 
         plano.setAtivo(ativo);
 
         planoRepository.save(plano);
+    }
+
+    private Academia resolveRequiredAcademia(Long academiaHeaderId, Authentication auth) {
+        Long academiaId = academiaContextService.resolveRequired(auth, academiaHeaderId);
+        return academiaRepository.findById(academiaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("academia.nao.encontrada")));
+    }
+
+    private Plano findPlanoInScope(Integer id, Long academiaHeaderId, Authentication auth) {
+        Long academiaId = academiaContextService.resolveOptional(auth, academiaHeaderId);
+        if (academiaId == null) {
+            return planoRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("plano.nao.encontrado")));
+        }
+        return planoRepository.findByIdAndAcademiaId(id, academiaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("plano.nao.encontrado")));
     }
 
     private PlanoResponse toResponse(Plano plano) {
