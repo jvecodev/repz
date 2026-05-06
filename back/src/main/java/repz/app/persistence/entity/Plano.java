@@ -31,5 +31,5 @@ public class Plano extends AuditoriaBase {
 
     @ManyToOne
     @JoinColumn(name = "academia_id")
-    private User academia;
+    private Academia academia;
 }

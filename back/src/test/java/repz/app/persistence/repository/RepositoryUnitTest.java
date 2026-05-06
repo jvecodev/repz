@@ -122,7 +122,8 @@ class RepositoryUnitTest {
 
     @Test
     void planoRepositoryExpoeEscopoPorAcademia() {
-        User academia = user(2L, UserRole.ACADEMIA);
+        User academiaUser = user(2L, UserRole.ACADEMIA);
+        Academia academia = academia(10L, academiaUser);
         Plano plano = Plano.builder()
                 .id(1)
                 .nome("Mensal")

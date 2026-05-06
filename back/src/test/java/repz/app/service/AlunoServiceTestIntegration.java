@@ -239,12 +239,13 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
 
     private Plano criarPlano(User acadUser, String nome) {
+        Academia academia = academiaRepository.findByResponsibleUserId(acadUser.getId()).getFirst();
         Plano plano = Plano.builder()
                 .nome(nome)
                 .duracaoDias(30)
                 .valor(BigDecimal.valueOf(99.90))
                 .ativo(true)
-                .academia(acadUser)
+                .academia(academia)
                 .build();
         return planoRepository.saveAndFlush(plano);
     }
