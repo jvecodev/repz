@@ -68,7 +68,7 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
         User currentUser = userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
 
-        if (currentUser.getRole() == UserRole.USUARIO && !currentUser.getId().equals(alunoId)) {
+        if (currentUser.getRole() == UserRole.ALUNO && !currentUser.getId().equals(alunoId)) {
             throw new RuntimeException(mensagens.get("avaliacao.usuario.apenas.proprias"));
         }
 
@@ -94,7 +94,7 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
         User currentUser = userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
 
-        if (currentUser.getRole() == UserRole.USUARIO && !currentUser.getId().equals(alunoId)) {
+        if (currentUser.getRole() == UserRole.ALUNO && !currentUser.getId().equals(alunoId)) {
             throw new RuntimeException(mensagens.get("avaliacao.usuario.apenas.graficos.proprios"));
         }
 
@@ -131,7 +131,7 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
                             || avaliacao.getAcademia() != null && avaliacao.getAcademia().getId().equals(academiaId))
                     .map(this::toDTOUnidade)
                     .collect(Collectors.toList());
-        } else if (currentUser.getRole() == UserRole.ACADEMIA) {
+        } else if (currentUser.getRole() == UserRole.GERENTE) {
             return avaliacaoFisicaRepository.findByAcademia_Id(academiaId).stream()
                     .map(this::toDTOUnidade)
                     .collect(Collectors.toList());

@@ -10,34 +10,16 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import repz.app.dto.request.AlunoCreateRequest;
 import repz.app.dto.request.AlunoMeUpdateRequest;
 import repz.app.dto.request.AlunoUpdateRequest;
 import repz.app.dto.response.AlunoDetalheResponse;
 
 import java.util.List;
 
-@Tag(name = "Alunos", description = "Matrícula e gestão de alunos")
+@Tag(name = "Alunos", description = "Gestão de alunos")
 @SecurityRequirement(name = "bearer-jwt")
 @RequestMapping("/api/alunos")
 public interface AlunoController {
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Matricular aluno", description = "Vincula um usuário a uma academia com um plano. Requer perfil ADMIN ou ACADEMIA.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Aluno matriculado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado"),
-            @ApiResponse(responseCode = "404", description = "Usuário, academia ou plano não encontrado"),
-            @ApiResponse(responseCode = "409", description = "Aluno já matriculado nessa academia")
-    })
-    AlunoDetalheResponse matricular(
-            @Valid @RequestBody AlunoCreateRequest request,
-            @Parameter(description = "ID da academia", example = "1")
-            @RequestHeader(value = "X-Academia-Id", required = false) Long academiaId,
-            @Parameter(hidden = true) Authentication auth);
 
     @GetMapping
     @Operation(summary = "Listar alunos", description = "ADMIN vê todos; ACADEMIA vê somente os seus; PERSONAL vê somente seus alunos.")

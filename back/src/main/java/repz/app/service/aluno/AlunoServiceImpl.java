@@ -38,7 +38,7 @@ public class AlunoServiceImpl implements AlunoService {
 
         User usuario = userRepository.findByIdAndDeletedAtIsNull(Math.toIntExact(request.userId()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("usuario.nao.encontrado")));
-        if (usuario.getRole() != UserRole.USUARIO) {
+        if (usuario.getRole() != UserRole.ALUNO) {
             throw new AccessDeniedException(mensagens.get("aluno.usuario.role.invalida"));
         }
 
@@ -84,7 +84,7 @@ public class AlunoServiceImpl implements AlunoService {
             return alunos.stream().map(this::toResponse).toList();
         }
 
-        if (currentUser.getRole() == UserRole.ACADEMIA) {
+        if (currentUser.getRole() == UserRole.GERENTE) {
             return alunoRepository.findByAcademiaId(academiaId).stream()
                     .map(this::toResponse).toList();
         }

@@ -35,7 +35,7 @@ class PasswordResetServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void forgotPasswordEnviaEmailEGeraTokenParaEmailCadastrado() {
-        var user = criarUsuario(UserRole.USUARIO, "reset-usuario");
+        var user = criarUsuario(UserRole.ALUNO, "reset-usuario");
 
         passwordResetService.forgotPassword(new ForgotPasswordRequest(user.getEmail()));
 
@@ -58,7 +58,7 @@ class PasswordResetServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void resetPasswordAtualizaSenhaComTokenValido() {
-        var user = criarUsuario(UserRole.USUARIO, "reset-senha");
+        var user = criarUsuario(UserRole.ALUNO, "reset-senha");
         passwordResetService.forgotPassword(new ForgotPasswordRequest(user.getEmail()));
 
         var token = tokenRepository.findAll().stream()
@@ -84,7 +84,7 @@ class PasswordResetServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void resetPasswordRejeitaTokenJaUtilizado() {
-        var user = criarUsuario(UserRole.USUARIO, "reset-reuso");
+        var user = criarUsuario(UserRole.ALUNO, "reset-reuso");
         passwordResetService.forgotPassword(new ForgotPasswordRequest(user.getEmail()));
 
         var token = tokenRepository.findAll().stream()
@@ -101,7 +101,7 @@ class PasswordResetServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void forgotPasswordSobrescreveTokenAnteriorDoMesmoUsuario() {
-        var user = criarUsuario(UserRole.USUARIO, "reset-sobrescreve");
+        var user = criarUsuario(UserRole.ALUNO, "reset-sobrescreve");
 
         passwordResetService.forgotPassword(new ForgotPasswordRequest(user.getEmail()));
         var tokensApos1 = tokenRepository.findAll().stream()

@@ -53,7 +53,7 @@ class StorageServiceUnitTest {
 
     @Test
     void uploadSalvaArquivoERetornaUrl() throws Exception {
-        User user = user(1L, UserRole.USUARIO);
+        User user = user(1L, UserRole.ALUNO);
         MultipartFile file = mock(MultipartFile.class);
         when(file.getOriginalFilename()).thenReturn("photo.jpg");
         when(file.getSize()).thenReturn(1024L);
@@ -72,7 +72,7 @@ class StorageServiceUnitTest {
 
     @Test
     void uploadAtualizaArquivoExistente() throws Exception {
-        User user = user(2L, UserRole.USUARIO);
+        User user = user(2L, UserRole.ALUNO);
         Arquivo existente = new Arquivo();
         existente.setUser(user);
         existente.setFileName("users/2/old.jpg");
@@ -106,7 +106,7 @@ class StorageServiceUnitTest {
 
     @Test
     void uploadLancaExcecaoQuandoMinioFalha() throws Exception {
-        User user = user(1L, UserRole.USUARIO);
+        User user = user(1L, UserRole.ALUNO);
         MultipartFile file = mock(MultipartFile.class);
         when(file.getOriginalFilename()).thenReturn("photo.jpg");
         when(file.getSize()).thenReturn(1024L);

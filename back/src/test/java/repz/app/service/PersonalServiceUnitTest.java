@@ -53,7 +53,7 @@ class PersonalServiceUnitTest {
     void adminPodeCriarPersonalParaQualquerAcademia() {
         User admin = user(1L, UserRole.ADMIN);
         User personalUser = user(2L, UserRole.PERSONAL);
-        User academiaUser = user(3L, UserRole.ACADEMIA);
+        User academiaUser = user(3L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         PersonalCreateRequest request = new PersonalCreateRequest(personalUser.getId(), academia.getId(), "Funcional");
 
@@ -76,8 +76,8 @@ class PersonalServiceUnitTest {
 
     @Test
     void academiaPodeCriarPersonalApenasNaPropriaAcademia() {
-        User academiaUser = user(3L, UserRole.ACADEMIA);
-        User otherAcademiaUser = user(4L, UserRole.ACADEMIA);
+        User academiaUser = user(3L, UserRole.GERENTE);
+        User otherAcademiaUser = user(4L, UserRole.GERENTE);
         User personalUser = user(2L, UserRole.PERSONAL);
         Academia outraAcademia = academia(20L, otherAcademiaUser);
         PersonalCreateRequest request = new PersonalCreateRequest(personalUser.getId(), outraAcademia.getId(), "Funcional");
@@ -91,7 +91,7 @@ class PersonalServiceUnitTest {
 
     @Test
     void usuarioNaoPodeCriarPersonal() {
-        User aluno = user(5L, UserRole.USUARIO);
+        User aluno = user(5L, UserRole.ALUNO);
         PersonalCreateRequest request = new PersonalCreateRequest(2L, 10L, "Funcional");
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
         when(academiaContextService.resolveRequired(auth(aluno.getEmail()), 10L)).thenReturn(10L);

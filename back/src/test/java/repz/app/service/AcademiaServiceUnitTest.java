@@ -42,7 +42,7 @@ class AcademiaServiceUnitTest {
         AcademiaCreateRequest request = new AcademiaCreateRequest(
                 "12345678000199", "Repz", "Rua 1", "Eduardo", "contato@repz.com", "11999999999");
         when(academiaRepository.findByCnpj(request.getCnpj()))
-                .thenReturn(Optional.of(academia(1L, user(1L, UserRole.ACADEMIA))));
+                .thenReturn(Optional.of(academia(1L, user(1L, UserRole.GERENTE))));
 
         assertThrows(IllegalArgumentException.class, () -> service.criar(request));
 
@@ -51,7 +51,7 @@ class AcademiaServiceUnitTest {
 
     @Test
     void dashboardCalculaTotaisDeAcademias() {
-        User responsavel = user(1L, UserRole.ACADEMIA);
+        User responsavel = user(1L, UserRole.GERENTE);
         Academia ativa = academia(10L, responsavel);
         ativa.setTotalStudents(20);
         ativa.setTotalInstructors(2);

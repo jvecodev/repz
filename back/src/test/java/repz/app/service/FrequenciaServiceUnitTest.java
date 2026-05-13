@@ -63,8 +63,8 @@ class FrequenciaServiceUnitTest {
 
     @Test
     void usuarioRegistraCheckInSomenteParaSiMesmo() {
-        User aluno = user(10L, UserRole.USUARIO);
-        User academiaUser = user(20L, UserRole.ACADEMIA);
+        User aluno = user(10L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
         Academia academia = academia(30L, academiaUser);
         LocalDateTime dataHora = LocalDateTime.of(2026, 5, 2, 10, 0);
         FrequenciaCreateRequest request = new FrequenciaCreateRequest(aluno.getId(), academia.getId(), null, dataHora);
@@ -90,7 +90,7 @@ class FrequenciaServiceUnitTest {
 
     @Test
     void usuarioNaoRegistraCheckInParaOutroAluno() {
-        User aluno = user(10L, UserRole.USUARIO);
+        User aluno = user(10L, UserRole.ALUNO);
         FrequenciaCreateRequest request = new FrequenciaCreateRequest(99L, 30L, null, null);
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
         when(academiaContextService.resolveRequired(auth(aluno.getEmail()), 30L)).thenReturn(30L);
@@ -101,8 +101,8 @@ class FrequenciaServiceUnitTest {
     @Test
     void personalPodeRegistrarCheckInDeAluno() {
         User personalUser = user(11L, UserRole.PERSONAL);
-        User aluno = user(12L, UserRole.USUARIO);
-        User academiaUser = user(20L, UserRole.ACADEMIA);
+        User aluno = user(12L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
         Academia academia = academia(30L, academiaUser);
         Personal personal = personal(40L, personalUser, academia);
         FrequenciaCreateRequest request = new FrequenciaCreateRequest(aluno.getId(), academia.getId(), personal.getId(), null);
@@ -126,7 +126,7 @@ class FrequenciaServiceUnitTest {
 
     @Test
     void academiaNaoPodeRegistrarCheckIn() {
-        User academiaUser = user(20L, UserRole.ACADEMIA);
+        User academiaUser = user(20L, UserRole.GERENTE);
         when(userRepository.findByEmail(academiaUser.getEmail())).thenReturn(Optional.of(academiaUser));
         when(academiaContextService.resolveRequired(auth(academiaUser.getEmail()), 30L)).thenReturn(30L);
 
@@ -136,8 +136,8 @@ class FrequenciaServiceUnitTest {
 
     @Test
     void relatorioPermiteAcademiaOuAdminERejeitaUsuario() {
-        User academiaUser = user(20L, UserRole.ACADEMIA);
-        User aluno = user(10L, UserRole.USUARIO);
+        User academiaUser = user(20L, UserRole.GERENTE);
+        User aluno = user(10L, UserRole.ALUNO);
         Academia academia = academia(30L, academiaUser);
         LocalDateTime inicio = LocalDateTime.now().minusDays(7);
         LocalDateTime fim = LocalDateTime.now();
@@ -157,10 +157,10 @@ class FrequenciaServiceUnitTest {
 
     @Test
     void alunosInativosRetornaSomenteQuemNaoTreinaHaMaisDeSeteDias() {
-        User academiaUser = user(20L, UserRole.ACADEMIA);
+        User academiaUser = user(20L, UserRole.GERENTE);
         Academia academia = academia(30L, academiaUser);
-        User alunoInativo = user(10L, UserRole.USUARIO);
-        User alunoAtivo = user(11L, UserRole.USUARIO);
+        User alunoInativo = user(10L, UserRole.ALUNO);
+        User alunoAtivo = user(11L, UserRole.ALUNO);
 
         when(academiaContextService.resolveRequired(auth(academiaUser), academia.getId())).thenReturn(academia.getId());
         when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));

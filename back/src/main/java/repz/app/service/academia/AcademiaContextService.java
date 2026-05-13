@@ -32,7 +32,7 @@ public class AcademiaContextService {
             return requestedAcademiaId;
         }
 
-        if (currentUser.getRole() == UserRole.USUARIO) {
+        if (currentUser.getRole() == UserRole.ALUNO) {
             if (requestedAcademiaId != null) {
                 assertAcademiaExists(requestedAcademiaId);
             }
@@ -62,7 +62,7 @@ public class AcademiaContextService {
     }
 
     private Long getUserAcademiaId(User user) {
-        if (user.getRole() == UserRole.ACADEMIA) {
+        if (user.getRole() == UserRole.GERENTE) {
             return academiaRepository.findByResponsibleUserId(user.getId()).stream()
                     .findFirst()
                     .orElseThrow(() -> new AccessDeniedException(mensagens.get("auth.usuario.sem.academia")))

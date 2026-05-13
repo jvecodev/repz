@@ -6,7 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 import repz.app.controller.UserController;
-import repz.app.dto.auth.RegistrationDTO;
+import repz.app.dto.request.AdminCreateRequest;
+import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
 import repz.app.dto.response.UserGetResponse;
 import repz.app.service.user.UserService;
@@ -30,8 +31,14 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Void> criar(RegistrationDTO registrationDTO, Authentication authentication) {
-        userService.criar(registrationDTO, authentication);
+    public ResponseEntity<Void> criar(UserCreateRequest userCreateRequest, Authentication authentication) {
+        userService.criarUsuario(userCreateRequest, authentication);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Override
+    public ResponseEntity<Void> criarAdmin(AdminCreateRequest adminCreateRequest) {
+        userService.criarAdmin(adminCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

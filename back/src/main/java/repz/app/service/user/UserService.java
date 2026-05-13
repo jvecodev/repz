@@ -1,7 +1,8 @@
 package repz.app.service.user;
 
 import org.springframework.security.core.Authentication;
-import repz.app.dto.auth.RegistrationDTO;
+import repz.app.dto.request.AdminCreateRequest;
+import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
 import repz.app.dto.response.UserGetResponse;
 
@@ -14,7 +15,9 @@ public interface UserService {
 
     void updateLastLogin(String email);
 
-    void criar(RegistrationDTO registrationDTO, Authentication authentication);
+    void criarUsuario(UserCreateRequest dto, Authentication auth);
+
+    void criarAdmin(AdminCreateRequest dto);
 
     void atualizar(Integer id, UserPutRequest userPutRequest);
 

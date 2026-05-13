@@ -56,8 +56,8 @@ class AcademiaContextServiceUnitTest {
     }
 
     @Test
-    void academiaFicaRestritaAoProprioContexto() {
-        User academiaUser = user(2L, UserRole.ACADEMIA);
+    void gerenteFicaRestritoAoProprioContexto() {
+        User academiaUser = user(2L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         when(userRepository.findByEmail(academiaUser.getEmail())).thenReturn(Optional.of(academiaUser));
         when(academiaRepository.findByResponsibleUserId(academiaUser.getId())).thenReturn(List.of(academia));
@@ -68,7 +68,7 @@ class AcademiaContextServiceUnitTest {
 
     @Test
     void personalFicaRestritoAAcademiaVinculada() {
-        User academiaUser = user(2L, UserRole.ACADEMIA);
+        User academiaUser = user(2L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         User personalUser = user(3L, UserRole.PERSONAL);
         Personal personal = personal(30L, personalUser, academia);
@@ -80,8 +80,8 @@ class AcademiaContextServiceUnitTest {
     }
 
     @Test
-    void usuarioPrecisaInformarAcademiaQuandoContextoEhObrigatorio() {
-        User aluno = user(4L, UserRole.USUARIO);
+    void alunoSemAcademiaFalhaSeContextoObrigatorio() {
+        User aluno = user(4L, UserRole.ALUNO);
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
 
         assertThrows(IllegalArgumentException.class, () -> service.resolveRequired(auth(aluno.getEmail()), null));

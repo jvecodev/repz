@@ -48,7 +48,7 @@ class RepositoryUnitTest {
 
     @Test
     void userRepositoryExpoeConsultasDeAutenticacaoEStatus() {
-        User aluno = user(1L, UserRole.USUARIO);
+        User aluno = user(1L, UserRole.ALUNO);
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
         when(userRepository.findByIdAndDeletedAtIsNull(1)).thenReturn(Optional.of(aluno));
         when(userRepository.findByActiveAndDeletedAtIsNull(true)).thenReturn(List.of(aluno));
@@ -61,7 +61,7 @@ class RepositoryUnitTest {
 
     @Test
     void academiaRepositoryExpoeConsultasDeUnidadeEResponsavel() {
-        User responsavel = user(2L, UserRole.ACADEMIA);
+        User responsavel = user(2L, UserRole.GERENTE);
         Academia academia = academia(10L, responsavel);
         when(academiaRepository.findByCnpj(academia.getCnpj())).thenReturn(Optional.of(academia));
         when(academiaRepository.findByResponsibleUserId(responsavel.getId())).thenReturn(List.of(academia));
@@ -74,7 +74,7 @@ class RepositoryUnitTest {
 
     @Test
     void personalRepositoryExpoeVinculoComUsuario() {
-        User responsavel = user(2L, UserRole.ACADEMIA);
+        User responsavel = user(2L, UserRole.GERENTE);
         Academia academia = academia(10L, responsavel);
         User personalUser = user(3L, UserRole.PERSONAL);
         Personal personal = personal(20L, personalUser, academia);
@@ -85,9 +85,9 @@ class RepositoryUnitTest {
 
     @Test
     void frequenciaRepositoryExpoeConsultasDePeriodoEHistorico() {
-        User responsavel = user(2L, UserRole.ACADEMIA);
+        User responsavel = user(2L, UserRole.GERENTE);
         Academia academia = academia(10L, responsavel);
-        User aluno = user(1L, UserRole.USUARIO);
+        User aluno = user(1L, UserRole.ALUNO);
         LocalDateTime inicio = LocalDateTime.now().minusDays(7);
         LocalDateTime fim = LocalDateTime.now();
         Frequencia frequencia = frequencia(30L, aluno, academia, null, LocalDateTime.now());
@@ -105,10 +105,10 @@ class RepositoryUnitTest {
 
     @Test
     void avaliacaoFisicaRepositoryExpoeHistoricoGraficoEUnidade() {
-        User responsavel = user(2L, UserRole.ACADEMIA);
+        User responsavel = user(2L, UserRole.GERENTE);
         Academia academia = academia(10L, responsavel);
         User personalUser = user(3L, UserRole.PERSONAL);
-        User aluno = user(1L, UserRole.USUARIO);
+        User aluno = user(1L, UserRole.ALUNO);
         AvaliacaoFisica avaliacao = avaliacao(40L, aluno, academia, personal(20L, personalUser, academia));
 
         when(avaliacaoFisicaRepository.findByAluno_IdOrderByDataAvaliacaoDesc(aluno.getId())).thenReturn(List.of(avaliacao));
@@ -122,7 +122,7 @@ class RepositoryUnitTest {
 
     @Test
     void planoRepositoryExpoeEscopoPorAcademia() {
-        User academiaUser = user(2L, UserRole.ACADEMIA);
+        User academiaUser = user(2L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         Plano plano = Plano.builder()
                 .id(1)

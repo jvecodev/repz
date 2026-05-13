@@ -42,7 +42,7 @@ public class PersonalServiceImpl implements PersonalService {
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
         Long academiaId = resolveAcademiaFromRequest(request.getAcademiaId(), academiaHeaderId, auth);
 
-        if (currentUser.getRole() == UserRole.ACADEMIA) {
+        if (currentUser.getRole() == UserRole.GERENTE) {
             Academia academia = academiaRepository.findById(academiaId)
                     .orElseThrow(() -> new RuntimeException(mensagens.get("academia.nao.encontrada")));
 
@@ -85,7 +85,7 @@ public class PersonalServiceImpl implements PersonalService {
                     .filter(p -> academiaId == null || p.getAcademia().getId().equals(academiaId))
                     .map(this::toDTO)
                     .collect(Collectors.toList());
-        } else if (currentUser.getRole() == UserRole.ACADEMIA) {
+        } else if (currentUser.getRole() == UserRole.GERENTE) {
             Academia academia = academiaRepository.findByResponsibleUserId(currentUser.getId())
                     .stream()
                     .findFirst()
@@ -115,7 +115,7 @@ public class PersonalServiceImpl implements PersonalService {
                 .orElseThrow(() -> new RuntimeException(mensagens.get("personal.nao.encontrado")));
         validatePersonalAcademia(personal, academiaId);
 
-        if (currentUser.getRole() == UserRole.ACADEMIA) {
+        if (currentUser.getRole() == UserRole.GERENTE) {
             Academia academia = academiaRepository.findByResponsibleUserId(currentUser.getId())
                     .stream()
                     .findFirst()
@@ -154,7 +154,7 @@ public class PersonalServiceImpl implements PersonalService {
                 .orElseThrow(() -> new RuntimeException(mensagens.get("personal.nao.encontrado")));
         validatePersonalAcademia(personal, academiaId);
 
-        if (currentUser.getRole() == UserRole.ACADEMIA) {
+        if (currentUser.getRole() == UserRole.GERENTE) {
             Academia academia = academiaRepository.findByResponsibleUserId(currentUser.getId())
                     .stream()
                     .findFirst()

@@ -67,7 +67,7 @@ class AcademiaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void obterEAtualizarMinhaAcademia() {
-        var responsavel = criarUsuario(UserRole.ACADEMIA, "responsavel-academia");
+        var responsavel = criarUsuario(UserRole.GERENTE, "responsavel-academia");
         var academia = criarAcademia(responsavel, "minha");
 
         var minha = academiaService.obterMinha(responsavel);
@@ -89,7 +89,7 @@ class AcademiaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void dashboardCalculaIndicadores() {
-        var user = criarUsuario(UserRole.ACADEMIA, "dashboard");
+        var user = criarUsuario(UserRole.GERENTE, "dashboard");
         var academiaAtiva = criarAcademia(user, "ativa");
         academiaAtiva.setTotalStudents(10);
         academiaAtiva.setTotalInstructors(2);

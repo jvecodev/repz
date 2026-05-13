@@ -30,8 +30,8 @@ class AcademiaContextServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void academiaResolveApenasSuaPropriaAcademia() {
-        var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-contexto");
-        var outraAcademiaUser = criarUsuario(UserRole.ACADEMIA, "outra-contexto");
+        var academiaUser = criarUsuario(UserRole.GERENTE, "academia-contexto");
+        var outraAcademiaUser = criarUsuario(UserRole.GERENTE, "outra-contexto");
         var academia = criarAcademia(academiaUser, "propria");
         var outraAcademia = criarAcademia(outraAcademiaUser, "outra");
 
@@ -43,7 +43,7 @@ class AcademiaContextServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void personalResolveAcademiaDoSeuVinculo() {
-        var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-personal-contexto");
+        var academiaUser = criarUsuario(UserRole.GERENTE, "academia-personal-contexto");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-contexto");
         var academia = criarAcademia(academiaUser, "contexto-personal");
         criarPersonal(personalUser, academia);
@@ -54,7 +54,7 @@ class AcademiaContextServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void usuarioSemAcademiaExigeHeaderQuandoObrigatorio() {
-        var aluno = criarUsuario(UserRole.USUARIO, "usuario-contexto");
+        var aluno = criarUsuario(UserRole.ALUNO, "usuario-contexto");
 
         assertThatThrownBy(() -> academiaContextService.resolveRequired(autenticar(aluno), null))
                 .isInstanceOf(IllegalArgumentException.class);

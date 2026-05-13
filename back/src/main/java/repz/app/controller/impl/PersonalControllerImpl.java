@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 import repz.app.controller.PersonalController;
-import repz.app.dto.request.PersonalCreateRequest;
 import repz.app.dto.request.PersonalUpdateRequest;
 import repz.app.dto.response.PersonalAlunosResponse;
 import repz.app.dto.response.PersonalResponse;
@@ -17,11 +16,6 @@ import java.util.List;
 public class PersonalControllerImpl implements PersonalController {
 
     private final PersonalService personalService;
-
-    @Override
-    public PersonalResponse criar(PersonalCreateRequest request, Long academiaId, Authentication auth) {
-        return personalService.criar(request, academiaId, auth);
-    }
 
     @Override
     public List<PersonalResponse> findAll(Long academiaId, Authentication auth) {
