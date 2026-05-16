@@ -100,6 +100,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/avaliacoes/*/ativar", "/api/avaliacoes/*/desativar")
                                 .hasAnyRole("PERSONAL", "ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/treinos/me", "/api/treinos/me/historico").hasRole("USUARIO")
+                        .requestMatchers(HttpMethod.POST, "/api/treinos").hasRole("PERSONAL")
+                        .requestMatchers(HttpMethod.PATCH, "/api/treinos/*/ativar", "/api/treinos/*/desativar")
+                                .hasAnyRole("PERSONAL", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/treinos/**")
+                                .hasAnyRole("PERSONAL", "USUARIO", "ACADEMIA", "ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -114,6 +121,7 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             ErrorResponse errorResponse = new ErrorResponse(
                     HttpStatus.FORBIDDEN.value(),
                     mensagens.get("erro.acesso.negado"),
@@ -126,6 +134,7 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             ErrorResponse errorResponse = new ErrorResponse(
                     HttpStatus.UNAUTHORIZED.value(),
                     mensagens.get("erro.autenticacao"),
