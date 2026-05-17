@@ -31,5 +31,9 @@ public class AvaliacaoFisicaGraficoResponse {
         private Double peso;
         private Double imc;
         private Double percentualGordura;
+        private Double cinturaCm;
+        private Double quadrilCm;
+        private Double bracoCm;
+        private Double coxaCm;
     }
 }

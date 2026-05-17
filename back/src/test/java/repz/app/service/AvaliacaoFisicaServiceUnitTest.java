@@ -61,7 +61,7 @@ class AvaliacaoFisicaServiceUnitTest {
         User personalUser = user(2L, UserRole.PERSONAL);
         Personal personal = personal(20L, personalUser, academia);
         User aluno = user(3L, UserRole.USUARIO);
-        AvaliacaoFisicaCreateRequest request = new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, 18.0, "Cintura: 82cm");
+        AvaliacaoFisicaCreateRequest request = new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, 18.0, "Cintura: 82cm", null, null, null, null);
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findAll()).thenReturn(List.of(personal));
@@ -90,7 +90,7 @@ class AvaliacaoFisicaServiceUnitTest {
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
 
         assertThrows(RuntimeException.class, () ->
-                service.criar(new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, null, null), auth(aluno.getEmail())));
+                service.criar(new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, null, null, null, null, null, null), auth(aluno.getEmail())));
     }
 
     @Test

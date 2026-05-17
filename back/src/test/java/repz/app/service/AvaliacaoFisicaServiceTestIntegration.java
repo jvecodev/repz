@@ -33,7 +33,7 @@ class AvaliacaoFisicaServiceTestIntegration extends ServiceIntegrationSupport {
         var aluno = criarUsuario(UserRole.USUARIO, "aluno-avaliacao");
 
         var response = avaliacaoFisicaService.criar(
-                new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, 20.0, "Cintura: 80cm"),
+                new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, 20.0, "Cintura: 80cm", null, null, null, null),
                 autenticar(personalUser));
 
         assertThat(response.getAlunoId()).isEqualTo(aluno.getId());
@@ -47,7 +47,7 @@ class AvaliacaoFisicaServiceTestIntegration extends ServiceIntegrationSupport {
         var outroAluno = criarUsuario(UserRole.USUARIO, "outro-negado-avaliacao");
 
         assertThatThrownBy(() -> avaliacaoFisicaService.criar(
-                new AvaliacaoFisicaCreateRequest(aluno.getId(), 70.0, 170.0, null, null),
+                new AvaliacaoFisicaCreateRequest(aluno.getId(), 70.0, 170.0, null, null, null, null, null, null),
                 autenticar(aluno)))
                 .isInstanceOf(RuntimeException.class);
 

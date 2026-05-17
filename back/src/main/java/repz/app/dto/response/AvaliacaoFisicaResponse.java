@@ -42,4 +42,12 @@ public class AvaliacaoFisicaResponse {
     private Double percentualGordura;
 
     private String medidas;
+
+    private Double cinturaCm;
+
+    private Double quadrilCm;
+
+    private Double bracoCm;
+
+    private Double coxaCm;
 }

@@ -56,6 +56,10 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
         avaliacao.setAlturaCm(request.getAlturaCm());
         avaliacao.setPercentualGordura(request.getPercentualGordura());
         avaliacao.setMedidas(request.getMedidas());
+        avaliacao.setCinturaCm(request.getCinturaCm());
+        avaliacao.setQuadrilCm(request.getQuadrilCm());
+        avaliacao.setBracoCm(request.getBracoCm());
+        avaliacao.setCoxaCm(request.getCoxaCm());
 
         Double imc = calcularIMC(request.getPesoKg(), request.getAlturaCm());
         avaliacao.setImc(imc);
@@ -108,7 +112,11 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
                         a.getDataAvaliacao(),
                         a.getPesoKg(),
                         a.getImc(),
-                        a.getPercentualGordura()
+                        a.getPercentualGordura(),
+                        a.getCinturaCm(),
+                        a.getQuadrilCm(),
+                        a.getBracoCm(),
+                        a.getCoxaCm()
                 ))
                 .collect(Collectors.toList());
 
@@ -178,7 +186,11 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
                 avaliacao.getAlturaCm(),
                 avaliacao.getImc(),
                 avaliacao.getPercentualGordura(),
-                avaliacao.getMedidas()
+                avaliacao.getMedidas(),
+                avaliacao.getCinturaCm(),
+                avaliacao.getQuadrilCm(),
+                avaliacao.getBracoCm(),
+                avaliacao.getCoxaCm()
         );
     }
 
