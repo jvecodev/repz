@@ -10,11 +10,7 @@
     (ctaClick)="ctaClick.emit()"
   ></app-sidebar>
 
-  <div
-    class="scrim"
-    [class.show]="!layout.colapsada()"
-    (click)="layout.recolher()"
-  ></div>
+  <div class="scrim" [class.show]="!layout.colapsada()" (click)="layout.recolher()"></div>
 
   <div class="shell-body">
     <app-topbar [crumbs]="crumbs()"></app-topbar>

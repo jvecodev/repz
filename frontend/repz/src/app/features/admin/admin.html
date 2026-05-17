@@ -1,0 +1,31 @@
+<app-shell
+  ativo="dashboard"
+  [crumbs]="['Admin', 'Dashboard']"
+  nome="Admin"
+  subtitulo="Administração"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Administração</div>
+      <div class="page-subtitle">Painel inicial para manter a operação organizada.</div>
+    </div>
+    <p-button label="Revisar acessos" icon="pi pi-id-card" styleClass="repz-primary" />
+  </div>
+
+  <div class="dash-grid">
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Perfis</div>
+      <h2>Controle de acesso</h2>
+      <p>Administre usuários e valide permissões entre aluno, personal e academia.</p>
+      <p-tag styleClass="repz-tag-success" value="Centralizado" />
+    </p-card>
+
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Operação</div>
+      <h2>Dados da plataforma</h2>
+      <p>Acompanhe cadastros e pontos de integração que sustentam as telas principais.</p>
+      <p-tag styleClass="repz-tag-muted" value="Em expansão" />
+    </p-card>
+  </div>
+</app-shell>

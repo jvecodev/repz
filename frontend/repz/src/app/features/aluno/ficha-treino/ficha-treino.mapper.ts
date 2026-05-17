@@ -68,9 +68,7 @@ export function extrairFoco(nome: string | undefined, letra: string): string {
 export function mapearFichaAtiva(treinos: TreinoResponse[]): FichaVM | null {
   if (!treinos || treinos.length === 0) return null;
 
-  const ordenados = [...treinos].sort((a, b) =>
-    (a.divisao ?? '').localeCompare(b.divisao ?? ''),
-  );
+  const ordenados = [...treinos].sort((a, b) => (a.divisao ?? '').localeCompare(b.divisao ?? ''));
   const primeiro = ordenados[0];
 
   const treinosMap: Record<string, DivisaoVM> = {};

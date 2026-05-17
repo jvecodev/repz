@@ -1,45 +1,15 @@
-@use "mixins" as *;
+@use 'mixins' as *;
 
 // Estilos específicos da tela de ficha de treino.
-// Tokens, .card, .btn, .pill, .icon-btn, helpers e .page-* são globais (styles.scss).
+// Tokens, helpers e .page-* são globais (styles.scss).
 // Sidebar/topbar/shell estão em shared/layout.
 
 :host {
   display: block;
 }
 
-svg {
-  width: 100%;
-  height: 100%;
-}
-
-// ============================================================
-// Tabs (sublinhadas)
-// ============================================================
-.tabs {
-  display: flex;
-  gap: 4px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
-  overflow-x: auto;
-}
-
-.tab {
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s;
-
-  &:hover { color: var(--text-2); }
-
-  &.active {
-    color: var(--mint);
-    border-bottom-color: var(--mint);
-  }
+:host ::ng-deep .repz-tabs {
+  margin-bottom: 22px;
 }
 
 // ============================================================
@@ -47,21 +17,29 @@ svg {
 // ============================================================
 .layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  gap: 20px;
   align-items: start;
 }
 
-.list-card { padding: 16px; }
+:host ::ng-deep .list-card .p-card-body {
+  padding: 18px;
+}
+
+:host ::ng-deep .list-card .p-card-content {
+  padding: 0;
+}
 
 .list-head {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 6px;
-  margin-bottom: 12px;
+  padding: 2px 4px 0;
+  margin-bottom: 16px;
 
-  .pill { margin-left: auto; }
+  p-tag {
+    margin-left: auto;
+  }
 }
 
 // ============================================================
@@ -70,7 +48,7 @@ svg {
 .ex-stack {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .ex-card {
@@ -80,14 +58,16 @@ svg {
   overflow: hidden;
   transition: border-color 0.15s;
 
-  &:hover { border-color: var(--border-strong); }
+  &:hover {
+    border-color: var(--border-strong);
+  }
 }
 
 .ex-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px;
+  gap: 16px;
+  padding: 16px;
 }
 
 .ex-idx {
@@ -99,29 +79,37 @@ svg {
 }
 
 .thumb {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: var(--r-sm);
   background: var(--mint-soft);
   color: var(--mint);
   display: grid;
   place-items: center;
-  flex: 0 0 44px;
+  flex: 0 0 46px;
 
-  svg { width: 18px; height: 18px; }
+  .pi {
+    font-size: 16px;
+  }
 }
 
 .meta {
   flex: 1;
   min-width: 0;
 
-  .name { font-size: 14px; font-weight: 600; }
+  .name {
+    font-size: 14px;
+    font-weight: 600;
+  }
   .sets {
     font-size: 12px;
     color: var(--text-3);
     margin-top: 2px;
 
-    .grupo { color: var(--text-2); font-weight: 500; }
+    .grupo {
+      color: var(--text-2);
+      font-weight: 500;
+    }
   }
 }
 
@@ -129,24 +117,29 @@ svg {
   text-align: right;
   flex-shrink: 0;
 
-  &-val { font-size: 13px; font-weight: 600; }
-  &-lbl { font-size: 11px; color: var(--text-3); }
+  &-val {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  &-lbl {
+    font-size: 11px;
+    color: var(--text-3);
+  }
 }
 
 .ex-note {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  padding: 11px 14px 13px 58px;
+  padding: 12px 16px 14px 114px;
   border-top: 1px solid var(--border);
   background: rgba(52, 211, 153, 0.05);
   font-size: 12.5px;
   line-height: 1.5;
   color: var(--text-2);
 
-  svg {
-    width: 14px;
-    height: 14px;
+  .pi {
+    font-size: 14px;
     color: var(--mint);
     flex-shrink: 0;
     margin-top: 1px;
@@ -159,13 +152,15 @@ svg {
 .side-stack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
-.scard {
+:host ::ng-deep .scard {
   transition: border-color 0.15s;
 
-  &:hover { border-color: var(--border-strong); }
+  &:hover {
+    border-color: var(--border-strong);
+  }
 }
 
 .scard-top {
@@ -173,7 +168,7 @@ svg {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .scard-label {
@@ -193,7 +188,7 @@ svg {
 }
 
 .scard-desc {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   font-size: 13px;
   line-height: 1.55;
   color: var(--text-3);
@@ -202,11 +197,13 @@ svg {
 .scard-rows {
   display: flex;
   flex-direction: column;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
 
-  &.mt { margin-top: 12px; }
+  &.mt {
+    margin-top: 12px;
+  }
 }
 
 .kv {
@@ -214,28 +211,40 @@ svg {
   align-items: center;
   justify-content: space-between;
   font-size: 13px;
-  padding: 6px 0;
+  gap: 14px;
+  padding: 7px 0;
 
-  span:last-child { font-weight: 600; color: var(--text); }
+  span:last-child {
+    font-weight: 600;
+    color: var(--text);
+  }
 }
 
 .scard-obs {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   font-size: 13px;
   line-height: 1.65;
   color: var(--text-2);
 }
 
 .scard-btn {
-  margin-top: 14px;
+  margin-top: 16px;
+  width: 100%;
 }
 
 // ============================================================
 // Histórico
 // ============================================================
-.historico {
-  margin-top: 16px;
-  padding: 16px 0 4px;
+:host ::ng-deep .historico {
+  margin-top: 20px;
+}
+
+:host ::ng-deep .historico .p-card-body {
+  padding: 18px 0 6px;
+}
+
+:host ::ng-deep .historico .p-card-content {
+  padding: 0;
 }
 
 .hist-head {
@@ -243,85 +252,73 @@ svg {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 20px 14px;
+  padding: 0 22px 16px;
 }
 
-.table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-
-  th {
-    text-align: left;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-3);
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    border-top: 1px solid var(--border);
-    font-weight: 600;
-  }
-
-  td {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    vertical-align: middle;
-  }
-
-  tr:last-child td { border-bottom: 0; }
-
-  tbody tr {
-    transition: background 0.15s;
-    &:hover { background: rgba(255, 255, 255, 0.025); }
-  }
-
-  .td-action { text-align: right; }
-  .td-action .btn { display: inline-flex; }
+.td-action {
+  text-align: right;
 }
 
 // ============================================================
 // Estados (loading / erro / vazio)
 // ============================================================
-.state-card {
+:host ::ng-deep .state-card .p-card-content {
   display: flex;
   align-items: center;
   gap: 14px;
   color: var(--text-2);
   font-size: 14px;
+  padding: 0;
 
-  svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--text-3); }
-
-  &.state-error {
-    border-color: rgba(248, 113, 113, 0.3);
-    color: #f4b4b4;
-    svg { color: #f87171; }
+  .pi {
+    font-size: 22px;
+    flex-shrink: 0;
+    color: var(--text-3);
   }
 }
 
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.18);
-  border-top-color: var(--mint);
-  border-radius: 50%;
-  animation: ft-spin 0.8s linear infinite;
-  flex-shrink: 0;
+:host ::ng-deep .state-card.state-error {
+  border-color: rgba(248, 113, 113, 0.3);
 }
 
-@keyframes ft-spin {
-  to { transform: rotate(360deg); }
+:host ::ng-deep .state-card.state-error .p-card-content {
+  color: #f4b4b4;
+  .pi {
+    color: #f87171;
+  }
+}
+
+:host ::ng-deep .state-card .p-card-body {
+  padding: 22px;
+}
+
+:host ::ng-deep .state-spinner {
+  width: 20px;
+  height: 20px;
+}
+
+.empty-message {
+  padding: 0 22px 18px;
 }
 
 // ============================================================
 // Responsivo (conteúdo)
 // ============================================================
 @include tablet {
-  .layout { grid-template-columns: 1fr; }
+  .layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 @include small {
-  .ex-row { flex-wrap: wrap; }
-  .carga { margin-left: 58px; text-align: left; }
+  .ex-row {
+    flex-wrap: wrap;
+  }
+  .ex-note {
+    padding: 12px 16px 14px;
+  }
+  .carga {
+    margin-left: 62px;
+    text-align: left;
+  }
 }

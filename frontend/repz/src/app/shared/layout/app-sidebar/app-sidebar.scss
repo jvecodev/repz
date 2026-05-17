@@ -1,11 +1,11 @@
-@use "mixins" as *;
+@use 'mixins' as *;
 
 :host {
   background: var(--bg-elev);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 20px 14px;
+  padding: 22px 14px 18px;
   position: sticky;
   top: 0;
   height: 100dvh;
@@ -20,43 +20,43 @@ svg {
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 8px 18px;
+  gap: 7px;
+  padding: 0 8px 22px;
   overflow: hidden;
 }
 
-.logo-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--r-sm);
-  background: var(--mint-soft);
-  display: grid;
-  place-items: center;
-  color: var(--mint);
-
-  svg { width: 18px; height: 18px; }
+.brand-symbol {
+  display: block;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  object-fit: contain;
 }
 
-.logo-text {
-  color: var(--mint);
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  font-size: 18px;
+.brand-wordmark {
+  display: block;
+  width: 150px;
+  min-width: 0;
+  height: auto;
 }
 
 .profile-block {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 14px 10px;
-  margin-bottom: 6px;
+  padding: 15px 12px;
+  margin-bottom: 8px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   overflow: hidden;
-  transition: background 0.15s, padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background 0.15s,
+    padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 
-  .pb-info { min-width: 0; }
+  .pb-info {
+    min-width: 0;
+  }
 
   .pb-role {
     font-size: 10px;
@@ -83,7 +83,7 @@ svg {
   letter-spacing: 0.1em;
   color: var(--text-4);
   font-weight: 600;
-  padding: 16px 12px 8px;
+  padding: 18px 12px 9px;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -91,7 +91,7 @@ svg {
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
 }
 
@@ -99,7 +99,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 11px 12px;
   border-radius: var(--r-sm);
   color: var(--text-2);
   cursor: pointer;
@@ -107,9 +107,15 @@ svg {
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 
-  .icon { width: 18px; height: 18px; flex: 0 0 18px; }
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+  }
 
   &:hover {
     background: rgba(255, 255, 255, 0.04);
@@ -124,14 +130,14 @@ svg {
 
 .sidebar-cta {
   margin-top: auto;
-  padding-top: 14px;
+  padding-top: 16px;
 }
 
 .cta-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
-  padding: 16px;
+  padding: 17px 16px;
   text-align: center;
   overflow: hidden;
 
@@ -147,28 +153,19 @@ svg {
     line-height: 1.45;
     margin: 6px 0 14px;
   }
-
-  .cta-btn {
-    width: 100%;
-    border-radius: var(--r-md);
-  }
 }
 
-.cta-mini {
+:host ::ng-deep .cta-btn {
+  width: 100%;
+  border-radius: var(--r-md);
+}
+
+:host ::ng-deep .cta-mini {
   display: none;
   width: 48px;
   height: 48px;
   margin: 0 auto;
   border-radius: var(--r-md);
-  background: var(--mint);
-  color: #0b2018;
-  border: 0;
-  cursor: pointer;
-  place-items: center;
-  transition: background 0.15s;
-
-  svg { width: 20px; height: 20px; }
-  &:hover { background: var(--mint-2); }
 }
 
 /* ---- estado colapsado (iOS rail) ---- */
@@ -177,14 +174,25 @@ svg {
     justify-content: center;
     padding-left: 0;
     padding-right: 0;
+    height: 54px;
   }
 
-  .logo-text { display: none; }
+  .brand-symbol {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .brand-wordmark {
+    display: none;
+  }
 
   .profile-block {
     justify-content: center;
     padding: 12px 0;
-    .pb-info { display: none; }
+    .pb-info {
+      display: none;
+    }
   }
 
   .nav-section {
@@ -202,11 +210,17 @@ svg {
   .nav-item {
     justify-content: center;
     padding: 11px 0;
-    .label { display: none; }
+    .label {
+      display: none;
+    }
   }
 
-  .cta-card { display: none; }
-  .cta-mini { display: grid; }
+  .cta-card {
+    display: none;
+  }
+  ::ng-deep .cta-mini {
+    display: inline-flex;
+  }
 }
 
 @include mobile {
@@ -225,13 +239,36 @@ svg {
     transform: translateX(-100%);
     box-shadow: none;
 
-    .logo-text,
     .profile-block .pb-info,
     .nav-item .label,
-    .cta-card { display: revert; }
-    .cta-mini { display: none; }
-    .nav-item { justify-content: flex-start; padding: 10px 12px; }
-    .profile-block { justify-content: flex-start; padding: 14px 10px; }
-    .logo { justify-content: flex-start; padding: 4px 8px 18px; }
+    .cta-card {
+      display: revert;
+    }
+    ::ng-deep .cta-mini {
+      display: none;
+    }
+    .nav-item {
+      justify-content: flex-start;
+      padding: 10px 12px;
+    }
+    .profile-block {
+      justify-content: flex-start;
+      padding: 14px 10px;
+    }
+    .logo {
+      justify-content: flex-start;
+      padding: 0 8px 22px;
+      height: auto;
+    }
+    .brand-symbol {
+      width: 31px;
+      height: 31px;
+      flex-basis: 31px;
+    }
+    .brand-wordmark {
+      display: block;
+      width: 150px;
+      height: auto;
+    }
   }
 }

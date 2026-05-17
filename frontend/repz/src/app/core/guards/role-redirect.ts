@@ -39,7 +39,7 @@ export function checarAcesso(rolesPermitidos: string[]): boolean {
     return true;
   }
 
-  // logado, porém sem permissão para esta área -> manda pro home dele
+  // Usuário autenticado sem permissão volta para a página inicial do próprio perfil.
   router.navigate([homePorRole(role)]);
   return false;
 }

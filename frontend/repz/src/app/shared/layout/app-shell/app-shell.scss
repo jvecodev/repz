@@ -1,4 +1,4 @@
-@use "mixins" as *;
+@use 'mixins' as *;
 
 :host {
   display: block;
@@ -21,8 +21,10 @@
 }
 
 .main {
-  padding: 24px 28px 96px;
+  width: 100%;
   max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 32px 96px;
 }
 
 /* scrim da gaveta no mobile */
@@ -47,6 +49,6 @@
 
 @include small {
   .main {
-    padding: 16px 14px 96px;
+    padding: 18px 14px 96px;
   }
 }

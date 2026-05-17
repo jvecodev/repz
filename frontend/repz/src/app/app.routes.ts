@@ -4,75 +4,72 @@ import { academiaGuard } from './core/guards/academia-guard';
 import { alunoGuard } from './core/guards/aluno-guard';
 import { personalGuard } from './core/guards/personal-guard';
 
-
-
 export const routes: Routes = [
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
-  
-  { 
-    path: 'auth', 
-    loadComponent: () => import('./features/auth/auth').then(m => m.Auth) 
-  },
-  
-  { 
-    path: 'admin', 
-    // Usando exatamente a classe Admin do arquivo admin.ts que você me mostrou
-    loadComponent: () => import('./features/admin/admin').then(m => m.Admin),
-    canActivate: [adminGuard]
+
+  {
+    path: 'auth',
+    loadComponent: () => import('./features/auth/auth').then((m) => m.Auth),
   },
 
-  { 
-    path: 'academia', 
-    loadComponent: () => import('./features/academia/academia').then(m => m.Academia),
-    canActivate: [academiaGuard]
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),
+    canActivate: [adminGuard],
   },
 
-  { 
-    path: 'personal', 
-    loadComponent: () => import('./features/personal/personal').then(m => m.Personal), 
-    canActivate: [personalGuard]
+  {
+    path: 'academia',
+    loadComponent: () => import('./features/academia/academia').then((m) => m.Academia),
+    canActivate: [academiaGuard],
+  },
+
+  {
+    path: 'personal',
+    loadComponent: () => import('./features/personal/personal').then((m) => m.Personal),
+    canActivate: [personalGuard],
   },
 
   {
     path: 'aluno',
-    loadComponent: () => import('./features/aluno/aluno').then(m => m.Aluno),
-    canActivate: [alunoGuard]
+    loadComponent: () => import('./features/aluno/aluno').then((m) => m.Aluno),
+    canActivate: [alunoGuard],
   },
 
   {
     path: 'aluno/ficha-treino',
     loadComponent: () =>
-      import('./features/aluno/ficha-treino/ficha-treino').then(m => m.FichaTreino),
-    canActivate: [alunoGuard]
+      import('./features/aluno/ficha-treino/ficha-treino').then((m) => m.FichaTreino),
+    canActivate: [alunoGuard],
   },
 
   {
     path: 'personal/aluno/:id/ficha-treino',
     loadComponent: () =>
-      import('./features/aluno/ficha-treino/ficha-treino').then(m => m.FichaTreino),
-    canActivate: [personalGuard]
+      import('./features/aluno/ficha-treino/ficha-treino').then((m) => m.FichaTreino),
+    canActivate: [personalGuard],
   },
 
   {
     path: 'aluno/evolucao',
     loadComponent: () =>
-      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then(m => m.AvaliacaoFisica),
-    canActivate: [alunoGuard]
+      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then((m) => m.AvaliacaoFisica),
+    canActivate: [alunoGuard],
   },
 
   {
     path: 'personal/aluno/:id/avaliacoes',
     loadComponent: () =>
-      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then(m => m.AvaliacaoFisica),
-    canActivate: [personalGuard]
+      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then((m) => m.AvaliacaoFisica),
+    canActivate: [personalGuard],
   },
 
   {
     path: 'academia/aluno/:id/avaliacoes',
     loadComponent: () =>
-      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then(m => m.AvaliacaoFisica),
-    canActivate: [academiaGuard]
+      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then((m) => m.AvaliacaoFisica),
+    canActivate: [academiaGuard],
   },
 
-  { path: '**', redirectTo: 'auth' }
+  { path: '**', redirectTo: 'auth' },
 ];

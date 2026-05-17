@@ -4,6 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { FichaTreinoService } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TableModule } from 'primeng/table';
+import { TabsModule } from 'primeng/tabs';
+import { TagModule } from 'primeng/tag';
 import {
   DivisaoVM,
   FichaVM,
@@ -15,7 +21,16 @@ import {
 @Component({
   selector: 'app-ficha-treino',
   standalone: true,
-  imports: [CommonModule, AppShell],
+  imports: [
+    CommonModule,
+    AppShell,
+    ButtonModule,
+    CardModule,
+    ProgressSpinnerModule,
+    TableModule,
+    TabsModule,
+    TagModule,
+  ],
   templateUrl: './ficha-treino.html',
   styleUrl: './ficha-treino.scss',
 })
@@ -40,13 +55,11 @@ export class FichaTreino implements OnInit {
 
   readonly totalExercicios = computed(() => {
     const f = this.ficha();
-    return f
-      ? Object.values(f.treinos).reduce((acc, d) => acc + d.exercicios.length, 0)
-      : 0;
+    return f ? Object.values(f.treinos).reduce((acc, d) => acc + d.exercicios.length, 0) : 0;
   });
 
   ngOnInit(): void {
-    // Modo personal: /personal/aluno/:id/ficha-treino
+    // Na rota do personal, o aluno é definido pelo parâmetro da URL.
     const idParam = this.route.snapshot.paramMap.get('id');
     const alunoId = idParam ? Number(idParam) : null;
 

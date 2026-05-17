@@ -52,19 +52,19 @@ export class AvaliacaoFisicaService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/avaliacoes`;
 
-  /** RF27 — PERSONAL registra avaliação. */
+  /** Somente o personal registra uma nova avaliação física. */
   criar(req: AvaliacaoFisicaCreateRequest): Observable<AvaliacaoFisicaResponse> {
     return this.http.post<AvaliacaoFisicaResponse>(this.base, req);
   }
 
-  /** RF29 — histórico do aluno (PERSONAL/USUARIO/ACADEMIA/ADMIN). */
+  /** Perfis autorizados consultam o histórico de avaliações do aluno. */
   listar(alunoId: number): Observable<AvaliacaoFisicaResponse[]> {
     return this.http.get<AvaliacaoFisicaResponse[]>(this.base, {
       params: { aluno: alunoId },
     });
   }
 
-  /** RF30 — pontos de evolução para o gráfico. */
+  /** Série temporal usada pelo gráfico de evolução. */
   grafico(alunoId: number): Observable<AvaliacaoGraficoResponse> {
     return this.http.get<AvaliacaoGraficoResponse>(`${this.base}/grafico`, {
       params: { aluno: alunoId },

@@ -5,19 +5,33 @@ import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AuthService, AvaliacaoFisicaService, DadoGrafico } from '@core/services';
 import { AppShell } from '@shared/layout';
-import {
-  AvaliacaoVM,
-  Metrica,
-  PontoGrafico,
-  linhaPolyline,
-  mapearHistorico,
-  pontosGrafico,
-} from './avaliacao-fisica.mapper';
+import type { ChartData, ChartOptions, TooltipItem } from 'chart.js';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { ChartModule } from 'primeng/chart';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { MessageModule } from 'primeng/message';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { TableModule } from 'primeng/table';
+import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao-fisica.mapper';
 
 @Component({
   selector: 'app-avaliacao-fisica',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppShell],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AppShell,
+    ButtonModule,
+    CardModule,
+    ChartModule,
+    InputNumberModule,
+    MessageModule,
+    ProgressSpinnerModule,
+    SelectButtonModule,
+    TableModule,
+  ],
   templateUrl: './avaliacao-fisica.html',
   styleUrl: './avaliacao-fisica.scss',
 })
@@ -37,8 +51,13 @@ export class AvaliacaoFisica implements OnInit {
   readonly dados = signal<DadoGrafico[]>([]);
   readonly metrica = signal<Metrica>('peso');
   readonly alunoNome = signal('Aluno');
+  readonly metricas = [
+    { label: 'Peso', value: 'peso' satisfies Metrica },
+    { label: 'IMC', value: 'imc' satisfies Metrica },
+    { label: '% Gordura', value: 'gordura' satisfies Metrica },
+  ];
 
-  /** Só PERSONAL registra; demais perfis veem em modo leitura (RF31). */
+  /** Apenas PERSONAL registra; demais perfis acessam em modo leitura. */
   readonly podeRegistrar = computed(() => this.auth.getUserRole() === 'PERSONAL');
 
   readonly form = {
@@ -51,7 +70,7 @@ export class AvaliacaoFisica implements OnInit {
     coxaCm: null as number | null,
   };
 
-  /** IMC calculado em tempo real (RF28). */
+  /** IMC calculado localmente para orientar o preenchimento antes de salvar. */
   readonly imcPreview = computed(() => {
     const p = this.form.pesoKg;
     const a = this.form.alturaCm;
@@ -60,15 +79,83 @@ export class AvaliacaoFisica implements OnInit {
     return Number((p / (m * m)).toFixed(1));
   });
 
-  readonly pontos = computed(() =>
-    pontosGrafico(this.dados(), this.metrica()),
+  readonly pontosValidos = computed(() =>
+    this.dados()
+      .map((d) => ({ data: d.data, valor: this.valorMetrica(d) }))
+      .filter((d): d is { data: string; valor: number } => d.valor != null),
   );
-  readonly polyline = computed(() => linhaPolyline(this.pontos()));
-  readonly tooltipPonto = signal<PontoGrafico | null>(null);
+
+  readonly graficoData = computed<ChartData<'line'>>(() => {
+    const pontos = this.pontosValidos();
+    return {
+      labels: pontos.map((p) => formatarData(p.data)),
+      datasets: [
+        {
+          data: pontos.map((p) => p.valor),
+          borderColor: '#34d399',
+          backgroundColor: 'rgba(52, 211, 153, 0.14)',
+          pointBackgroundColor: '#34d399',
+          pointBorderColor: '#0b0d11',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: '#34d399',
+          pointHoverBorderColor: '#0b0d11',
+          pointHoverRadius: 6,
+          pointRadius: 4,
+          tension: 0.35,
+          fill: true,
+        },
+      ],
+    };
+  });
+
+  readonly graficoOptions = computed<ChartOptions<'line'>>(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 180 },
+    interaction: {
+      intersect: false,
+      mode: 'index',
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#12151b',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 1,
+        bodyColor: '#f3f5f7',
+        displayColors: false,
+        padding: 10,
+        titleColor: '#7c8493',
+        callbacks: {
+          label: (ctx: TooltipItem<'line'>) =>
+            `${this.rotuloMetrica()}: ${this.formatarValorTooltip(Number(ctx.parsed.y))}`,
+        },
+      },
+    },
+    scales: {
+      x: {
+        border: { display: false },
+        grid: { display: false },
+        ticks: {
+          color: '#7c8493',
+          font: { size: 11 },
+          maxRotation: 0,
+        },
+      },
+      y: {
+        border: { display: false },
+        grid: { color: 'rgba(255, 255, 255, 0.06)' },
+        ticks: {
+          color: '#7c8493',
+          font: { size: 11 },
+        },
+      },
+    },
+  }));
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    this.alunoId = idParam ? Number(idParam) : this.auth.sessao()?.id ?? null;
+    this.alunoId = idParam ? Number(idParam) : (this.auth.sessao()?.id ?? null);
 
     if (!this.alunoId) {
       this.carregando.set(false);
@@ -80,15 +167,6 @@ export class AvaliacaoFisica implements OnInit {
 
   selecionarMetrica(m: Metrica): void {
     this.metrica.set(m);
-    this.tooltipPonto.set(null);
-  }
-
-  mostrarTooltip(p: PontoGrafico): void {
-    this.tooltipPonto.set(p);
-  }
-
-  ocultarTooltip(): void {
-    this.tooltipPonto.set(null);
   }
 
   formatarValorTooltip(valor: number): string {
@@ -96,6 +174,20 @@ export class AvaliacaoFisica implements OnInit {
     if (m === 'peso') return `${valor} kg`;
     if (m === 'gordura') return `${valor}%`;
     return String(valor);
+  }
+
+  private rotuloMetrica(): string {
+    const m = this.metrica();
+    if (m === 'peso') return 'Peso';
+    if (m === 'imc') return 'IMC';
+    return '% Gordura';
+  }
+
+  private valorMetrica(d: DadoGrafico): number | undefined {
+    const m = this.metrica();
+    if (m === 'peso') return d.peso;
+    if (m === 'imc') return d.imc;
+    return d.percentualGordura;
   }
 
   salvar(): void {

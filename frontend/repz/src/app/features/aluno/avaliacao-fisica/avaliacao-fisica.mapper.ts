@@ -1,4 +1,4 @@
-import { AvaliacaoFisicaResponse, DadoGrafico } from '@core/services';
+import { AvaliacaoFisicaResponse } from '@core/services';
 
 export type Metrica = 'peso' | 'imc' | 'gordura';
 
@@ -15,13 +15,6 @@ export interface AvaliacaoVM {
   coxa?: number;
   deltaPeso?: number; // variação vs avaliação anterior (cronológica)
   personal?: string;
-}
-
-export interface PontoGrafico {
-  x: number;
-  y: number;
-  rotulo: string;
-  valor: number;
 }
 
 /**
@@ -54,9 +47,7 @@ function chave(valor?: string | null): number {
  * com a variação de peso em relação à avaliação imediatamente anterior.
  */
 export function mapearHistorico(itens: AvaliacaoFisicaResponse[]): AvaliacaoVM[] {
-  const asc = [...(itens ?? [])].sort(
-    (a, b) => chave(a.dataAvaliacao) - chave(b.dataAvaliacao),
-  );
+  const asc = [...(itens ?? [])].sort((a, b) => chave(a.dataAvaliacao) - chave(b.dataAvaliacao));
 
   const vms: AvaliacaoVM[] = asc.map((a, i) => {
     const anterior = asc[i - 1];
@@ -81,42 +72,4 @@ export function mapearHistorico(itens: AvaliacaoFisicaResponse[]): AvaliacaoVM[]
   });
 
   return vms.reverse(); // mais recente primeiro
-}
-
-const VALOR: Record<Metrica, (d: DadoGrafico) => number | undefined> = {
-  peso: (d) => d.peso,
-  imc: (d) => d.imc,
-  gordura: (d) => d.percentualGordura,
-};
-
-/**
- * Converte os pontos do gráfico em coordenadas SVG (viewBox 0 0 100 100),
- * para a métrica escolhida. Retorna [] se houver menos de 1 ponto.
- */
-export function pontosGrafico(
-  dados: DadoGrafico[],
-  metrica: Metrica,
-): PontoGrafico[] {
-  const validos = (dados ?? [])
-    .map((d) => ({ data: d.data, valor: VALOR[metrica](d) }))
-    .filter((d): d is { data: string; valor: number } => d.valor != null);
-
-  if (validos.length === 0) return [];
-
-  const valores = validos.map((d) => d.valor);
-  const min = Math.min(...valores);
-  const max = Math.max(...valores);
-  const span = max - min || 1;
-  const n = validos.length;
-
-  return validos.map((d, i) => ({
-    x: n === 1 ? 50 : (i / (n - 1)) * 100,
-    y: 100 - ((d.valor - min) / span) * 90 - 5, // margem de 5%
-    rotulo: formatarData(d.data),
-    valor: d.valor,
-  }));
-}
-
-export function linhaPolyline(pontos: PontoGrafico[]): string {
-  return pontos.map((p) => `${p.x},${p.y}`).join(' ');
 }

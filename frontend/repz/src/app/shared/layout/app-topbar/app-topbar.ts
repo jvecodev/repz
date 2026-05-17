@@ -1,10 +1,11 @@
 import { Component, inject, input } from '@angular/core';
 import { LayoutService } from '@core/services/layout';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [],
+  imports: [ButtonModule],
   templateUrl: './app-topbar.html',
   styleUrl: './app-topbar.scss',
 })

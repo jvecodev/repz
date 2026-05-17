@@ -6,51 +6,56 @@
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 32px 20px;
 }
 
-.auth-card {
+:host ::ng-deep .auth-card {
   width: 100%;
-  max-width: 380px;
-  padding: 32px 28px;
+  max-width: 420px;
+}
+
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+}
+
+:host ::ng-deep .auth-card .p-card-body {
+  padding: 36px 32px 32px;
+}
+
+:host ::ng-deep .auth-card .p-card-content {
+  padding: 0;
 }
 
 .auth-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.auth-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--r-sm);
-  background: var(--mint-soft);
-  color: var(--mint);
-  display: grid;
-  place-items: center;
-
-  svg { width: 18px; height: 18px; }
+.auth-symbol {
+  display: block;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
 }
 
-.auth-name {
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  color: var(--mint);
+.auth-wordmark {
+  display: block;
+  width: min(202px, calc(100% - 50px));
+  height: auto;
 }
 
 .auth-title {
-  margin: 6px 0 0;
-  font-size: 22px;
+  margin: 0;
+  font-size: 24px;
   font-weight: 700;
 }
 
 .auth-sub {
-  margin: 0 0 8px;
+  margin: -6px 0 4px;
   font-size: 13px;
   color: var(--text-3);
 }
@@ -67,48 +72,15 @@
   }
 
   input {
-    background: var(--bg-elev);
-    color: var(--text);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--r-sm);
-    padding: 10px 12px;
-    font: inherit;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-
-    &::placeholder { color: var(--text-4); }
-
-    &:focus {
-      border-color: var(--mint);
-      box-shadow: 0 0 0 3px var(--mint-soft);
-    }
+    width: 100%;
   }
 }
 
-.auth-error {
-  font-size: 13px;
-  color: #f4b4b4;
-  background: rgba(248, 113, 113, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.3);
-  border-radius: var(--r-sm);
-  padding: 10px 12px;
+:host ::ng-deep .auth-error {
+  width: 100%;
 }
 
-.auth-submit {
-  margin-top: 6px;
-  padding: 12px;
-}
-
-.spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(0, 0, 0, 0.25);
-  border-top-color: #0b2018;
-  border-radius: 50%;
-  display: inline-block;
-  animation: auth-spin 0.8s linear infinite;
-}
-
-@keyframes auth-spin {
-  to { transform: rotate(360deg); }
+:host ::ng-deep .auth-submit {
+  margin-top: 4px;
+  width: 100%;
 }

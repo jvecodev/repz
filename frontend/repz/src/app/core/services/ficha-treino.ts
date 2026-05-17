@@ -39,24 +39,24 @@ export class FichaTreinoService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/treinos`;
 
-  /** RF24 — aluno autenticado vê sua ficha ativa */
+  /** Aluno autenticado consulta a própria ficha ativa. */
   obterMinhaFichaAtiva(): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}/me`);
   }
 
-  /** RF25 — histórico de fichas do aluno autenticado */
+  /** Aluno autenticado consulta o próprio histórico de fichas. */
   obterMeuHistorico(): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}/me/historico`);
   }
 
-  /** RF16 — personal/academia/admin vê a ficha ativa de um aluno */
+  /** Perfis de gestão consultam a ficha ativa de um aluno específico. */
   obterFichaAtivaDoAluno(alunoId: number): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}`, {
       params: { aluno: alunoId },
     });
   }
 
-  /** RF25 — histórico de fichas de um aluno */
+  /** Perfis de gestão consultam o histórico de fichas de um aluno específico. */
   obterHistoricoDoAluno(alunoId: number): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}/historico`, {
       params: { aluno: alunoId },

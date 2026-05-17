@@ -1,1 +1,33 @@
-<p>academia works!</p>
+<app-shell
+  ativo="dashboard"
+  [crumbs]="['Academia', 'Dashboard']"
+  nome="Academia"
+  subtitulo="Gestão operacional"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dashboard da academia</div>
+      <div class="page-subtitle">
+        Base para acompanhar alunos, personais e avaliações da unidade.
+      </div>
+    </div>
+    <p-button label="Gerenciar alunos" icon="pi pi-users" styleClass="repz-primary" />
+  </div>
+
+  <div class="dash-grid">
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Alunos</div>
+      <h2>Carteira ativa</h2>
+      <p>Organize a relação de alunos e acompanhe os vínculos com personais.</p>
+      <p-tag styleClass="repz-tag-muted" value="Preparado" />
+    </p-card>
+
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Saúde</div>
+      <h2>Avaliações físicas</h2>
+      <p>Consulte históricos de avaliação dos alunos quando o perfil tiver permissão.</p>
+      <p-tag styleClass="repz-tag-success" value="Consulta segura" />
+    </p-card>
+  </div>
+</app-shell>

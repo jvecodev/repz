@@ -1,49 +1,52 @@
 <div class="auth-wrap">
-  <form class="auth-card card" (ngSubmit)="realizarLogin()">
-    <div class="auth-brand">
-      <span class="auth-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
-      </span>
-      <span class="auth-name">REPZ</span>
-    </div>
+  <p-card styleClass="auth-card repz-card">
+    <form class="auth-form" (ngSubmit)="realizarLogin()">
+      <div class="auth-brand">
+        <img class="auth-symbol" src="/assets/repz-symbol.png" alt="" aria-hidden="true" />
+        <img class="auth-wordmark" src="/assets/repz-wordmark.png" alt="REPZ" />
+      </div>
 
-    <h1 class="auth-title">Entrar</h1>
-    <p class="auth-sub">Acesse sua conta para ver sua ficha de treino.</p>
+      <h1 class="auth-title">Entrar</h1>
+      <p class="auth-sub">Acesse sua conta para ver sua ficha de treino.</p>
 
-    <label class="field">
-      <span>E-mail</span>
-      <input
-        type="email"
-        name="email"
-        autocomplete="username"
-        [(ngModel)]="credenciais.email"
-        required
-        placeholder="voce@email.com"
-      />
-    </label>
+      <label class="field">
+        <span>E-mail</span>
+        <input
+          pInputText
+          type="email"
+          name="email"
+          autocomplete="username"
+          [(ngModel)]="credenciais.email"
+          required
+          placeholder="voce@email.com"
+        />
+      </label>
 
-    <label class="field">
-      <span>Senha</span>
-      <input
-        type="password"
-        name="password"
-        autocomplete="current-password"
-        [(ngModel)]="credenciais.password"
-        required
-        placeholder="••••••••"
-      />
-    </label>
+      <label class="field">
+        <span>Senha</span>
+        <input
+          pInputText
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          [(ngModel)]="credenciais.password"
+          required
+          placeholder="••••••••"
+        />
+      </label>
 
-    @if (erro()) {
-      <div class="auth-error">{{ erro() }}</div>
-    }
-
-    <button type="submit" class="btn btn-primary auth-submit" [disabled]="carregando()">
-      @if (carregando()) {
-        <span class="spinner"></span> Entrando…
-      } @else {
-        Entrar
+      @if (erro()) {
+        <p-message severity="error" styleClass="auth-error" [text]="erro() ?? ''" />
       }
-    </button>
-  </form>
+
+      <p-button
+        type="submit"
+        label="Entrar"
+        icon="pi pi-sign-in"
+        [loading]="carregando()"
+        [disabled]="carregando()"
+        styleClass="auth-submit repz-primary"
+      />
+    </form>
+  </p-card>
 </div>

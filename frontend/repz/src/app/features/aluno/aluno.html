@@ -1,1 +1,42 @@
-<p>aluno works!</p>
+<app-shell
+  ativo="dashboard"
+  [crumbs]="['Aluno', 'Dashboard']"
+  nome="Aluno"
+  subtitulo="Área do aluno"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-subtitle">Resumo rápido para continuar o treino sem perder contexto.</div>
+    </div>
+    <p-button
+      label="Ver treino"
+      icon="pi pi-list-check"
+      routerLink="/aluno/ficha-treino"
+      styleClass="repz-primary"
+    />
+  </div>
+
+  <div class="dash-grid">
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Próximo passo</div>
+      <h2>Ficha de treino</h2>
+      <p>Consulte divisões, exercícios, cargas e observações cadastradas pelo personal.</p>
+      <p-tag styleClass="repz-tag-success" value="Ativa" />
+    </p-card>
+
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Evolução</div>
+      <h2>Avaliação física</h2>
+      <p>Acompanhe peso, IMC e medidas com histórico organizado por data.</p>
+      <p-button
+        label="Abrir evolução"
+        icon="pi pi-chart-line"
+        routerLink="/aluno/evolucao"
+        severity="secondary"
+        [outlined]="true"
+        styleClass="repz-ghost"
+      />
+    </p-card>
+  </div>
+</app-shell>

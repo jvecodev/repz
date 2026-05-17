@@ -1,1 +1,33 @@
-<p>personal works!</p>
+<app-shell
+  ativo="dashboard"
+  [crumbs]="['Personal', 'Dashboard']"
+  nome="Personal"
+  subtitulo="Gestão de alunos"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dashboard do personal</div>
+      <div class="page-subtitle">
+        Visão inicial para acompanhar fichas, avaliações e alunos ativos.
+      </div>
+    </div>
+    <p-button label="Novo acompanhamento" icon="pi pi-user-plus" styleClass="repz-primary" />
+  </div>
+
+  <div class="dash-grid">
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Treinos</div>
+      <h2>Fichas dos alunos</h2>
+      <p>Revise as fichas ativas e mantenha cargas, divisões e observações alinhadas.</p>
+      <p-tag styleClass="repz-tag-muted" value="Em breve" />
+    </p-card>
+
+    <p-card styleClass="repz-card dash-card">
+      <div class="dash-kicker">Avaliações</div>
+      <h2>Evolução física</h2>
+      <p>Registre medidas e compare os pontos de evolução ao longo do tempo.</p>
+      <p-tag styleClass="repz-tag-success" value="Disponível por aluno" />
+    </p-card>
+  </div>
+</app-shell>

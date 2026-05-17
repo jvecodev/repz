@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { AvaliacaoFisicaResponse, DadoGrafico } from '@core/services';
-import {
-  formatarData,
-  mapearHistorico,
-  pontosGrafico,
-} from './avaliacao-fisica.mapper';
+import { AvaliacaoFisicaResponse } from '@core/services';
+import { formatarData, mapearHistorico } from './avaliacao-fisica.mapper';
 
 function av(p: Partial<AvaliacaoFisicaResponse>): AvaliacaoFisicaResponse {
   return {
@@ -28,7 +24,7 @@ describe('formatarData', () => {
 });
 
 describe('mapearHistorico', () => {
-  it('ordena do mais recente para o mais antigo (RF29)', () => {
+  it('ordena do mais recente para o mais antigo', () => {
     const out = mapearHistorico([
       av({ id: 1, dataAvaliacao: '01/02/2026 10:00:00', pesoKg: 80 }),
       av({ id: 2, dataAvaliacao: '01/04/2026 10:00:00', pesoKg: 78 }),
@@ -50,31 +46,5 @@ describe('mapearHistorico', () => {
   it('arredonda o IMC para 1 casa', () => {
     const out = mapearHistorico([av({ imc: 24.6789 })]);
     expect(out[0].imc).toBe(24.7);
-  });
-});
-
-describe('pontosGrafico', () => {
-  const dados: DadoGrafico[] = [
-    { data: '01/01/2026 10:00:00', peso: 80, imc: 26, percentualGordura: 20 },
-    { data: '01/02/2026 10:00:00', peso: 78, imc: 25, percentualGordura: 18 },
-    { data: '01/03/2026 10:00:00', peso: 76, imc: 24, percentualGordura: 16 },
-  ];
-
-  it('gera um ponto por avaliação com x distribuído de 0 a 100', () => {
-    const p = pontosGrafico(dados, 'peso');
-    expect(p).toHaveLength(3);
-    expect(p[0].x).toBe(0);
-    expect(p[2].x).toBe(100);
-  });
-
-  it('maior valor fica mais alto no SVG (y menor)', () => {
-    const p = pontosGrafico(dados, 'peso');
-    // peso 80 (maior) deve ter y menor que peso 76 (menor)
-    expect(p[0].y).toBeLessThan(p[2].y);
-  });
-
-  it('ignora métrica ausente e retorna [] se não houver dados', () => {
-    expect(pontosGrafico([{ data: 'x', peso: 1 }], 'gordura')).toEqual([]);
-    expect(pontosGrafico([], 'peso')).toEqual([]);
   });
 });

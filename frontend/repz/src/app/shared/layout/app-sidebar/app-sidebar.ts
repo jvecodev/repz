@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LayoutService } from '@core/services/layout';
+import { ButtonModule } from 'primeng/button';
 
 export interface NavItem {
   key: string;
@@ -19,7 +20,7 @@ const NAV: NavItem[] = [
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ButtonModule],
   templateUrl: './app-sidebar.html',
   styleUrl: './app-sidebar.scss',
   host: { '[class.is-collapsed]': 'layout.colapsada()' },
