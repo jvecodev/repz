@@ -1,11 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="utf-8">
-  <p-button label="PrimeNG funcionando 🚀"></p-button>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    (function () {
+      var saved = localStorage.getItem('repz-tema');
+      var tema = saved === 'light' || saved === 'dark'
+        ? saved
+        : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', tema);
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

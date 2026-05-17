@@ -17,3 +17,16 @@
     }
   }
 </div>
+
+<div class="topbar-actions">
+  <p-button
+    [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
+    severity="secondary"
+    [text]="true"
+    [rounded]="true"
+    styleClass="theme-btn repz-icon-button"
+    (onClick)="theme.toggleTema()"
+    [title]="theme.tema() === 'dark' ? 'Modo claro' : 'Modo escuro'"
+    [ariaLabel]="theme.tema() === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
+  />
+</div>

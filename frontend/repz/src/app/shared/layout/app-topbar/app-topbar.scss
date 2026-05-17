@@ -10,6 +10,27 @@
   position: sticky;
   top: 0;
   z-index: 20;
+  transition: var(--transition-tema);
+}
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:host ::ng-deep .theme-btn {
+  width: 38px;
+  height: 38px;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  background: var(--card);
+
+  &:hover {
+    background: var(--card-hover);
+    color: var(--text);
+  }
 }
 
 :host ::ng-deep .menu-btn {

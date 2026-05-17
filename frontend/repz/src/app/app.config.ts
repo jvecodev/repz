@@ -13,7 +13,12 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    providePrimeNG({ theme: { preset: Lara } }),
+    providePrimeNG({
+      theme: {
+        preset: Lara,
+        options: { darkModeSelector: '[data-theme="dark"]' },
+      },
+    }),
     provideHttpClient(withInterceptors([authInterceptor])),
   ],
 };
