@@ -40,7 +40,7 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": []
+              "allowedHosts": ["localhost", "127.0.0.1", "0.0.0.0", "repzfront"]
             },
             "ssr": {
               "entry": "src/server.ts"
@@ -72,6 +72,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": ["localhost", "127.0.0.1", "0.0.0.0", "repzfront"]
+          },
           "configurations": {
             "production": {
               "buildTarget": "repz:build:production"

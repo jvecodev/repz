@@ -53,5 +53,26 @@ export const routes: Routes = [
     canActivate: [personalGuard]
   },
 
+  {
+    path: 'aluno/evolucao',
+    loadComponent: () =>
+      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then(m => m.AvaliacaoFisica),
+    canActivate: [alunoGuard]
+  },
+
+  {
+    path: 'personal/aluno/:id/avaliacoes',
+    loadComponent: () =>
+      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then(m => m.AvaliacaoFisica),
+    canActivate: [personalGuard]
+  },
+
+  {
+    path: 'academia/aluno/:id/avaliacoes',
+    loadComponent: () =>
+      import('./features/aluno/avaliacao-fisica/avaliacao-fisica').then(m => m.AvaliacaoFisica),
+    canActivate: [academiaGuard]
+  },
+
   { path: '**', redirectTo: 'auth' }
 ];
