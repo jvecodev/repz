@@ -29,6 +29,7 @@ export interface FichaVM {
   validadeAte: string;
   ativa: boolean;
   personal: string;
+  personalId: number | null;
   observacoes: string;
   letras: string[];
   treinos: Record<string, DivisaoVM>;
@@ -102,6 +103,7 @@ export function mapearFichaAtiva(treinos: TreinoResponse[]): FichaVM | null {
     validadeAte: formatarData(primeiro.validadeAte),
     ativa: ordenados.some((t) => t.ativo),
     personal: primeiro.personalNome ?? '—',
+    personalId: primeiro.personalId ?? null,
     observacoes: primeiro.observacoes || 'Sem observações registradas.',
     letras,
     treinos: treinosMap,

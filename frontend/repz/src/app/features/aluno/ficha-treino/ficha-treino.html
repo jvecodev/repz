@@ -127,13 +127,26 @@
               <span class="text-3">Vence em</span><span>{{ f.validadeAte }}</span>
             </div>
           </div>
-          <p-button
-            label="Solicitar nova ficha"
-            icon="pi pi-envelope"
-            severity="secondary"
-            [outlined]="true"
-            styleClass="repz-ghost scard-btn"
-          />
+
+          <ng-container *ngIf="podesolicitar()">
+            <!-- Já tem solicitação pendente -->
+            <div class="sol-status" *ngIf="solicitacaoPendente()">
+              <i class="pi pi-clock"></i>
+              <div>
+                <div class="sol-status-label">Solicitação enviada</div>
+                <div class="sol-status-data">{{ solicitacaoPendente()!.criadaEm }}</div>
+              </div>
+            </div>
+
+            <!-- Pode solicitar -->
+            <p-button
+              *ngIf="!solicitacaoPendente()"
+              label="Solicitar nova ficha"
+              icon="pi pi-envelope"
+              styleClass="repz-ghost scard-btn"
+              (onClick)="abrirDialogSolicitacao()"
+            />
+          </ng-container>
         </p-card>
       </div>
     </div>
@@ -193,4 +206,60 @@
       </ng-template>
     </p-table>
   </p-card>
+<!-- Dialog: solicitar nova ficha -->
+<p-dialog
+  header="Solicitar nova ficha"
+  [visible]="dialogAberto()"
+  (visibleChange)="$event ? null : fecharDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="repz-dialog sol-dialog"
+  [style]="{ width: '420px' }"
+>
+  <div class="sol-form">
+    <p class="sol-intro">
+      Seu personal receberá uma notificação e poderá preparar uma nova ficha para você.
+    </p>
+
+    <label class="sol-field">
+      <span>Mensagem para o personal <em>(opcional)</em></span>
+      <textarea
+        pTextarea
+        rows="4"
+        [autoResize]="false"
+        placeholder="Ex: quero foco em hipertrofia de membros inferiores…"
+        [ngModel]="mensagemSolicitacao()"
+        (ngModelChange)="mensagemSolicitacao.set($event)"
+        maxlength="500"
+        class="sol-textarea"
+      ></textarea>
+      <span class="sol-counter">{{ mensagemSolicitacao().length }}/500</span>
+    </label>
+
+    <p-message
+      *ngIf="avisoSolicitacao()"
+      severity="error"
+      styleClass="aviso"
+      [text]="avisoSolicitacao()!"
+    />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      styleClass="repz-ghost"
+      (onClick)="fecharDialog()"
+      [disabled]="enviando()"
+    />
+    <p-button
+      label="Enviar solicitação"
+      icon="pi pi-send"
+      styleClass="repz-primary"
+      (onClick)="enviarSolicitacao()"
+      [loading]="enviando()"
+    />
+  </ng-template>
+</p-dialog>
 </app-shell>

@@ -12,8 +12,112 @@
         Visão inicial para acompanhar fichas, avaliações e alunos ativos.
       </div>
     </div>
-    <p-button label="Novo acompanhamento" icon="pi pi-user-plus" styleClass="repz-primary" />
   </div>
+
+  <!-- Solicitações pendentes de nova ficha -->
+  <p-card styleClass="repz-card sol-card">
+    <div class="sol-head">
+      <div>
+        <div class="font-semibold">Solicitações de nova ficha</div>
+        <div class="text-3 text-sm" *ngIf="!carregandoSol()">
+          {{ solicitacoes().length === 0 ? 'Nenhuma pendente' : solicitacoes().length + ' pendente(s)' }}
+        </div>
+      </div>
+      <p-tag
+        *ngIf="!carregandoSol() && solicitacoes().length > 0"
+        styleClass="repz-tag-success"
+        [value]="solicitacoes().length.toString()"
+      />
+    </div>
+
+    <!-- Skeleton enquanto carrega -->
+    <ng-container *ngIf="carregandoSol()">
+      <div class="sol-skeleton" *ngFor="let _ of [1,2]">
+        <p-skeleton width="60%" height="14px" />
+        <p-skeleton width="40%" height="12px" styleClass="mt-1" />
+      </div>
+    </ng-container>
+
+    <!-- Vazio -->
+    <div class="sol-empty text-3" *ngIf="!carregandoSol() && solicitacoes().length === 0">
+      <i class="pi pi-check-circle"></i>
+      <span>Todos os alunos estão com fichas em dia.</span>
+    </div>
+
+    <!-- Lista de solicitações -->
+    <div class="sol-list" *ngIf="!carregandoSol() && solicitacoes().length > 0">
+      <div *ngFor="let s of solicitacoes()" class="sol-item">
+        <div class="sol-item-row">
+          <div class="sol-aluno">
+            <div class="avatar avatar-sm">{{ s.alunoNome.charAt(0).toUpperCase() }}</div>
+            <div>
+              <div class="sol-aluno-nome">{{ s.alunoNome }}</div>
+              <div class="sol-data text-3">Solicitado em {{ s.criadaEm }}</div>
+            </div>
+          </div>
+          <div class="sol-actions" *ngIf="respondendoId() !== s.id">
+            <p-button
+              label="Responder"
+              icon="pi pi-reply"
+              size="small"
+              styleClass="repz-ghost"
+              (onClick)="abrirResposta(s.id)"
+            />
+          </div>
+        </div>
+
+        <!-- Mensagem do aluno -->
+        <div class="sol-msg" *ngIf="s.mensagem">
+          <i class="pi pi-comment"></i>
+          <span>{{ s.mensagem }}</span>
+        </div>
+
+        <!-- Área de resposta inline -->
+        <div class="sol-reply" *ngIf="respondendoId() === s.id">
+          <textarea
+            pTextarea
+            rows="3"
+            placeholder="Comentário opcional (ex: vou preparar até sexta-feira)…"
+            [ngModel]="respostaTexto()"
+            (ngModelChange)="respostaTexto.set($event)"
+            class="sol-reply-textarea"
+            [autoResize]="false"
+          ></textarea>
+          <p-message
+            *ngIf="avisoResposta()"
+            severity="error"
+            styleClass="w-full"
+            [text]="avisoResposta()!"
+          />
+          <div class="sol-reply-btns">
+            <p-button
+              label="Cancelar"
+              size="small"
+              styleClass="repz-ghost"
+              (onClick)="fecharResposta()"
+              [disabled]="salvandoResposta()"
+            />
+            <p-button
+              label="Rejeitar"
+              icon="pi pi-times"
+              size="small"
+              styleClass="repz-ghost sol-btn-rejeitar"
+              (onClick)="responder(s.id, 'REJEITADA')"
+              [loading]="salvandoResposta()"
+            />
+            <p-button
+              label="Aprovar"
+              icon="pi pi-check"
+              size="small"
+              styleClass="repz-primary"
+              (onClick)="responder(s.id, 'APROVADA')"
+              [loading]="salvandoResposta()"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-card>
 
   <div class="dash-grid">
     <p-card styleClass="repz-card dash-card">

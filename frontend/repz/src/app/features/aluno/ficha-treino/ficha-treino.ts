@@ -1,14 +1,19 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { FichaTreinoService } from '@core/services';
+import { catchError, forkJoin, of } from 'rxjs';
+import { AuthService, FichaTreinoService, SolicitacaoFichaService } from '@core/services';
+import type { SolicitacaoFichaResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { DialogModule } from 'primeng/dialog';
+import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TextareaModule } from 'primeng/textarea';
 import {
   DivisaoVM,
   FichaVM,
@@ -22,18 +27,24 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     AppShell,
     ButtonModule,
     CardModule,
+    DialogModule,
+    MessageModule,
     ProgressSpinnerModule,
     TableModule,
     TagModule,
+    TextareaModule,
   ],
   templateUrl: './ficha-treino.html',
   styleUrl: './ficha-treino.scss',
 })
 export class FichaTreino implements OnInit {
   private readonly service = inject(FichaTreinoService);
+  private readonly solicitacaoService = inject(SolicitacaoFichaService);
+  private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
   readonly ficha = signal<FichaVM | null>(null);
@@ -42,6 +53,13 @@ export class FichaTreino implements OnInit {
   readonly historicoAberto = signal(false);
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
+
+  // Solicitação de nova ficha
+  readonly dialogAberto = signal(false);
+  readonly mensagemSolicitacao = signal('');
+  readonly enviando = signal(false);
+  readonly solicitacaoPendente = signal<SolicitacaoFichaResponse | null>(null);
+  readonly avisoSolicitacao = signal<string | null>(null);
 
   readonly aluno = computed(() => this.ficha()?.alunoNome ?? 'Aluno');
   readonly alunoObjetivo = computed(() => this.ficha()?.objetivo || 'Treino');
@@ -56,8 +74,10 @@ export class FichaTreino implements OnInit {
     return f ? Object.values(f.treinos).reduce((acc, d) => acc + d.exercicios.length, 0) : 0;
   });
 
+  /** Apenas alunos logados (não personal visitando aluno) podem solicitar. */
+  readonly podesolicitar = computed(() => this.auth.getUserRole() === 'USUARIO');
+
   ngOnInit(): void {
-    // Na rota do personal, o aluno é definido pelo parâmetro da URL.
     const idParam = this.route.snapshot.paramMap.get('id');
     const alunoId = idParam ? Number(idParam) : null;
 
@@ -68,12 +88,18 @@ export class FichaTreino implements OnInit {
       ? this.service.obterHistoricoDoAluno(alunoId)
       : this.service.obterMeuHistorico();
 
-    forkJoin({ ativa: ativa$, historico: historico$ }).subscribe({
-      next: ({ ativa, historico }) => {
+    // Só busca solicitação pendente se for o próprio aluno logado
+    const pendente$ = !alunoId
+      ? this.solicitacaoService.pendente().pipe(catchError(() => of(null)))
+      : of(null);
+
+    forkJoin({ ativa: ativa$, historico: historico$, pendente: pendente$ }).subscribe({
+      next: ({ ativa, historico, pendente }) => {
         const ficha = mapearFichaAtiva(ativa);
         this.ficha.set(ficha);
         if (ficha) this.tabAtiva.set(ficha.letras[0]);
         this.historico.set(mapearHistorico(historico));
+        this.solicitacaoPendente.set(pendente);
         this.carregando.set(false);
       },
       error: (err) => {
@@ -93,5 +119,39 @@ export class FichaTreino implements OnInit {
 
   toggleHistorico(): void {
     this.historicoAberto.update((v) => !v);
+  }
+
+  abrirDialogSolicitacao(): void {
+    this.mensagemSolicitacao.set('');
+    this.avisoSolicitacao.set(null);
+    this.dialogAberto.set(true);
+  }
+
+  fecharDialog(): void {
+    this.dialogAberto.set(false);
+  }
+
+  enviarSolicitacao(): void {
+    if (this.enviando()) return;
+    this.avisoSolicitacao.set(null);
+    this.enviando.set(true);
+
+    this.solicitacaoService
+      .criar({
+        personalId: this.ficha()?.personalId ?? undefined,
+        mensagem: this.mensagemSolicitacao().trim() || undefined,
+      })
+      .subscribe({
+        next: (res) => {
+          this.enviando.set(false);
+          this.solicitacaoPendente.set(res);
+          this.dialogAberto.set(false);
+        },
+        error: (err) => {
+          this.enviando.set(false);
+          const msg = err?.error?.message ?? 'Não foi possível enviar a solicitação.';
+          this.avisoSolicitacao.set(msg);
+        },
+      });
   }
 }
