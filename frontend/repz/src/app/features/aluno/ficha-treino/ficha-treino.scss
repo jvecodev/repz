@@ -1,0 +1,327 @@
+@use "mixins" as *;
+
+// Estilos específicos da tela de ficha de treino.
+// Tokens, .card, .btn, .pill, .icon-btn, helpers e .page-* são globais (styles.scss).
+// Sidebar/topbar/shell estão em shared/layout.
+
+:host {
+  display: block;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+// ============================================================
+// Tabs (sublinhadas)
+// ============================================================
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover { color: var(--text-2); }
+
+  &.active {
+    color: var(--mint);
+    border-bottom-color: var(--mint);
+  }
+}
+
+// ============================================================
+// Layout da página
+// ============================================================
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+.list-card { padding: 16px; }
+
+.list-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px;
+  margin-bottom: 12px;
+
+  .pill { margin-left: auto; }
+}
+
+// ============================================================
+// Exercícios
+// ============================================================
+.ex-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ex-card {
+  background: var(--card-2);
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  overflow: hidden;
+  transition: border-color 0.15s;
+
+  &:hover { border-color: var(--border-strong); }
+}
+
+.ex-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+}
+
+.ex-idx {
+  color: var(--text-3);
+  font-family: var(--mono);
+  font-size: 11px;
+  width: 20px;
+  flex: 0 0 20px;
+}
+
+.thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  background: var(--mint-soft);
+  color: var(--mint);
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+
+  svg { width: 18px; height: 18px; }
+}
+
+.meta {
+  flex: 1;
+  min-width: 0;
+
+  .name { font-size: 14px; font-weight: 600; }
+  .sets {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 2px;
+
+    .grupo { color: var(--text-2); font-weight: 500; }
+  }
+}
+
+.carga {
+  text-align: right;
+  flex-shrink: 0;
+
+  &-val { font-size: 13px; font-weight: 600; }
+  &-lbl { font-size: 11px; color: var(--text-3); }
+}
+
+.ex-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 14px 13px 58px;
+  border-top: 1px solid var(--border);
+  background: rgba(52, 211, 153, 0.05);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-2);
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: var(--mint);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+// ============================================================
+// Cards laterais
+// ============================================================
+.side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.scard {
+  transition: border-color 0.15s;
+
+  &:hover { border-color: var(--border-strong); }
+}
+
+.scard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.scard-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.scard-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.scard-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-3);
+}
+
+.scard-rows {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+
+  &.mt { margin-top: 12px; }
+}
+
+.kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 0;
+
+  span:last-child { font-weight: 600; color: var(--text); }
+}
+
+.scard-obs {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-2);
+}
+
+.scard-btn {
+  margin-top: 14px;
+}
+
+// ============================================================
+// Histórico
+// ============================================================
+.historico {
+  margin-top: 16px;
+  padding: 16px 0 4px;
+}
+
+.hist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 20px 14px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    font-weight: 600;
+  }
+
+  td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: 0; }
+
+  tbody tr {
+    transition: background 0.15s;
+    &:hover { background: rgba(255, 255, 255, 0.025); }
+  }
+
+  .td-action { text-align: right; }
+  .td-action .btn { display: inline-flex; }
+}
+
+// ============================================================
+// Estados (loading / erro / vazio)
+// ============================================================
+.state-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-2);
+  font-size: 14px;
+
+  svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--text-3); }
+
+  &.state-error {
+    border-color: rgba(248, 113, 113, 0.3);
+    color: #f4b4b4;
+    svg { color: #f87171; }
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--mint);
+  border-radius: 50%;
+  animation: ft-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes ft-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ============================================================
+// Responsivo (conteúdo)
+// ============================================================
+@include tablet {
+  .layout { grid-template-columns: 1fr; }
+}
+
+@include small {
+  .ex-row { flex-wrap: wrap; }
+  .carga { margin-left: 58px; text-align: left; }
+}

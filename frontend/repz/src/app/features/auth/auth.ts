@@ -1,59 +1,62 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms'; 
-import { AuthService } from '../../core/services/auth';
+import { AuthService } from '@core/services/auth';
 
 @Component({
   selector: 'app-auth',
-  standalone: true, 
-  imports: [FormsModule], 
+  standalone: true,
+  imports: [FormsModule],
   templateUrl: './auth.html',
-  styleUrls: ['./auth.scss'],
+  styleUrl: './auth.scss',
 })
 export class Auth {
-  credenciais = {
-    email: '',
-    password: ''
-  };
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  readonly credenciais = { email: '', password: '' };
+  readonly carregando = signal(false);
+  readonly erro = signal<string | null>(null);
 
-  // realizarLogin() {
-  //   this.authService.login(this.credenciais).subscribe({
-  //     next: (response: any) => {
-  //       this.authService.saveToken(response.token);
-        
-  //       localStorage.setItem('USER_ROLE', response.role); 
+  realizarLogin(): void {
+    if (this.carregando()) return;
+    this.erro.set(null);
+    this.carregando.set(true);
 
-  //       //this.redirecionarPorPerfil(response.role);
-  //     },
-  //     error: (err) => {
-  //       console.error('Erro no login', err);
-  //       alert('Credenciais inválidas ou erro no servidor!');
-  //     }
-  //   });
-  // }
+    this.authService
+      .login(this.credenciais.email, this.credenciais.password)
+      .subscribe({
+        next: () => {
+          this.carregando.set(false);
+          this.redirecionarPorPerfil(this.authService.getUserRole());
+        },
+        error: (err) => {
+          this.carregando.set(false);
+          this.erro.set(
+            err?.status === 401 || err?.status === 400
+              ? 'E-mail ou senha inválidos.'
+              : 'Não foi possível entrar. Tente novamente.',
+          );
+        },
+      });
+  }
 
-  // redirecionarPorPerfil(role: string) {
-  //   switch(role) {
-  //     case 'ADMIN':
-  //       this.router.navigate(['/admin']);
-  //       break;
-  //     case 'ACADEMIA':
-  //       this.router.navigate(['/academia']);
-  //       break;
-  //     case 'PERSONAL':
-  //       this.router.navigate(['/personal']);
-  //       break;
-  //     case 'ALUNO':
-  //       this.router.navigate(['/aluno']);
-  //       break;
-  //     default:
-  //       // Se vier uma role desconhecida, fica no login
-  //       this.router.navigate(['/auth']); 
-  //   }
-  // }
+  private redirecionarPorPerfil(role: string | null): void {
+    switch (role) {
+      case 'ADMIN':
+        this.router.navigate(['/admin']);
+        break;
+      case 'ACADEMIA':
+        this.router.navigate(['/academia']);
+        break;
+      case 'PERSONAL':
+        this.router.navigate(['/personal']);
+        break;
+      case 'USUARIO':
+        this.router.navigate(['/aluno/ficha-treino']);
+        break;
+      default:
+        this.erro.set('Perfil de usuário desconhecido.');
+    }
+  }
 }

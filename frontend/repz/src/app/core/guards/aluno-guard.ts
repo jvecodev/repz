@@ -1,17 +1,6 @@
-import { CanActivateFn, Router } from '@angular/router';
-import { inject } from '@angular/core';
-import { AuthService } from '../services/auth';
+import { CanActivateFn } from '@angular/router';
+import { checarAcesso } from './role-redirect';
 
-export const alunoGuard: CanActivateFn = () => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
-
-  const userRole = authService.getUserRole();
-
-  if (userRole === 'ALUNO') {
-    return true;
-  }
-
-  router.navigate(['/auth']);
-  return false;
-};
+// USUARIO/ALUNO = dono da ficha; ADMIN tem visão geral.
+export const alunoGuard: CanActivateFn = () =>
+  checarAcesso(['USUARIO', 'ALUNO', 'ADMIN']);

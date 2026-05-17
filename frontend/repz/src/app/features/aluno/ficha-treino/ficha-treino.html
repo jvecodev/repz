@@ -1,0 +1,164 @@
+<app-shell
+  ativo="treino"
+  [crumbs]="['Aluno', 'Meu treino']"
+  [nome]="aluno()"
+  [subtitulo]="alunoObjetivo()"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Meu treino</div>
+      <div class="page-subtitle" *ngIf="ficha() as f">
+        Ficha criada por {{ f.personal }} · atualizada em {{ f.atualizadaEm }}
+      </div>
+    </div>
+    <button class="btn btn-ghost" (click)="toggleHistorico()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+      Fichas anteriores
+    </button>
+  </div>
+
+  <!-- ESTADO: carregando -->
+  <div class="card state-card" *ngIf="carregando()">
+    <div class="spinner"></div>
+    <span>Carregando sua ficha de treino…</span>
+  </div>
+
+  <!-- ESTADO: erro -->
+  <div class="card state-card state-error" *ngIf="!carregando() && erro()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 16.6-7.9-13.7a2 2 0 0 0-3.5 0L2.4 16.6A2 2 0 0 0 4.1 19.6h15.8a2 2 0 0 0 1.8-3z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+    <span>{{ erro() }}</span>
+  </div>
+
+  <!-- ESTADO: sem ficha ativa -->
+  <div class="card state-card" *ngIf="!carregando() && !erro() && !ficha()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+    <span>Você ainda não tem uma ficha de treino ativa.</span>
+  </div>
+
+  <ng-container *ngIf="!carregando() && !erro() && ficha() as f">
+    <!-- TABS A/B/C/D -->
+    <div class="tabs">
+      <div
+        *ngFor="let l of letras()"
+        class="tab"
+        [class.active]="tabAtiva() === l"
+        (click)="selecionarTab(l)"
+      >
+        Treino {{ l }} · {{ f.treinos[l]?.foco }}
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- LEFT: lista de exercícios -->
+      <div class="card list-card">
+        <div class="list-head" *ngIf="treinoAtual() as t">
+          <div class="font-semibold">{{ t.nome }}</div>
+          <div class="pill pill-muted">{{ t.exercicios.length }} exercícios</div>
+        </div>
+
+        <div class="ex-stack" *ngIf="treinoAtual() as t">
+          <div *ngFor="let ex of t.exercicios; let idx = index" class="ex-card">
+            <div class="ex-row">
+              <div class="ex-idx">{{ (idx + 1).toString().padStart(2, '0') }}</div>
+              <div class="thumb">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+              </div>
+              <div class="meta">
+                <div class="name">{{ ex.nome }}</div>
+                <div class="sets">
+                  <span class="grupo">{{ ex.grupo }}</span>
+                  · {{ ex.series }} séries × {{ ex.reps }} reps · descanso {{ ex.descanso }}
+                </div>
+              </div>
+              <div class="carga">
+                <div class="carga-val">{{ ex.carga }}</div>
+                <div class="carga-lbl">carga atual</div>
+              </div>
+            </div>
+            <div *ngIf="ex.obs" class="ex-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <span>{{ ex.obs }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: side cards (simples) -->
+      <div class="side-stack">
+        <div class="card scard">
+          <div class="scard-top">
+            <span class="scard-label">Ficha de treino</span>
+            <span class="pill pill-success" *ngIf="f.ativa">
+              <span class="dot"></span> Ativa
+            </span>
+          </div>
+          <div class="scard-name">{{ f.nome }}</div>
+          <p class="scard-desc" *ngIf="f.objetivo">{{ f.objetivo }}</p>
+          <div class="scard-rows">
+            <div class="kv"><span class="text-3">Treinos</span><span>{{ letras().length }} divisões</span></div>
+            <div class="kv"><span class="text-3">Exercícios</span><span>{{ totalExercicios() }}</span></div>
+            <div class="kv"><span class="text-3">Personal</span><span>{{ f.personal }}</span></div>
+          </div>
+        </div>
+
+        <div class="card scard">
+          <span class="scard-label">Observações do personal</span>
+          <p class="scard-obs">{{ f.observacoes }}</p>
+        </div>
+
+        <div class="card scard">
+          <span class="scard-label">Validade da ficha</span>
+          <div class="scard-rows mt">
+            <div class="kv"><span class="text-3">Iniciada em</span><span>{{ f.criadaEm }}</span></div>
+            <div class="kv"><span class="text-3">Vence em</span><span>{{ f.validadeAte }}</span></div>
+          </div>
+          <button class="btn btn-ghost btn-sm w-full scard-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+            Solicitar nova ficha
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- HISTÓRICO -->
+  <div class="card historico" *ngIf="historicoAberto()">
+    <div class="hist-head">
+      <div>
+        <div class="font-semibold">Fichas anteriores</div>
+        <div class="text-3 text-sm">{{ historico().length }} ficha(s) encerrada(s)</div>
+      </div>
+      <button class="icon-btn" (click)="toggleHistorico()" title="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="text-3 text-sm" style="padding: 0 20px 16px" *ngIf="historico().length === 0">
+      Nenhuma ficha anterior registrada.
+    </div>
+    <table class="table" *ngIf="historico().length > 0">
+      <thead>
+        <tr>
+          <th>Ficha</th>
+          <th>Objetivo</th>
+          <th>Período</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of historico()">
+          <td><strong>{{ h.nome }}</strong></td>
+          <td class="text-2">{{ h.objetivo }}</td>
+          <td class="text-3">
+            {{ h.criadaEm }} — {{ h.encerradaEm }}
+          </td>
+          <td class="td-action">
+            <button class="btn btn-ghost btn-sm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Ver
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</app-shell>

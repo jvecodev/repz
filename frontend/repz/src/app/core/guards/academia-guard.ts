@@ -1,19 +1,5 @@
-import { CanActivateFn, Router} from '@angular/router';
-import { inject } from '@angular/core';
-import { AuthService } from '../services/auth';
+import { CanActivateFn } from '@angular/router';
+import { checarAcesso } from './role-redirect';
 
-
-export const academiaGuard: CanActivateFn = () => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
-
-  const userRole = authService.getUserRole();
-
-  if (userRole === 'ACADEMIA') {
-    return true;
-  }
-
-  router.navigate(['/auth']);
-  return false;
-
-};
+export const academiaGuard: CanActivateFn = () =>
+  checarAcesso(['ACADEMIA', 'ADMIN']);

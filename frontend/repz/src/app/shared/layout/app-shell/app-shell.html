@@ -1,0 +1,27 @@
+<div class="app-shell" [class.collapsed]="layout.colapsada()">
+  <app-sidebar
+    [nome]="nome()"
+    [subtitulo]="subtitulo()"
+    [ativo]="ativo()"
+    [ctaTitulo]="ctaTitulo()"
+    [ctaDescricao]="ctaDescricao()"
+    [ctaLabel]="ctaLabel()"
+    [mostrarCta]="mostrarCta()"
+    (ctaClick)="ctaClick.emit()"
+  ></app-sidebar>
+
+  <div
+    class="scrim"
+    [class.show]="!layout.colapsada()"
+    (click)="layout.recolher()"
+  ></div>
+
+  <div class="shell-body">
+    <app-topbar [crumbs]="crumbs()"></app-topbar>
+    <main class="main">
+      <div class="page-enter">
+        <ng-content></ng-content>
+      </div>
+    </main>
+  </div>
+</div>
