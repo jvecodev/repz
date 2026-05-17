@@ -8,7 +8,6 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
-import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import {
   DivisaoVM,
@@ -28,7 +27,6 @@ import {
     CardModule,
     ProgressSpinnerModule,
     TableModule,
-    TabsModule,
     TagModule,
   ],
   templateUrl: './ficha-treino.html',

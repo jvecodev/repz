@@ -37,26 +37,33 @@
   </p-card>
 
   <ng-container *ngIf="!carregando() && !erro() && ficha() as f">
-    <p-tabs
-      [value]="tabAtiva()"
-      (valueChange)="selecionarTab($any($event))"
-      [scrollable]="true"
-      styleClass="repz-tabs"
-    >
-      <p-tablist>
-        <p-tab *ngFor="let l of letras()" [value]="l">
-          Treino {{ l }} · {{ f.treinos[l]?.foco }}
-        </p-tab>
-      </p-tablist>
-    </p-tabs>
-
     <div class="layout">
       <p-card styleClass="repz-card list-card">
-        <div class="list-head" *ngIf="treinoAtual() as t">
-          <div class="font-semibold">{{ t.nome }}</div>
-          <p-tag styleClass="repz-tag-muted" [value]="t.exercicios.length + ' exercícios'" />
+
+        <!-- Cabeçalho com navegação de treinos -->
+        <div class="card-tabs-row">
+          <div class="tab-group">
+            <button
+              *ngFor="let l of letras()"
+              class="tab-pill"
+              [class.active]="tabAtiva() === l"
+              (click)="selecionarTab(l)"
+              type="button"
+            >
+              <span class="tab-letra">{{ l }}</span>
+              <span class="tab-foco" *ngIf="f.treinos[l]?.foco">{{ f.treinos[l]?.foco }}</span>
+            </button>
+          </div>
+          <p-tag
+            *ngIf="treinoAtual() as t"
+            styleClass="repz-tag-muted"
+            [value]="t.exercicios.length + ' exercícios'"
+          />
         </div>
 
+        <div class="list-divider"></div>
+
+        <!-- Lista de exercícios -->
         <div class="ex-stack" *ngIf="treinoAtual() as t">
           <div *ngFor="let ex of t.exercicios; let idx = index" class="ex-card">
             <div class="ex-row">
@@ -105,7 +112,7 @@
           </div>
         </p-card>
 
-        <p-card styleClass="repz-card scard">
+        <p-card styleClass="repz-card scard" *ngIf="f.observacoes">
           <span class="scard-label">Observações do personal</span>
           <p class="scard-obs">{{ f.observacoes }}</p>
         </p-card>
