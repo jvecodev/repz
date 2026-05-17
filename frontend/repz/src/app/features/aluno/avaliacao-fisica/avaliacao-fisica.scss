@@ -1,0 +1,358 @@
+@use "mixins" as *;
+
+:host { display: block; }
+
+svg { width: 100%; height: 100%; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.col-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ---- gráfico ----
+.chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric-switch {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.seg {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover { color: var(--text-2); }
+  &.active { background: var(--mint); color: #0b2018; }
+}
+
+.chart-box {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// Wrapper relativo para SVG (linha) + dots HTML (círculos)
+.chart-inner {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.chart-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 100% 25%;
+  border-radius: var(--r-sm);
+
+  .chart-line {
+    fill: none;
+    stroke: var(--mint);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+}
+
+// Dot: div HTML → sempre circular independente do aspect ratio do container
+.chart-dot-el {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mint);
+  border: 2px solid var(--bg);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 0.12s, box-shadow 0.12s;
+
+  &:hover,
+  &.active {
+    transform: translate(-50%, -50%) scale(1.5);
+    box-shadow: 0 0 0 4px var(--mint-soft);
+  }
+}
+
+// Tooltip que aparece acima do dot
+.dot-tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #12151b;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+
+  // seta
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--border-strong);
+  }
+
+  .tt-label {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 2px;
+  }
+
+  .tt-valor {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  // perto da borda direita → tooltip vai para a esquerda
+  &.flip-left {
+    left: auto;
+    right: 50%;
+    transform: translateX(50%);
+
+    &::after {
+      left: auto;
+      right: 0;
+      transform: translateX(-8px);
+    }
+  }
+
+  // perto do topo → tooltip vai para baixo
+  &.flip-down {
+    bottom: auto;
+    top: calc(100% + 10px);
+
+    &::after {
+      top: auto;
+      bottom: 100%;
+      border-top-color: transparent;
+      border-bottom-color: var(--border-strong);
+    }
+  }
+}
+
+.chart-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.chart-empty {
+  height: 120px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 13px;
+}
+
+// ---- histórico ----
+.hist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 20px 14px;
+}
+
+.table-wrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 640px;
+
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: 0; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: rgba(255, 255, 255, 0.025); }
+}
+
+.hist-personal { font-weight: 400; }
+
+.delta {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+
+  &.up { color: #f4b4b4; background: rgba(248, 113, 113, 0.14); }
+  &.down { color: var(--mint); background: var(--mint-soft); }
+}
+
+// ---- formulário ----
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scard-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  span {
+    font-size: 12px;
+    color: var(--text-2);
+    font-weight: 500;
+  }
+
+  input {
+    background: var(--bg-elev);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    padding: 9px 11px;
+    font: inherit;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:focus {
+      border-color: var(--mint);
+      box-shadow: 0 0 0 3px var(--mint-soft);
+    }
+  }
+}
+
+.imc-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--mint-soft);
+  border-radius: var(--r-sm);
+  font-size: 13px;
+
+  strong { font-size: 18px; color: var(--mint); }
+}
+
+.aviso {
+  font-size: 12.5px;
+  color: var(--text-2);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  padding: 9px 12px;
+}
+
+// ---- estados ----
+.state-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-2);
+  font-size: 14px;
+
+  svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--text-3); }
+
+  &.state-error {
+    border-color: rgba(248, 113, 113, 0.3);
+    color: #f4b4b4;
+    svg { color: #f87171; }
+  }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--mint);
+  border-radius: 50%;
+  animation: af-spin 0.8s linear infinite;
+  flex-shrink: 0;
+
+  &.spinner-dark {
+    width: 14px;
+    height: 14px;
+    border-color: rgba(0, 0, 0, 0.25);
+    border-top-color: #0b2018;
+  }
+}
+
+@keyframes af-spin {
+  to { transform: rotate(360deg); }
+}
+
+@include tablet {
+  .layout { grid-template-columns: 1fr; }
+  .col-side { order: -1; }
+}
+
+@include small {
+  .grid2 { grid-template-columns: 1fr; }
+}

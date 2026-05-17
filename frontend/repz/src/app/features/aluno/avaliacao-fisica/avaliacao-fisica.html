@@ -1,0 +1,199 @@
+<app-shell
+  ativo="evolucao"
+  [crumbs]="['Aluno', 'Evolução']"
+  [nome]="alunoNome()"
+  subtitulo="Avaliação física"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Avaliação física</div>
+      <div class="page-subtitle">
+        Acompanhe a evolução de {{ alunoNome() }} ao longo do tempo.
+      </div>
+    </div>
+  </div>
+
+  <!-- estados -->
+  <div class="card state-card" *ngIf="carregando()">
+    <div class="spinner"></div>
+    <span>Carregando avaliações…</span>
+  </div>
+
+  <div class="card state-card state-error" *ngIf="!carregando() && erro()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 16.6-7.9-13.7a2 2 0 0 0-3.5 0L2.4 16.6A2 2 0 0 0 4.1 19.6h15.8a2 2 0 0 0 1.8-3z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+    <span>{{ erro() }}</span>
+  </div>
+
+  <ng-container *ngIf="!carregando() && !erro()">
+    <div class="layout">
+      <!-- ESQUERDA: gráfico + histórico -->
+      <div class="col-main">
+        <!-- GRÁFICO (RF30) -->
+        <div class="card chart-card">
+          <div class="chart-head">
+            <div class="font-semibold">Evolução</div>
+            <div class="metric-switch">
+              <button
+                *ngFor="let m of ['peso','imc','gordura']"
+                class="seg"
+                [class.active]="metrica() === m"
+                (click)="selecionarMetrica($any(m))"
+              >
+                {{ m === 'peso' ? 'Peso' : m === 'imc' ? 'IMC' : '% Gordura' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="chart-box" *ngIf="pontos().length > 1; else semGrafico">
+            <!-- área do gráfico: SVG (linha) + dots HTML (sempre circulares) -->
+            <div class="chart-inner">
+              <!-- linha: SVG com preserveAspectRatio="none" para preencher a área -->
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+                <polyline
+                  class="chart-line"
+                  [attr.points]="polyline()"
+                  vector-effect="non-scaling-stroke"
+                />
+              </svg>
+
+              <!-- dots: divs HTML — always circular, suportam hover/tooltip -->
+              <div
+                *ngFor="let p of pontos()"
+                class="chart-dot-el"
+                [class.active]="tooltipPonto()?.x === p.x && tooltipPonto()?.y === p.y"
+                [style.left.%]="p.x"
+                [style.top.%]="p.y"
+                (mouseenter)="mostrarTooltip(p)"
+                (mouseleave)="ocultarTooltip()"
+              >
+                <div
+                  class="dot-tip"
+                  [class.flip-left]="p.x > 70"
+                  [class.flip-down]="p.y < 20"
+                  *ngIf="tooltipPonto()?.x === p.x && tooltipPonto()?.y === p.y"
+                >
+                  <div class="tt-label">{{ p.rotulo }}</div>
+                  <div class="tt-valor">{{ formatarValorTooltip(p.valor) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-axis">
+              <span>{{ pontos()[0].rotulo }}</span>
+              <span>{{ pontos()[pontos().length - 1].rotulo }}</span>
+            </div>
+          </div>
+          <ng-template #semGrafico>
+            <div class="chart-empty text-3">
+              São necessárias ao menos 2 avaliações para comparar a evolução.
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- HISTÓRICO (RF29) -->
+        <div class="card historico">
+          <div class="hist-head">
+            <div class="font-semibold">Histórico de avaliações</div>
+            <div class="text-3 text-sm">{{ historico().length }} registro(s)</div>
+          </div>
+
+          <div class="text-3 text-sm" style="padding: 0 20px 16px" *ngIf="historico().length === 0">
+            Nenhuma avaliação registrada ainda.
+          </div>
+
+          <div class="table-wrap" *ngIf="historico().length > 0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Peso</th>
+                  <th>IMC</th>
+                  <th>% Gord.</th>
+                  <th>Cintura</th>
+                  <th>Quadril</th>
+                  <th>Braço</th>
+                  <th>Coxa</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let a of historico()">
+                  <td>
+                    <strong>{{ a.data }}</strong>
+                    <span class="hist-personal text-3" *ngIf="a.personal"> · {{ a.personal }}</span>
+                  </td>
+                  <td>
+                    {{ a.peso != null ? a.peso + ' kg' : '—' }}
+                    <span
+                      *ngIf="a.deltaPeso != null && a.deltaPeso !== 0"
+                      class="delta"
+                      [class.up]="a.deltaPeso > 0"
+                      [class.down]="a.deltaPeso < 0"
+                    >
+                      {{ a.deltaPeso > 0 ? '+' : '' }}{{ a.deltaPeso }}
+                    </span>
+                  </td>
+                  <td>{{ a.imc ?? '—' }}</td>
+                  <td>{{ a.gordura != null ? a.gordura + '%' : '—' }}</td>
+                  <td>{{ a.cintura != null ? a.cintura + ' cm' : '—' }}</td>
+                  <td>{{ a.quadril != null ? a.quadril + ' cm' : '—' }}</td>
+                  <td>{{ a.braco != null ? a.braco + ' cm' : '—' }}</td>
+                  <td>{{ a.coxa != null ? a.coxa + ' cm' : '—' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIREITA: formulário (só PERSONAL — RF27) -->
+      <div class="col-side" *ngIf="podeRegistrar()">
+        <form class="card form-card" (ngSubmit)="salvar()">
+          <div class="scard-label">Nova avaliação</div>
+
+          <div class="grid2">
+            <label class="field">
+              <span>Peso (kg) *</span>
+              <input type="number" step="0.1" name="peso" [(ngModel)]="form.pesoKg" required />
+            </label>
+            <label class="field">
+              <span>Altura (cm) *</span>
+              <input type="number" step="0.1" name="altura" [(ngModel)]="form.alturaCm" required />
+            </label>
+            <label class="field">
+              <span>% Gordura</span>
+              <input type="number" step="0.1" name="gordura" [(ngModel)]="form.percentualGordura" />
+            </label>
+            <label class="field">
+              <span>Cintura (cm)</span>
+              <input type="number" step="0.1" name="cintura" [(ngModel)]="form.cinturaCm" />
+            </label>
+            <label class="field">
+              <span>Quadril (cm)</span>
+              <input type="number" step="0.1" name="quadril" [(ngModel)]="form.quadrilCm" />
+            </label>
+            <label class="field">
+              <span>Braço (cm)</span>
+              <input type="number" step="0.1" name="braco" [(ngModel)]="form.bracoCm" />
+            </label>
+            <label class="field">
+              <span>Coxa (cm)</span>
+              <input type="number" step="0.1" name="coxa" [(ngModel)]="form.coxaCm" />
+            </label>
+          </div>
+
+          <div class="imc-box">
+            <span class="text-3">IMC calculado</span>
+            <strong>{{ imcPreview() ?? '—' }}</strong>
+          </div>
+
+          <div class="aviso" *ngIf="aviso()">{{ aviso() }}</div>
+
+          <button type="submit" class="btn btn-primary w-full" [disabled]="salvando()">
+            <span class="spinner spinner-dark" *ngIf="salvando()"></span>
+            {{ salvando() ? 'Salvando…' : 'Registrar avaliação' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </ng-container>
+</app-shell>
