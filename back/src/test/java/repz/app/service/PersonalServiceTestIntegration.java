@@ -35,7 +35,7 @@ class PersonalServiceTestIntegration extends ServiceIntegrationSupport {
     @Test
     void adminCriaEListaPersonalComFiltroDeAcademia() {
         var admin = criarUsuario(UserRole.ADMIN, "admin-personal");
-        var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-personal");
+        var academiaUser = criarUsuario(UserRole.GERENTE, "academia-personal");
         var academia = criarAcademia(academiaUser, "personal");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-novo");
 
@@ -53,8 +53,8 @@ class PersonalServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void academiaCriaSomenteNaPropriaUnidade() {
-        var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-dona");
-        var outraAcademiaUser = criarUsuario(UserRole.ACADEMIA, "academia-outra");
+        var academiaUser = criarUsuario(UserRole.GERENTE, "academia-dona");
+        var outraAcademiaUser = criarUsuario(UserRole.GERENTE, "academia-outra");
         var academia = criarAcademia(academiaUser, "dona");
         var outraAcademia = criarAcademia(outraAcademiaUser, "outra");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-bloqueado");
@@ -92,11 +92,11 @@ class PersonalServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void personalConsultaEAtualizaMeuPerfilEListaAlunos() {
-        var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-perfil");
+        var academiaUser = criarUsuario(UserRole.GERENTE, "academia-perfil");
         var academia = criarAcademia(academiaUser, "perfil");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-perfil");
         var personal = criarPersonal(personalUser, academia);
-        var alunoUser = criarUsuario(UserRole.USUARIO, "aluno-perfil");
+        var alunoUser = criarUsuario(UserRole.ALUNO, "aluno-perfil");
         var plano = Plano.builder()
                 .nome("Mensal")
                 .duracaoDias(30)

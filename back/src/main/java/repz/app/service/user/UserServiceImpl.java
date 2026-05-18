@@ -1,22 +1,24 @@
 package repz.app.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
-import repz.app.dto.auth.RegistrationDTO;
+import repz.app.dto.request.AdminCreateRequest;
+import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
 import repz.app.dto.response.UserGetResponse;
 import repz.app.message.Mensagens;
-import repz.app.persistence.entity.User;
-import repz.app.persistence.entity.UserRole;
+import repz.app.persistence.entity.*;
 import repz.app.persistence.mapper.UserMapper;
-import repz.app.persistence.repository.UserRepository;
+import repz.app.persistence.repository.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +27,10 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final AcademiaRepository academiaRepository;
+    private final PlanoRepository planoRepository;
+    private final PersonalRepository personalRepository;
+    private final AlunoRepository alunoRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final Mensagens mensagens;
@@ -41,10 +47,8 @@ public class UserServiceImpl implements UserService {
     public UserGetResponse findById(Integer id) {
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 mensagens.get("usuario.nao.encontrado")));
-
         return userMapper.toResponse(user);
     }
 
@@ -57,56 +61,82 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void criar(RegistrationDTO dto, Authentication authentication) {
+    @Transactional
+    public void criarUsuario(UserCreateRequest dto, Authentication auth) {
+
+        if (dto.role() == UserRole.ADMIN) {
+            throw new AccessDeniedException(mensagens.get("usuario.criacao.role.negada", dto.role()));
+        }
 
         if (userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     mensagens.get("usuario.email.ja.cadastrado"));
         }
 
-        UserRole role = resolveRoleForCreation(dto.role(), authentication);
+        Academia academia = academiaRepository.findById(dto.academiaId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        mensagens.get("academia.nao.encontrada")));
 
         User user = new User();
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setPassword(passwordEncoder.encode(dto.password()));
-        user.setRole(role);
+        user.setRole(dto.role());
         user.setActive(true);
+        user = userRepository.save(user);
 
-        userRepository.save(user);
+        switch (dto.role()) {
+            case ALUNO -> {
+                if (dto.planoId() == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            mensagens.get("usuario.criacao.aluno.plano.obrigatorio"));
+                }
+                Plano plano = planoRepository.findByIdAndAcademiaId(dto.planoId(), dto.academiaId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                mensagens.get("plano.nao.encontrado")));
+                if (alunoRepository.existsByUsuarioIdAndAcademiaId(user.getId(), dto.academiaId())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            mensagens.get("aluno.ja.matriculado"));
+                }
+                Aluno aluno = new Aluno();
+                aluno.setUsuario(user);
+                aluno.setAcademia(academia);
+                aluno.setPlano(plano);
+                aluno.setDataInicio(LocalDate.now());
+                aluno.setAtivo(true);
+                alunoRepository.save(aluno);
+            }
+            case PERSONAL -> {
+                Personal personal = new Personal();
+                personal.setUser(user);
+                personal.setAcademia(academia);
+                personal.setAtivo(true);
+                personalRepository.save(personal);
+            }
+            case GERENTE -> {
+                academia.setResponsibleUser(user);
+                academiaRepository.save(academia);
+            }
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    mensagens.get("usuario.criacao.role.invalida"));
+        }
     }
 
-    private UserRole resolveRoleForCreation(UserRole requestedRole, Authentication authentication) {
-        UserRole role = requestedRole != null ? requestedRole : UserRole.USUARIO;
+    @Override
+    public void criarAdmin(AdminCreateRequest dto) {
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
-            if (role == UserRole.USUARIO) {
-                return UserRole.USUARIO;
-            }
-            throw new AccessDeniedException(mensagens.get("usuario.criacao.autenticado.obrigatorio", role));
+        if (userRepository.findByEmail(dto.email()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    mensagens.get("usuario.email.ja.cadastrado"));
         }
 
-        UserRole currentRole = currentUser.getRole();
-        if (currentRole == UserRole.ADMIN) {
-            return role;
-        }
-
-        if (currentRole == UserRole.USUARIO && role == UserRole.USUARIO) {
-            return UserRole.USUARIO;
-        }
-
-        if (currentRole == UserRole.ACADEMIA
-                && (role == UserRole.PERSONAL || role == UserRole.USUARIO)) {
-            return role;
-        }
-
-        // Personal não pode criar outros usuários
-        if (currentRole == UserRole.PERSONAL && role == UserRole.USUARIO) {
-            throw new AccessDeniedException(mensagens.get("usuario.criacao.role.negada", role));
-        }
-
-        throw new AccessDeniedException(mensagens.get("usuario.criacao.role.negada", role));
+        User user = new User();
+        user.setName(dto.name());
+        user.setEmail(dto.email());
+        user.setPassword(passwordEncoder.encode(dto.password()));
+        user.setRole(UserRole.ADMIN);
+        user.setActive(true);
+        userRepository.save(user);
     }
 
     @Override
@@ -114,12 +144,9 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 mensagens.get("usuario.nao.encontrado")));
-
         user.setName(dto.name());
-
         userRepository.save(user);
     }
 
@@ -128,13 +155,10 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 mensagens.get("usuario.nao.encontrado")));
-
         user.setActive(false);
         user.setDeletedAt(LocalDateTime.now());
-
         userRepository.save(user);
     }
 
@@ -143,13 +167,10 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 mensagens.get("usuario.nao.encontrado")));
-
         user.setActive(true);
         user.setDeletedAt(null);
-
         userRepository.save(user);
     }
 }

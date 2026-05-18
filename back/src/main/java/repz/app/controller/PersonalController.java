@@ -7,43 +7,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import repz.app.dto.request.PersonalCreateRequest;
 import repz.app.dto.request.PersonalUpdateRequest;
 import repz.app.dto.response.PersonalAlunosResponse;
 import repz.app.dto.response.PersonalResponse;
 
 import java.util.List;
 
-@Tag(name = "Personais", description = "Cadastro e gestão de personais")
+@Tag(name = "Personais", description = "Gestão de personais")
 @SecurityRequirement(name = "bearer-jwt")
 @RequestMapping("/api/personais")
 public interface PersonalController {
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Criar personal", description = "Cadastra um personal vinculado a uma academia.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Personal criado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
-    })
-    PersonalResponse criar(
-            @Valid @RequestBody PersonalCreateRequest request,
-            @Parameter(description = "ID da academia no contexto da requisição", example = "1")
-            @RequestHeader(value = "X-Academia-Id", required = false) Long academiaId,
-            @Parameter(hidden = true) Authentication auth);
 
     @GetMapping
     @Operation(summary = "Listar personais", description = "Lista os personais disponíveis para o perfil autenticado.")

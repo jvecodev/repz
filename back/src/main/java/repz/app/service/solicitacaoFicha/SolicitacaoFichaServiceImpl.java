@@ -34,7 +34,7 @@ public class SolicitacaoFichaServiceImpl implements SolicitacaoFichaService {
         User aluno = userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
 
-        if (aluno.getRole() != UserRole.USUARIO) {
+        if (aluno.getRole() != UserRole.ALUNO) {
             throw new RuntimeException(mensagens.get("solicitacao.apenas.aluno.cria"));
         }
 

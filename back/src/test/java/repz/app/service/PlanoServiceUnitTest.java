@@ -55,7 +55,7 @@ class PlanoServiceUnitTest {
 
     @Test
     void criarPlanoSempreVinculaNaAcademiaLogada() {
-        User academiaUser = user(1L, UserRole.ACADEMIA);
+        User academiaUser = user(1L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         var auth = auth(academiaUser);
         when(academiaContextService.resolveRequired(auth, null)).thenReturn(academia.getId());
@@ -71,7 +71,7 @@ class PlanoServiceUnitTest {
 
     @Test
     void atualizarPlanoRespeitaEscopoDaAcademiaLogada() {
-        User academiaUser = user(1L, UserRole.ACADEMIA);
+        User academiaUser = user(1L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         Plano plano = Plano.builder()
                 .id(5)

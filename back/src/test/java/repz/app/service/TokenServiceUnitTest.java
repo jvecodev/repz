@@ -40,7 +40,7 @@ class TokenServiceUnitTest {
 
     @Test
     void geraEValidaRefreshTokenSeparadoDoAccessToken() {
-        User user = user(2L, UserRole.USUARIO);
+        User user = user(2L, UserRole.ALUNO);
 
         String token = tokenService.generateRefreshToken(user);
 

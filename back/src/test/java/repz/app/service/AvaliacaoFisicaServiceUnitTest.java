@@ -56,12 +56,12 @@ class AvaliacaoFisicaServiceUnitTest {
 
     @Test
     void personalCriaAvaliacaoCalculandoImc() {
-        User academiaUser = user(1L, UserRole.ACADEMIA);
+        User academiaUser = user(1L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         User personalUser = user(2L, UserRole.PERSONAL);
         Personal personal = personal(20L, personalUser, academia);
-        User aluno = user(3L, UserRole.USUARIO);
-        AvaliacaoFisicaCreateRequest request = new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, 18.0, "Cintura: 82cm", null, null, null, null);
+        User aluno = user(3L, UserRole.ALUNO);
+        AvaliacaoFisicaCreateRequest request = new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, null, null, null, null, null, null);
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findAll()).thenReturn(List.of(personal));
@@ -86,7 +86,7 @@ class AvaliacaoFisicaServiceUnitTest {
 
     @Test
     void usuarioNaoPodeCriarAvaliacaoFisica() {
-        User aluno = user(3L, UserRole.USUARIO);
+        User aluno = user(3L, UserRole.ALUNO);
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
 
         assertThrows(RuntimeException.class, () ->
@@ -95,7 +95,7 @@ class AvaliacaoFisicaServiceUnitTest {
 
     @Test
     void usuarioVisualizaSomenteAvaliacoesProprias() {
-        User aluno = user(3L, UserRole.USUARIO);
+        User aluno = user(3L, UserRole.ALUNO);
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
 
         assertThrows(RuntimeException.class, () -> service.findAll(99L, auth(aluno.getEmail())));
@@ -103,8 +103,8 @@ class AvaliacaoFisicaServiceUnitTest {
 
     @Test
     void graficoRetornaEvolucaoDoAluno() {
-        User aluno = user(3L, UserRole.USUARIO);
-        User academiaUser = user(1L, UserRole.ACADEMIA);
+        User aluno = user(3L, UserRole.ALUNO);
+        User academiaUser = user(1L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         User personalUser = user(2L, UserRole.PERSONAL);
         Personal personal = personal(20L, personalUser, academia);
@@ -123,10 +123,10 @@ class AvaliacaoFisicaServiceUnitTest {
 
     @Test
     void academiaListaAvaliacoesDaPropriaUnidade() {
-        User academiaUser = user(1L, UserRole.ACADEMIA);
+        User academiaUser = user(1L, UserRole.GERENTE);
         Academia academia = academia(10L, academiaUser);
         User personalUser = user(2L, UserRole.PERSONAL);
-        User aluno = user(3L, UserRole.USUARIO);
+        User aluno = user(3L, UserRole.ALUNO);
         Personal personal = personal(20L, personalUser, academia);
 
         when(userRepository.findByEmail(academiaUser.getEmail())).thenReturn(Optional.of(academiaUser));

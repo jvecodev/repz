@@ -27,9 +27,9 @@ class FrequenciaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void usuarioRegistraCheckinApenasParaSiMesmo() {
-        var academia = criarAcademia(criarUsuario(UserRole.ACADEMIA, "academia-checkin"), "checkin");
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-checkin");
-        var outroAluno = criarUsuario(UserRole.USUARIO, "outro-aluno-checkin");
+        var academia = criarAcademia(criarUsuario(UserRole.GERENTE, "academia-checkin"), "checkin");
+        var aluno = criarUsuario(UserRole.ALUNO, "aluno-checkin");
+        var outroAluno = criarUsuario(UserRole.ALUNO, "outro-aluno-checkin");
         var dataHora = LocalDateTime.now().minusHours(1);
 
         var response = frequenciaService.criar(
@@ -49,10 +49,10 @@ class FrequenciaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void personalRegistraCheckinParaAluno() {
-        var academia = criarAcademia(criarUsuario(UserRole.ACADEMIA, "academia-personal-checkin"), "personal-checkin");
+        var academia = criarAcademia(criarUsuario(UserRole.GERENTE, "academia-personal-checkin"), "personal-checkin");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-checkin");
         var personal = criarPersonal(personalUser, academia);
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-com-personal");
+        var aluno = criarUsuario(UserRole.ALUNO, "aluno-com-personal");
 
         var response = frequenciaService.criar(
                 new FrequenciaCreateRequest(aluno.getId(), academia.getId(), personal.getId(), LocalDateTime.now()),
@@ -65,10 +65,10 @@ class FrequenciaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void filtraHistoricoRelatorioEAlunosInativos() {
-        var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-relatorio");
+        var academiaUser = criarUsuario(UserRole.GERENTE, "academia-relatorio");
         var academia = criarAcademia(academiaUser, "relatorio");
-        var alunoAtivo = criarUsuario(UserRole.USUARIO, "aluno-ativo");
-        var alunoInativo = criarUsuario(UserRole.USUARIO, "aluno-inativo");
+        var alunoAtivo = criarUsuario(UserRole.ALUNO, "aluno-ativo");
+        var alunoInativo = criarUsuario(UserRole.ALUNO, "aluno-inativo");
         salvarFrequencia(alunoAtivo, academia, LocalDateTime.now().minusDays(2));
         salvarFrequencia(alunoInativo, academia, LocalDateTime.now().minusDays(10));
 
@@ -92,8 +92,8 @@ class FrequenciaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void ativarEDesativarCheckin() {
-        var academia = criarAcademia(criarUsuario(UserRole.ACADEMIA, "academia-status-checkin"), "status-checkin");
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-status-checkin");
+        var academia = criarAcademia(criarUsuario(UserRole.GERENTE, "academia-status-checkin"), "status-checkin");
+        var aluno = criarUsuario(UserRole.ALUNO, "aluno-status-checkin");
         var frequencia = salvarFrequencia(aluno, academia, LocalDateTime.now());
 
         frequenciaService.desativar(frequencia.getId());

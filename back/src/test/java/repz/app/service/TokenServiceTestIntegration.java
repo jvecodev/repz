@@ -18,7 +18,7 @@ class TokenServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void geraEValidaTokenDeAcesso() {
-        var user = criarUsuario(UserRole.USUARIO, "token-acesso");
+        var user = criarUsuario(UserRole.ALUNO, "token-acesso");
 
         var token = tokenService.generateToken(user);
 
@@ -29,7 +29,7 @@ class TokenServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void geraEValidaRefreshTokenSeparadamente() {
-        var user = criarUsuario(UserRole.USUARIO, "token-refresh");
+        var user = criarUsuario(UserRole.ALUNO, "token-refresh");
 
         var refreshToken = tokenService.generateRefreshToken(user);
 

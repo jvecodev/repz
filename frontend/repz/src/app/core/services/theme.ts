@@ -24,6 +24,7 @@ export class ThemeService {
     if (!this.isBrowser) return 'dark';
     const salvo = localStorage.getItem(CHAVE) as Tema | null;
     if (salvo === 'dark' || salvo === 'light') return salvo;
+    if (typeof window.matchMedia !== 'function') return 'dark';
     return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   }
 

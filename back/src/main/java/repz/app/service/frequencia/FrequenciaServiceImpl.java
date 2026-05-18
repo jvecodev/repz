@@ -40,7 +40,7 @@ public class FrequenciaServiceImpl implements FrequenciaService {
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
         Long academiaId = resolveAcademiaFromRequest(request.getAcademiaId(), academiaHeaderId, auth);
 
-        if (currentUser.getRole() == UserRole.USUARIO) {
+        if (currentUser.getRole() == UserRole.ALUNO) {
             if (!currentUser.getId().equals(request.getAlunoId())) {
                 throw new RuntimeException(mensagens.get("frequencia.aluno.apenas.propria"));
             }
@@ -145,7 +145,7 @@ public class FrequenciaServiceImpl implements FrequenciaService {
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
 
-        if (currentUser.getRole() != UserRole.ACADEMIA && currentUser.getRole() != UserRole.ADMIN) {
+        if (currentUser.getRole() != UserRole.GERENTE && currentUser.getRole() != UserRole.ADMIN) {
             throw new RuntimeException(mensagens.get("frequencia.acesso.relatorio.negado"));
         }
 

@@ -65,9 +65,9 @@ public class User extends AuditoriaBase implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return switch (this.role) {
             case ADMIN -> List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            case ACADEMIA -> List.of(new SimpleGrantedAuthority("ROLE_ACADEMIA"));
+            case GERENTE -> List.of(new SimpleGrantedAuthority("ROLE_GERENTE"));
             case PERSONAL -> List.of(new SimpleGrantedAuthority("ROLE_PERSONAL"));
-            case USUARIO -> List.of(new SimpleGrantedAuthority("ROLE_USUARIO"));
+            case ALUNO -> List.of(new SimpleGrantedAuthority("ROLE_ALUNO"));
         };
     }
 

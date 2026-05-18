@@ -42,8 +42,8 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
     @Test
     void matricularAlunoComSucessoComoAdmin() {
         User adminUser  = criarUsuario(UserRole.ADMIN, "admin-matricula");
-        User alunoUser  = criarUsuario(UserRole.USUARIO, "aluno-novo");
-        User acadUser   = criarUsuario(UserRole.ACADEMIA, "acad-responsavel");
+        User alunoUser  = criarUsuario(UserRole.ALUNO, "aluno-novo");
+        User acadUser   = criarUsuario(UserRole.GERENTE, "acad-responsavel");
         Academia academia = criarAcademia(acadUser, "academia-teste");
         Plano plano     = criarPlano(acadUser, "Mensal");
 
@@ -60,9 +60,9 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void matricularAlunoComPersonalOpcional() {
-        User acadUser   = criarUsuario(UserRole.ACADEMIA, "acad-p");
+        User acadUser   = criarUsuario(UserRole.GERENTE, "acad-p");
         User personalUser = criarUsuario(UserRole.PERSONAL, "personal-p");
-        User alunoUser  = criarUsuario(UserRole.USUARIO, "aluno-p");
+        User alunoUser  = criarUsuario(UserRole.ALUNO, "aluno-p");
         Academia academia = criarAcademia(acadUser, "academia-personal");
         Personal personal = criarPersonal(personalUser, academia);
         Plano plano = criarPlano(acadUser, "Trimestral");
@@ -76,8 +76,8 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void matricularRejeitaDuplicataParaMesmaAcademia() {
-        User acadUser  = criarUsuario(UserRole.ACADEMIA, "acad-dup");
-        User alunoUser = criarUsuario(UserRole.USUARIO, "aluno-dup");
+        User acadUser  = criarUsuario(UserRole.GERENTE, "acad-dup");
+        User alunoUser = criarUsuario(UserRole.ALUNO, "aluno-dup");
         Academia academia = criarAcademia(acadUser, "academia-dup");
         Plano plano = criarPlano(acadUser, "Mensal-dup");
 
@@ -92,8 +92,8 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
     @Test
     void matricularRejeitaPlanoInexistente() {
         User adminUser = criarUsuario(UserRole.ADMIN, "admin-plano");
-        User alunoUser = criarUsuario(UserRole.USUARIO, "aluno-plano");
-        User acadUser  = criarUsuario(UserRole.ACADEMIA, "acad-plano");
+        User alunoUser = criarUsuario(UserRole.ALUNO, "aluno-plano");
+        User acadUser  = criarUsuario(UserRole.GERENTE, "acad-plano");
         Academia academia = criarAcademia(acadUser, "academia-plano-inv");
 
         AlunoCreateRequest req = new AlunoCreateRequest(alunoUser.getId(), 999999, null, null);
@@ -105,7 +105,7 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
     @Test
     void matricularRejeitaUsuarioInexistente() {
         User adminUser = criarUsuario(UserRole.ADMIN, "admin-usr");
-        User acadUser  = criarUsuario(UserRole.ACADEMIA, "acad-usr");
+        User acadUser  = criarUsuario(UserRole.GERENTE, "acad-usr");
         Academia academia = criarAcademia(acadUser, "academia-usr-inv");
         Plano plano = criarPlano(acadUser, "Plano-usr");
 
@@ -119,15 +119,15 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void findAllRetornaSomenteAlunosDaAcademia() {
-        User acadUser1 = criarUsuario(UserRole.ACADEMIA, "acad-list1");
-        User acadUser2 = criarUsuario(UserRole.ACADEMIA, "acad-list2");
+        User acadUser1 = criarUsuario(UserRole.GERENTE, "acad-list1");
+        User acadUser2 = criarUsuario(UserRole.GERENTE, "acad-list2");
         Academia acad1 = criarAcademia(acadUser1, "list1");
         Academia acad2 = criarAcademia(acadUser2, "list2");
         Plano plano1 = criarPlano(acadUser1, "plano-list1");
         Plano plano2 = criarPlano(acadUser2, "plano-list2");
 
-        User aluno1 = criarUsuario(UserRole.USUARIO, "aluno-list1");
-        User aluno2 = criarUsuario(UserRole.USUARIO, "aluno-list2");
+        User aluno1 = criarUsuario(UserRole.ALUNO, "aluno-list1");
+        User aluno2 = criarUsuario(UserRole.ALUNO, "aluno-list2");
 
         alunoService.matricular(new AlunoCreateRequest(aluno1.getId(), plano1.getId(), null, null),
                 acad1.getId(), autenticar(acadUser1));
@@ -141,10 +141,10 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void findAllPersonalVeSomenteSeusAlunos() {
-        User acadUser    = criarUsuario(UserRole.ACADEMIA, "acad-personal-list");
+        User acadUser    = criarUsuario(UserRole.GERENTE, "acad-personal-list");
         User personalUser = criarUsuario(UserRole.PERSONAL, "personal-list");
-        User aluno1      = criarUsuario(UserRole.USUARIO, "aluno-personal1");
-        User aluno2      = criarUsuario(UserRole.USUARIO, "aluno-sem-personal");
+        User aluno1      = criarUsuario(UserRole.ALUNO, "aluno-personal1");
+        User aluno2      = criarUsuario(UserRole.ALUNO, "aluno-sem-personal");
         Academia academia = criarAcademia(acadUser, "academia-personal-list");
         Personal personal = criarPersonal(personalUser, academia);
         Plano plano = criarPlano(acadUser, "plano-personal-list");
@@ -161,8 +161,8 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void atualizarAluno() {
-        User acadUser  = criarUsuario(UserRole.ACADEMIA, "acad-upd");
-        User alunoUser = criarUsuario(UserRole.USUARIO, "aluno-upd");
+        User acadUser  = criarUsuario(UserRole.GERENTE, "acad-upd");
+        User alunoUser = criarUsuario(UserRole.ALUNO, "aluno-upd");
         Academia academia = criarAcademia(acadUser, "academia-upd");
         Plano plano1 = criarPlano(acadUser, "Plano-upd1");
         Plano plano2 = criarPlano(acadUser, "Plano-upd2");
@@ -181,8 +181,8 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void inativarAluno() {
-        User acadUser  = criarUsuario(UserRole.ACADEMIA, "acad-inat");
-        User alunoUser = criarUsuario(UserRole.USUARIO, "aluno-inat");
+        User acadUser  = criarUsuario(UserRole.GERENTE, "acad-inat");
+        User alunoUser = criarUsuario(UserRole.ALUNO, "aluno-inat");
         Academia academia = criarAcademia(acadUser, "academia-inat");
         Plano plano = criarPlano(acadUser, "plano-inat");
 
@@ -199,10 +199,10 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void findByIdPersonalNaoVeAlunoDeOutro() {
-        User acadUser    = criarUsuario(UserRole.ACADEMIA, "acad-rb");
+        User acadUser    = criarUsuario(UserRole.GERENTE, "acad-rb");
         User p1User      = criarUsuario(UserRole.PERSONAL, "personal-rb1");
         User p2User      = criarUsuario(UserRole.PERSONAL, "personal-rb2");
-        User alunoUser   = criarUsuario(UserRole.USUARIO, "aluno-rb");
+        User alunoUser   = criarUsuario(UserRole.ALUNO, "aluno-rb");
         Academia academia = criarAcademia(acadUser, "academia-rb");
         Personal p1 = criarPersonal(p1User, academia);
         criarPersonal(p2User, academia);
@@ -220,8 +220,8 @@ class AlunoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void atualizarMeuPerfilAlteraNomeETelefone() {
-        User acadUser  = criarUsuario(UserRole.ACADEMIA, "acad-me");
-        User alunoUser = criarUsuario(UserRole.USUARIO, "aluno-me");
+        User acadUser  = criarUsuario(UserRole.GERENTE, "acad-me");
+        User alunoUser = criarUsuario(UserRole.ALUNO, "aluno-me");
         Academia academia = criarAcademia(acadUser, "academia-me");
         Plano plano = criarPlano(acadUser, "plano-me");
 

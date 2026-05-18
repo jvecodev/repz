@@ -27,10 +27,10 @@ class AvaliacaoFisicaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void personalCriaAvaliacaoCalculandoImc() {
-        var academia = criarAcademia(criarUsuario(UserRole.ACADEMIA, "academia-avaliacao"), "avaliacao");
+        var academia = criarAcademia(criarUsuario(UserRole.GERENTE, "academia-avaliacao"), "avaliacao");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-avaliacao");
         criarPersonal(personalUser, academia);
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-avaliacao");
+        var aluno = criarUsuario(UserRole.ALUNO, "aluno-avaliacao");
 
         var response = avaliacaoFisicaService.criar(
                 new AvaliacaoFisicaCreateRequest(aluno.getId(), 80.0, 180.0, 20.0, "Cintura: 80cm", null, null, null, null),
@@ -43,8 +43,8 @@ class AvaliacaoFisicaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void usuarioNaoPodeCriarAvaliacaoENaoAcessaAvaliacaoDeOutroAluno() {
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-negado-avaliacao");
-        var outroAluno = criarUsuario(UserRole.USUARIO, "outro-negado-avaliacao");
+        var aluno = criarUsuario(UserRole.ALUNO, "aluno-negado-avaliacao");
+        var outroAluno = criarUsuario(UserRole.ALUNO, "outro-negado-avaliacao");
 
         assertThatThrownBy(() -> avaliacaoFisicaService.criar(
                 new AvaliacaoFisicaCreateRequest(aluno.getId(), 70.0, 170.0, null, null, null, null, null, null),
@@ -60,10 +60,10 @@ class AvaliacaoFisicaServiceTestIntegration extends ServiceIntegrationSupport {
     @Test
     void historicoGraficoEUnidadeRetornamAvaliacoes() {
         var admin = criarUsuario(UserRole.ADMIN, "admin-avaliacao");
-        var academia = criarAcademia(criarUsuario(UserRole.ACADEMIA, "academia-historico-avaliacao"), "historico-avaliacao");
+        var academia = criarAcademia(criarUsuario(UserRole.GERENTE, "academia-historico-avaliacao"), "historico-avaliacao");
         var personalUser = criarUsuario(UserRole.PERSONAL, "personal-historico-avaliacao");
         var personal = criarPersonal(personalUser, academia);
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-historico-avaliacao");
+        var aluno = criarUsuario(UserRole.ALUNO, "aluno-historico-avaliacao");
         salvarAvaliacao(aluno, personal, academia, 77.0, 175.0, LocalDateTime.now().minusDays(2));
         salvarAvaliacao(aluno, personal, academia, 76.0, 175.0, LocalDateTime.now().minusDays(1));
 
@@ -79,9 +79,9 @@ class AvaliacaoFisicaServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void ativarEDesativarAvaliacao() {
-        var academia = criarAcademia(criarUsuario(UserRole.ACADEMIA, "academia-status-avaliacao"), "status-avaliacao");
+        var academia = criarAcademia(criarUsuario(UserRole.GERENTE, "academia-status-avaliacao"), "status-avaliacao");
         var personal = criarPersonal(criarUsuario(UserRole.PERSONAL, "personal-status-avaliacao"), academia);
-        var aluno = criarUsuario(UserRole.USUARIO, "aluno-status-avaliacao");
+        var aluno = criarUsuario(UserRole.ALUNO, "aluno-status-avaliacao");
         var avaliacao = salvarAvaliacao(aluno, personal, academia, 70.0, 170.0, LocalDateTime.now());
 
         avaliacaoFisicaService.desativar(avaliacao.getId());

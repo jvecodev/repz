@@ -29,7 +29,7 @@ class PlanoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void criaListaBuscaAtualizaEAlteraStatusDoPlanoDaAcademiaLogada() {
-        var academiaUser = criarUsuario(UserRole.ACADEMIA, "academia-plano");
+        var academiaUser = criarUsuario(UserRole.GERENTE, "academia-plano");
         var academia = criarAcademia(academiaUser, "academia-plano");
         var auth = autenticar(academiaUser);
 
@@ -53,8 +53,8 @@ class PlanoServiceTestIntegration extends ServiceIntegrationSupport {
 
     @Test
     void planoFicaIsoladoPorAcademiaLogada() {
-        var academiaA = criarUsuario(UserRole.ACADEMIA, "academia-plano-a");
-        var academiaB = criarUsuario(UserRole.ACADEMIA, "academia-plano-b");
+        var academiaA = criarUsuario(UserRole.GERENTE, "academia-plano-a");
+        var academiaB = criarUsuario(UserRole.GERENTE, "academia-plano-b");
         criarAcademia(academiaA, "academia-plano-a");
         criarAcademia(academiaB, "academia-plano-b");
 

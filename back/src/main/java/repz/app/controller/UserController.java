@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import repz.app.dto.auth.RegistrationDTO;
+import repz.app.dto.request.AdminCreateRequest;
+import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
 import repz.app.dto.response.UserGetResponse;
 
@@ -50,7 +51,7 @@ public interface UserController {
     @PostMapping
     @Operation(
             summary = "Criar usuário",
-            description = "Cria um usuário. Sem token, somente o perfil USUARIO é permitido."
+            description = "Cria um usuário (ALUNO, PERSONAL ou GERENTE) já vinculado a uma academia. Requer perfil ADMIN ou GERENTE."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
@@ -58,8 +59,21 @@ public interface UserController {
             @ApiResponse(responseCode = "403", description = "Perfil solicitado não permitido")
     })
     ResponseEntity<Void> criar(
-            @RequestBody @Valid RegistrationDTO registrationDTO,
+            @RequestBody @Valid UserCreateRequest userCreateRequest,
             @Parameter(hidden = true) Authentication authentication);
+
+    @PostMapping("/admin")
+    @Operation(
+            summary = "Criar administrador",
+            description = "Cria um usuário com perfil ADMIN. Requer perfil ADMIN."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Admin criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
+    ResponseEntity<Void> criarAdmin(
+            @RequestBody @Valid AdminCreateRequest adminCreateRequest);
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar usuário", description = "Atualiza os dados de um usuário. Requer perfil ADMIN.")

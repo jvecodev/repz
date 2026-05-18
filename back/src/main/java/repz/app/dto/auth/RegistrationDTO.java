@@ -23,7 +23,7 @@ public record RegistrationDTO(
         @Size(min = 6, message = "A senha precisa ter no mínimo {min} caracteres.")
         String password,
 
-        @Schema(description = "Perfil solicitado para o usuário", example = "USUARIO")
+        @Schema(description = "Perfil solicitado para o usuário", example = "ALUNO")
         UserRole role
 
 ) {

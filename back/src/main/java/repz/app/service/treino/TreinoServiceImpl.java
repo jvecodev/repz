@@ -48,7 +48,7 @@ public class TreinoServiceImpl implements TreinoService {
         User aluno = userRepository.findById(Math.toIntExact(request.getAlunoId()))
                 .orElseThrow(() -> new RuntimeException(mensagens.get("aluno.nao.encontrado")));
 
-        if (aluno.getRole() != UserRole.USUARIO) {
+        if (aluno.getRole() != UserRole.ALUNO) {
             throw new RuntimeException(mensagens.get("treino.aluno.role.invalida"));
         }
 
@@ -105,9 +105,9 @@ public class TreinoServiceImpl implements TreinoService {
         Treino treino = treinoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(mensagens.get("treino.nao.encontrado")));
 
-        if (currentUser.getRole() == UserRole.USUARIO
+        if (currentUser.getRole() == UserRole.ALUNO
                 && (treino.getAluno() == null || !treino.getAluno().getId().equals(currentUser.getId()))) {
-            throw new AccessDeniedException(mensagens.get("treino.usuario.apenas.proprio"));
+            throw new AccessDeniedException(mensagens.get("treino.aluno.apenas.proprio"));
         }
 
         return toDTO(treino);
@@ -133,8 +133,8 @@ public class TreinoServiceImpl implements TreinoService {
     private void validarAcessoAoAluno(Long alunoId, Authentication auth) {
         User currentUser = getCurrentUser(auth);
 
-        if (currentUser.getRole() == UserRole.USUARIO && !currentUser.getId().equals(alunoId)) {
-            throw new AccessDeniedException(mensagens.get("treino.usuario.apenas.proprio"));
+        if (currentUser.getRole() == UserRole.ALUNO && !currentUser.getId().equals(alunoId)) {
+            throw new AccessDeniedException(mensagens.get("treino.aluno.apenas.proprio"));
         }
 
         if (currentUser.getRole() == UserRole.PERSONAL) {

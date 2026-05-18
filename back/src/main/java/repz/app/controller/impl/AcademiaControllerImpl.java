@@ -107,7 +107,7 @@ public class AcademiaControllerImpl implements AcademiaController {
     }
 
     private void validateAcademiaRole(User user) {
-        if (!user.getRole().equals(UserRole.ACADEMIA)) {
+        if (!user.getRole().equals(UserRole.GERENTE)) {
             throw new org.springframework.security.access.AccessDeniedException(mensagens.get("auth.academia.necessario"));
         }
     }

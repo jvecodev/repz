@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 import repz.app.controller.AlunoController;
-import repz.app.dto.request.AlunoCreateRequest;
 import repz.app.dto.request.AlunoMeUpdateRequest;
 import repz.app.dto.request.AlunoUpdateRequest;
 import repz.app.dto.response.AlunoDetalheResponse;
@@ -17,11 +16,6 @@ import java.util.List;
 public class AlunoControllerImpl implements AlunoController {
 
     private final AlunoService alunoService;
-
-    @Override
-    public AlunoDetalheResponse matricular(AlunoCreateRequest request, Long academiaId, Authentication auth) {
-        return alunoService.matricular(request, academiaId, auth);
-    }
 
     @Override
     public List<AlunoDetalheResponse> findAll(Long academiaId, Authentication auth) {
