@@ -47,6 +47,14 @@ export class AuthService {
     return this.isBrowser() ? localStorage.getItem(TOKEN_KEY) : null;
   }
 
+  forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/reset-password`, { token, newPassword });
+  }
+
   getUserRole(): string | null {
     return this.sessao()?.role ?? (this.isBrowser() ? localStorage.getItem(ROLE_KEY) : null);
   }

@@ -54,6 +54,9 @@ services:
     container_name: repzfront
     ports:
       - "4200:4200"
+    volumes:
+      - ./frontend/repz:/app
+      - /app/node_modules
     depends_on:
       - api
 
