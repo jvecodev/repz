@@ -22,7 +22,7 @@
   </p-card>
 
   <ng-container *ngIf="!carregando() && !erro()">
-    <div class="layout">
+    <div class="layout" [class.layout-full]="!podeRegistrar()">
       <div class="col-main">
 
         <!-- ===== Gráfico ===== -->
