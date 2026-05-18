@@ -139,13 +139,14 @@
             </div>
 
             <!-- Pode solicitar -->
-            <p-button
-              *ngIf="!solicitacaoPendente()"
-              label="Solicitar nova ficha"
-              icon="pi pi-envelope"
-              styleClass="repz-ghost scard-btn"
-              (onClick)="abrirDialogSolicitacao()"
-            />
+            <div class="sol-btn-wrap" *ngIf="!solicitacaoPendente()">
+              <p-button
+                label="Solicitar nova ficha"
+                icon="pi pi-envelope"
+                styleClass="repz-ghost w-full"
+                (onClick)="abrirDialogSolicitacao()"
+              />
+            </div>
           </ng-container>
         </p-card>
       </div>
