@@ -22,7 +22,7 @@ import java.util.List;
 public interface AlunoController {
 
     @GetMapping
-    @Operation(summary = "Listar alunos", description = "ADMIN vê todos; ACADEMIA vê somente os seus; PERSONAL vê somente seus alunos.")
+    @Operation(summary = "Listar alunos", description = "ADMIN vê todos; GERENTE vê somente os seus; PERSONAL vê somente seus alunos.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Alunos encontrados"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
@@ -34,7 +34,7 @@ public interface AlunoController {
             @Parameter(hidden = true) Authentication auth);
 
     @GetMapping("/me")
-    @Operation(summary = "Meu perfil", description = "Retorna o perfil do aluno autenticado. Requer perfil USUARIO.")
+    @Operation(summary = "Meu perfil", description = "Retorna o perfil do aluno autenticado. Requer perfil ALUNO.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Perfil retornado"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
@@ -67,7 +67,7 @@ public interface AlunoController {
             @Parameter(hidden = true) Authentication auth);
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar matrícula do aluno", description = "Atualiza plano e/ou personal. Requer perfil ADMIN ou ACADEMIA.")
+    @Operation(summary = "Atualizar matrícula do aluno", description = "Atualiza plano e/ou personal. Requer perfil ADMIN ou GERENTE.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Aluno atualizado com sucesso"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
@@ -84,7 +84,7 @@ public interface AlunoController {
 
     @PatchMapping("/{id}/inativar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Inativar aluno", description = "Inativa a matrícula do aluno. Requer perfil ADMIN ou ACADEMIA.")
+    @Operation(summary = "Inativar aluno", description = "Inativa a matrícula do aluno. Requer perfil ADMIN ou GERENTE.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Aluno inativado com sucesso"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),

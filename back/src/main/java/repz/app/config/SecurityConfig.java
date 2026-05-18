@@ -111,7 +111,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/treinos/*/ativar", "/api/treinos/*/desativar")
                                 .hasAnyRole("PERSONAL", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/treinos/**")
-                                .hasAnyRole("PERSONAL", "ALUNO", "ACADEMIA", "ADMIN")
+                                .hasAnyRole("PERSONAL", "ALUNO", "GERENTE", "ADMIN")
 
                         .anyRequest().authenticated()
                 )

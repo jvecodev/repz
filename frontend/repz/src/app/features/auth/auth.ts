@@ -48,13 +48,13 @@ export class Auth {
       case 'ADMIN':
         this.router.navigate(['/admin']);
         break;
-      case 'ACADEMIA':
+      case 'GERENTE':
         this.router.navigate(['/academia']);
         break;
       case 'PERSONAL':
         this.router.navigate(['/personal']);
         break;
-      case 'USUARIO':
+      case 'ALUNO':
         this.router.navigate(['/aluno/ficha-treino']);
         break;
       default:

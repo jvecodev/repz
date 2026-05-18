@@ -7,11 +7,10 @@ export function homePorRole(role: string | null): string {
   switch (role) {
     case 'ADMIN':
       return '/admin';
-    case 'ACADEMIA':
+    case 'GERENTE':
       return '/academia';
     case 'PERSONAL':
       return '/personal';
-    case 'USUARIO':
     case 'ALUNO':
       return '/aluno/ficha-treino';
     default:

@@ -75,7 +75,7 @@ export class FichaTreino implements OnInit {
   });
 
   /** Apenas alunos logados (não personal visitando aluno) podem solicitar. */
-  readonly podesolicitar = computed(() => this.auth.getUserRole() === 'USUARIO');
+  readonly podesolicitar = computed(() => this.auth.getUserRole() === 'ALUNO');
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');

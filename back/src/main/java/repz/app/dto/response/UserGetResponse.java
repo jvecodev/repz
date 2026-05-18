@@ -21,7 +21,7 @@ public record UserGetResponse(
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
         LocalDateTime lastLogin,
 
-        @Schema(description = "Perfil do usuário", example = "USUARIO")
+        @Schema(description = "Perfil do usuário", example = "ALUNO")
         UserRole role,
 
         @Schema(description = "Status ativo do usuário", example = "true")

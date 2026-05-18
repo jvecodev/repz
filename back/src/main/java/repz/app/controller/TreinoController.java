@@ -59,7 +59,7 @@ public interface TreinoController {
     List<TreinoResponse> obterMeuHistorico(@Parameter(hidden = true) Authentication auth);
 
     @GetMapping
-    @Operation(summary = "Ficha ativa do aluno", description = "Lista as divisões da ficha ativa de um aluno. PERSONAL vê seus alunos; ACADEMIA/ADMIN também.")
+    @Operation(summary = "Ficha ativa do aluno", description = "Lista as divisões da ficha ativa de um aluno. PERSONAL vê seus alunos; GERENTE/ADMIN também.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ficha ativa retornada"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),

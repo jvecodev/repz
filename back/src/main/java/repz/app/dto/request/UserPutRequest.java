@@ -16,7 +16,7 @@ public record UserPutRequest(
         @Email(message = "E-mail inválido.")
         String email,
 
-        @Schema(description = "Perfil do usuário", example = "USUARIO")
+        @Schema(description = "Perfil do usuário", example = "ALUNO")
         UserRole role,
 
         @Schema(description = "Status ativo do usuário", example = "true")
