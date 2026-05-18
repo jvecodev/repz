@@ -24,35 +24,75 @@
   <ng-container *ngIf="!carregando() && !erro()">
     <div class="layout">
       <div class="col-main">
+
+        <!-- ===== Gráfico ===== -->
         <p-card styleClass="repz-card chart-card">
-          <div class="chart-head">
-            <div class="font-semibold">Evolução</div>
-            <p-selectButton
-              [options]="metricas"
-              optionLabel="label"
-              optionValue="value"
-              [allowEmpty]="false"
-              [ngModel]="metrica()"
-              (ngModelChange)="selecionarMetrica($any($event))"
-              styleClass="metric-switch"
-            />
+
+          <!-- Pills de métrica + data da última avaliação -->
+          <div class="card-tabs-row">
+            <div class="tab-group">
+              <button
+                *ngFor="let m of metricas"
+                class="tab-pill"
+                [class.active]="metrica() === m.value"
+                (click)="selecionarMetrica($any(m.value))"
+              >{{ m.label }}</button>
+            </div>
+            <div class="last-date" *ngIf="ultimaAvaliacao()">
+              <span class="last-date-label text-3">Última avaliação</span>
+              <strong class="last-date-val">{{ ultimaAvaliacao()!.data }}</strong>
+            </div>
           </div>
 
-          <div class="chart-box" *ngIf="pontosValidos().length > 1; else semGrafico">
-            <p-chart
-              type="line"
-              [data]="graficoData()"
-              [options]="graficoOptions()"
-              styleClass="repz-chart"
-            />
-          </div>
-          <ng-template #semGrafico>
-            <div class="chart-empty text-3">
-              São necessárias ao menos 2 avaliações para comparar a evolução.
+          <!-- Barra de estatísticas com os valores da última medição -->
+          <div class="stats-row" *ngIf="ultimaAvaliacao()">
+            <div class="stat-item">
+              <span class="stat-label">Peso</span>
+              <span class="stat-val">
+                {{ ultimaAvaliacao()!.peso != null ? ultimaAvaliacao()!.peso + ' kg' : '—' }}
+              </span>
+              <span
+                class="stat-delta"
+                [class.delta-up]="ultimaAvaliacao()!.deltaPeso! > 0"
+                [class.delta-down]="ultimaAvaliacao()!.deltaPeso! < 0"
+                *ngIf="ultimaAvaliacao()!.deltaPeso != null && ultimaAvaliacao()!.deltaPeso !== 0"
+              >{{ ultimaAvaliacao()!.deltaPeso! > 0 ? '+' : '' }}{{ ultimaAvaliacao()!.deltaPeso }} kg</span>
             </div>
-          </ng-template>
+            <div class="stat-sep"></div>
+            <div class="stat-item">
+              <span class="stat-label">IMC</span>
+              <span class="stat-val">{{ ultimaAvaliacao()!.imc ?? '—' }}</span>
+            </div>
+            <div class="stat-sep"></div>
+            <div class="stat-item">
+              <span class="stat-label">% Gordura</span>
+              <span class="stat-val">
+                {{ ultimaAvaliacao()!.gordura != null ? ultimaAvaliacao()!.gordura + '%' : '—' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="chart-divider"></div>
+
+          <!-- Gráfico ou estado vazio -->
+          <div class="chart-wrap">
+            <div class="chart-box" *ngIf="pontosValidos().length > 1; else semGrafico">
+              <p-chart
+                type="line"
+                [data]="graficoData()"
+                [options]="graficoOptions()"
+                styleClass="repz-chart"
+              />
+            </div>
+            <ng-template #semGrafico>
+              <div class="chart-empty text-3">
+                São necessárias ao menos 2 avaliações para comparar a evolução.
+              </div>
+            </ng-template>
+          </div>
         </p-card>
 
+        <!-- ===== Histórico ===== -->
         <p-card styleClass="repz-card historico">
           <div class="hist-head">
             <div class="font-semibold">Histórico de avaliações</div>
@@ -110,108 +150,121 @@
         </p-card>
       </div>
 
+      <!-- ===== Formulário (só PERSONAL) ===== -->
       <div class="col-side" *ngIf="podeRegistrar()">
-        <form class="form-card" (ngSubmit)="salvar()">
+        <form (ngSubmit)="salvar()">
           <p-card styleClass="repz-card form-card-shell">
             <div class="scard-label">Nova avaliação</div>
 
-            <div class="grid2">
-              <label class="field">
-                <span>Peso (kg) *</span>
-                <p-inputNumber
-                  inputId="peso"
-                  name="peso"
-                  [(ngModel)]="form.pesoKg"
-                  [minFractionDigits]="1"
-                  [maxFractionDigits]="1"
-                  [useGrouping]="false"
-                  [allowEmpty]="true"
-                  suffix=" kg"
-                />
-              </label>
-              <label class="field">
-                <span>Altura (cm) *</span>
-                <p-inputNumber
-                  inputId="altura"
-                  name="altura"
-                  [(ngModel)]="form.alturaCm"
-                  [minFractionDigits]="1"
-                  [maxFractionDigits]="1"
-                  [useGrouping]="false"
-                  [allowEmpty]="true"
-                  suffix=" cm"
-                />
-              </label>
-              <label class="field">
-                <span>% Gordura</span>
-                <p-inputNumber
-                  inputId="gordura"
-                  name="gordura"
-                  [(ngModel)]="form.percentualGordura"
-                  [minFractionDigits]="1"
-                  [maxFractionDigits]="1"
-                  [useGrouping]="false"
-                  [allowEmpty]="true"
-                  suffix="%"
-                />
-              </label>
-              <label class="field">
-                <span>Cintura (cm)</span>
-                <p-inputNumber
-                  inputId="cintura"
-                  name="cintura"
-                  [(ngModel)]="form.cinturaCm"
-                  [minFractionDigits]="1"
-                  [maxFractionDigits]="1"
-                  [useGrouping]="false"
-                  [allowEmpty]="true"
-                  suffix=" cm"
-                />
-              </label>
-              <label class="field">
-                <span>Quadril (cm)</span>
-                <p-inputNumber
-                  inputId="quadril"
-                  name="quadril"
-                  [(ngModel)]="form.quadrilCm"
-                  [minFractionDigits]="1"
-                  [maxFractionDigits]="1"
-                  [useGrouping]="false"
-                  [allowEmpty]="true"
-                  suffix=" cm"
-                />
-              </label>
-              <label class="field">
-                <span>Braço (cm)</span>
-                <p-inputNumber
-                  inputId="braco"
-                  name="braco"
-                  [(ngModel)]="form.bracoCm"
-                  [minFractionDigits]="1"
-                  [maxFractionDigits]="1"
-                  [useGrouping]="false"
-                  [allowEmpty]="true"
-                  suffix=" cm"
-                />
-              </label>
-              <label class="field">
-                <span>Coxa (cm)</span>
-                <p-inputNumber
-                  inputId="coxa"
-                  name="coxa"
-                  [(ngModel)]="form.coxaCm"
-                  [minFractionDigits]="1"
-                  [maxFractionDigits]="1"
-                  [useGrouping]="false"
-                  [allowEmpty]="true"
-                  suffix=" cm"
-                />
-              </label>
+            <!-- Seção: composição corporal -->
+            <div class="form-section">
+              <div class="form-section-hd">Composição corporal</div>
+              <div class="grid2">
+                <label class="field">
+                  <span>Peso (kg) *</span>
+                  <p-inputNumber
+                    inputId="peso"
+                    name="peso"
+                    [(ngModel)]="form.pesoKg"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="1"
+                    [useGrouping]="false"
+                    [allowEmpty]="true"
+                    suffix=" kg"
+                  />
+                </label>
+                <label class="field">
+                  <span>Altura (cm) *</span>
+                  <p-inputNumber
+                    inputId="altura"
+                    name="altura"
+                    [(ngModel)]="form.alturaCm"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="1"
+                    [useGrouping]="false"
+                    [allowEmpty]="true"
+                    suffix=" cm"
+                  />
+                </label>
+                <label class="field">
+                  <span>% Gordura</span>
+                  <p-inputNumber
+                    inputId="gordura"
+                    name="gordura"
+                    [(ngModel)]="form.percentualGordura"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="1"
+                    [useGrouping]="false"
+                    [allowEmpty]="true"
+                    suffix="%"
+                  />
+                </label>
+                <div class="field">
+                  <span>IMC estimado</span>
+                  <div class="imc-inline" [class.imc-filled]="imcPreview() != null">
+                    {{ imcPreview() ?? '—' }}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="imc-box">
-              <span class="text-3">IMC calculado</span>
-              <strong>{{ imcPreview() ?? '—' }}</strong>
+            <!-- Seção: circunferências -->
+            <div class="form-section">
+              <div class="form-section-hd">Circunferências</div>
+              <div class="grid2">
+                <label class="field">
+                  <span>Cintura (cm)</span>
+                  <p-inputNumber
+                    inputId="cintura"
+                    name="cintura"
+                    [(ngModel)]="form.cinturaCm"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="1"
+                    [useGrouping]="false"
+                    [allowEmpty]="true"
+                    suffix=" cm"
+                  />
+                </label>
+                <label class="field">
+                  <span>Quadril (cm)</span>
+                  <p-inputNumber
+                    inputId="quadril"
+                    name="quadril"
+                    [(ngModel)]="form.quadrilCm"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="1"
+                    [useGrouping]="false"
+                    [allowEmpty]="true"
+                    suffix=" cm"
+                  />
+                </label>
+                <label class="field">
+                  <span>Braço (cm)</span>
+                  <p-inputNumber
+                    inputId="braco"
+                    name="braco"
+                    [(ngModel)]="form.bracoCm"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="1"
+                    [useGrouping]="false"
+                    [allowEmpty]="true"
+                    suffix=" cm"
+                  />
+                </label>
+                <label class="field">
+                  <span>Coxa (cm)</span>
+                  <p-inputNumber
+                    inputId="coxa"
+                    name="coxa"
+                    [(ngModel)]="form.coxaCm"
+                    [minFractionDigits]="1"
+                    [maxFractionDigits]="1"
+                    [useGrouping]="false"
+                    [allowEmpty]="true"
+                    suffix=" cm"
+                  />
+                </label>
+              </div>
             </div>
 
             <p-message severity="info" styleClass="aviso" [text]="aviso() ?? ''" *ngIf="aviso()" />

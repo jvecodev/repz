@@ -12,7 +12,6 @@ import { ChartModule } from 'primeng/chart';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao-fisica.mapper';
 
@@ -29,7 +28,6 @@ import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao
     InputNumberModule,
     MessageModule,
     ProgressSpinnerModule,
-    SelectButtonModule,
     TableModule,
   ],
   templateUrl: './avaliacao-fisica.html',
@@ -60,6 +58,9 @@ export class AvaliacaoFisica implements OnInit {
 
   /** Apenas PERSONAL registra; demais perfis acessam em modo leitura. */
   readonly podeRegistrar = computed(() => this.auth.getUserRole() === 'PERSONAL');
+
+  /** Avaliação mais recente (histórico já está em ordem decrescente). */
+  readonly ultimaAvaliacao = computed(() => this.historico()[0] ?? null);
 
   readonly form = {
     pesoKg: null as number | null,

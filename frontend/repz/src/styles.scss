@@ -337,27 +337,6 @@ body {
   border-color: var(--mint);
 }
 
-.p-selectbutton.metric-switch .p-togglebutton {
-  color: var(--text-3);
-  background: transparent;
-  border: 0;
-  border-radius: var(--r-sm);
-  font-size: 12px;
-  font-weight: 600;
-  min-height: 32px;
-  padding: 6px 12px;
-}
-
-.p-selectbutton.metric-switch .p-togglebutton:not(.p-disabled):hover {
-  color: var(--text-2);
-  background: transparent;
-}
-
-.p-selectbutton.metric-switch .p-togglebutton.p-togglebutton-checked {
-  color: #0b2018;
-  background: var(--mint);
-}
-
 .p-datatable.repz-table .p-datatable-table {
   border-collapse: separate;
   border-spacing: 0;
