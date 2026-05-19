@@ -18,7 +18,7 @@ public record RegistrationDTO(
         @Email(message = "E-mail inválido.")
         String email,
 
-        @Schema(description = "Senha com no mínimo 6 caracteres", example = "123456")
+        @Schema(description = "Senha com no mínimo 5 caracteres", example = "12345")
         @NotBlank(message = "Insira a senha.")
         @Size(min = 6, message = "A senha precisa ter no mínimo {min} caracteres.")
         String password,

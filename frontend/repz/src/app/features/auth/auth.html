@@ -1,52 +1,237 @@
 <div class="auth-wrap">
   <p-card styleClass="auth-card repz-card">
-    <form class="auth-form" (ngSubmit)="realizarLogin()">
-      <div class="auth-brand">
-        <img class="auth-symbol" src="/assets/repz-symbol.png" alt="" aria-hidden="true" />
-        <img class="auth-wordmark" src="/assets/repz-wordmark.png" alt="REPZ" />
-      </div>
 
-      <h1 class="auth-title">Entrar</h1>
-      <p class="auth-sub">Acesse sua conta para ver sua ficha de treino.</p>
+    <div class="auth-topbar">
+      <p-button
+        [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        styleClass="repz-icon-button"
+        (onClick)="theme.toggleTema()"
+        [title]="theme.tema() === 'dark' ? 'Modo claro' : 'Modo escuro'"
+        [ariaLabel]="theme.tema() === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
+      />
+    </div>
 
-      <label class="field">
-        <span>E-mail</span>
-        <input
-          pInputText
-          type="email"
-          name="email"
-          autocomplete="username"
-          [(ngModel)]="credenciais.email"
-          required
-          placeholder="voce@email.com"
-        />
-      </label>
+    @switch (etapa()) {
 
-      <label class="field">
-        <span>Senha</span>
-        <input
-          pInputText
-          type="password"
-          name="password"
-          autocomplete="current-password"
-          [(ngModel)]="credenciais.password"
-          required
-          placeholder="••••••••"
-        />
-      </label>
+      @case ('login') {
+        <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="realizarLogin()" novalidate>
+          <div class="auth-brand">
+            <img class="auth-symbol" src="/assets/repz-symbol.png" alt="" aria-hidden="true" />
+            <img class="auth-wordmark" src="/assets/repz-wordmark.png" alt="REPZ" />
+          </div>
 
-      @if (erro()) {
-        <p-message severity="error" styleClass="auth-error" [text]="erro() ?? ''" />
+          <div class="auth-titles">
+            <h1 class="auth-title">Entrar</h1>
+            <p class="auth-sub">Acesse sua conta para ver sua ficha de treino.</p>
+          </div>
+
+          <div class="field" [class.field--invalid]="lEmail.invalid && lEmail.touched">
+            <label class="field__label" for="email">E-mail</label>
+            <input
+              pInputText
+              id="email"
+              type="email"
+              autocomplete="username"
+              formControlName="email"
+              placeholder="voce@email.com"
+              [class.p-invalid]="lEmail.invalid && lEmail.touched"
+            />
+            @if (lEmail.touched && lEmail.errors?.['required']) {
+              <small class="field__error">E-mail obrigatório.</small>
+            } @else if (lEmail.touched && lEmail.errors?.['email']) {
+              <small class="field__error">Formato de e-mail inválido.</small>
+            }
+          </div>
+
+          <div class="field" [class.field--invalid]="lPassword.invalid && lPassword.touched">
+            <label class="field__label" for="password">Senha</label>
+            <input
+              pInputText
+              id="password"
+              type="password"
+              autocomplete="current-password"
+              formControlName="password"
+              placeholder="•••••"
+              [class.p-invalid]="lPassword.invalid && lPassword.touched"
+            />
+            @if (lPassword.touched && lPassword.errors?.['required']) {
+              <small class="field__error">Senha obrigatória.</small>
+            } @else if (lPassword.touched && lPassword.errors?.['minlength']) {
+              <small class="field__error">Mínimo de 5 caracteres.</small>
+            }
+          </div>
+
+          @if (erro()) {
+            <p-message severity="error" styleClass="auth-message" [text]="erro() ?? ''" />
+          }
+
+          @if (sucesso()) {
+            <p-message severity="success" styleClass="auth-message" [text]="sucesso() ?? ''" />
+          }
+
+          <p-button
+            type="submit"
+            label="Entrar"
+            icon="pi pi-sign-in"
+            [loading]="carregando()"
+            [disabled]="carregando()"
+            styleClass="repz-primary w-full"
+          />
+
+          <button type="button" class="auth-link" (click)="irParaEsqueci()">
+            Esqueci minha senha
+          </button>
+        </form>
       }
 
-      <p-button
-        type="submit"
-        label="Entrar"
-        icon="pi pi-sign-in"
-        [loading]="carregando()"
-        [disabled]="carregando()"
-        styleClass="auth-submit repz-primary"
-      />
-    </form>
+      @case ('esqueci') {
+        <form class="auth-form" [formGroup]="esqueciForm" (ngSubmit)="enviarEsqueci()" novalidate>
+          <div class="auth-brand">
+            <img class="auth-symbol" src="/assets/repz-symbol.png" alt="" aria-hidden="true" />
+            <img class="auth-wordmark" src="/assets/repz-wordmark.png" alt="REPZ" />
+          </div>
+
+          <div class="auth-titles">
+            <h1 class="auth-title">Recuperar senha</h1>
+            <p class="auth-sub">Informe seu e-mail e enviaremos um código de redefinição.</p>
+          </div>
+
+          <div class="field" [class.field--invalid]="eEmail.invalid && eEmail.touched">
+            <label class="field__label" for="esqueci-email">E-mail</label>
+            <input
+              pInputText
+              id="esqueci-email"
+              type="email"
+              autocomplete="username"
+              formControlName="email"
+              placeholder="voce@email.com"
+              [class.p-invalid]="eEmail.invalid && eEmail.touched"
+            />
+            @if (eEmail.touched && eEmail.errors?.['required']) {
+              <small class="field__error">E-mail obrigatório.</small>
+            } @else if (eEmail.touched && eEmail.errors?.['email']) {
+              <small class="field__error">Formato de e-mail inválido.</small>
+            }
+          </div>
+
+          @if (erro()) {
+            <p-message severity="error" styleClass="auth-message" [text]="erro() ?? ''" />
+          }
+
+          <p-button
+            type="submit"
+            label="Enviar código"
+            icon="pi pi-send"
+            [loading]="carregando()"
+            [disabled]="carregando()"
+            styleClass="repz-primary w-full"
+          />
+
+          <button type="button" class="auth-link" (click)="irParaLogin()">
+            ← Voltar para o login
+          </button>
+        </form>
+      }
+
+      @case ('redefinir') {
+        <form class="auth-form" [formGroup]="redefinirForm" (ngSubmit)="redefinirSenha()" novalidate>
+          <div class="auth-brand">
+            <img class="auth-symbol" src="/assets/repz-symbol.png" alt="" aria-hidden="true" />
+            <img class="auth-wordmark" src="/assets/repz-wordmark.png" alt="REPZ" />
+          </div>
+
+          <div class="auth-titles">
+            <h1 class="auth-title">Nova senha</h1>
+            <p class="auth-sub">Insira o código recebido por e-mail e defina sua nova senha.</p>
+          </div>
+
+          @if (sucesso()) {
+            <p-message severity="info" styleClass="auth-message" [text]="sucesso() ?? ''" />
+          }
+
+          <div class="field" [class.field--invalid]="rToken.invalid && rToken.touched">
+            <label class="field__label" for="token">Código de verificação</label>
+            <input
+              pInputText
+              id="token"
+              type="text"
+              autocomplete="one-time-code"
+              formControlName="token"
+              placeholder="Cole o código aqui"
+              [class.p-invalid]="rToken.invalid && rToken.touched"
+            />
+            @if (rToken.touched && rToken.errors?.['required']) {
+              <small class="field__error">Código obrigatório.</small>
+            }
+          </div>
+
+          <div class="field" [class.field--invalid]="rNewPassword.invalid && rNewPassword.touched">
+            <label class="field__label" for="new-password">Nova senha</label>
+            <input
+              pInputText
+              id="new-password"
+              type="password"
+              autocomplete="new-password"
+              formControlName="newPassword"
+              placeholder="••••••••"
+              [class.p-invalid]="rNewPassword.invalid && rNewPassword.touched"
+            />
+            @if (rNewPassword.touched && rNewPassword.errors?.['required']) {
+              <small class="field__error">Nova senha obrigatória.</small>
+            } @else if (rNewPassword.touched && rNewPassword.errors?.['minlength']) {
+              <small class="field__error">Mínimo de 5 caracteres.</small>
+            }
+          </div>
+
+          <div
+            class="field"
+            [class.field--invalid]="
+              (rConfirmar.invalid && rConfirmar.touched) ||
+              (redefinirForm.errors?.['senhasDiferentes'] && rConfirmar.touched)
+            "
+          >
+            <label class="field__label" for="confirmar-senha">Confirmar nova senha</label>
+            <input
+              pInputText
+              id="confirmar-senha"
+              type="password"
+              autocomplete="new-password"
+              formControlName="confirmarSenha"
+              placeholder="••••••••"
+              [class.p-invalid]="
+                (rConfirmar.invalid && rConfirmar.touched) ||
+                (redefinirForm.errors?.['senhasDiferentes'] && rConfirmar.touched)
+              "
+            />
+            @if (rConfirmar.touched && rConfirmar.errors?.['required']) {
+              <small class="field__error">Confirmação obrigatória.</small>
+            } @else if (redefinirForm.errors?.['senhasDiferentes'] && rConfirmar.touched) {
+              <small class="field__error">As senhas não coincidem.</small>
+            }
+          </div>
+
+          @if (erro()) {
+            <p-message severity="error" styleClass="auth-message" [text]="erro() ?? ''" />
+          }
+
+          <p-button
+            type="submit"
+            label="Redefinir senha"
+            icon="pi pi-check"
+            [loading]="carregando()"
+            [disabled]="carregando()"
+            styleClass="repz-primary w-full"
+          />
+
+          <button type="button" class="auth-link" (click)="irParaLogin()">
+            ← Voltar para o login
+          </button>
+        </form>
+      }
+
+    }
   </p-card>
 </div>
