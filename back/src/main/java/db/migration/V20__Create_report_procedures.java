@@ -9,8 +9,7 @@ import java.sql.Statement;
  * RNF05 - Stored procedures (functions) para queries complexas.
  * Migration em Java porque o DDL e especifico do PostgreSQL
  * (LANGUAGE sql / RETURNS TABLE / dollar-quoting), que o H2 usado
- * nos testes nao suporta. Em H2 a migration e ignorada (no-op);
- * o {vendor} de location e recurso pago do Flyway, indisponivel aqui.
+ * nos testes nao suporta. Em H2, cria aliases equivalentes via CREATE ALIAS.
  */
 public class V20__Create_report_procedures extends BaseJavaMigration {
 
@@ -88,10 +87,88 @@ public class V20__Create_report_procedures extends BaseJavaMigration {
             $$;
             """;
 
+    // -------------------------------------------------------------------------
+    // H2-compatible aliases (used in tests)
+    // -------------------------------------------------------------------------
+
+    private static final String H2_FN_DASHBOARD = """
+            CREATE ALIAS IF NOT EXISTS fn_dashboard_academia AS $$
+            java.sql.ResultSet fn_dashboard_academia(java.sql.Connection conn) throws Exception {
+                return conn.createStatement().executeQuery(
+                    "SELECT CAST(COUNT(*) AS BIGINT) AS total_academias, "
+                    + "CAST(COALESCE(SUM(COALESCE(total_alunos, 0)), 0) AS INTEGER) AS total_alunos, "
+                    + "CAST(COALESCE(SUM(COALESCE(total_professores, 0)), 0) AS INTEGER) AS total_professores, "
+                    + "CAST(SUM(CASE WHEN ativo = TRUE THEN 1 ELSE 0 END) AS INTEGER) AS academias_ativas, "
+                    + "CAST(SUM(CASE WHEN ativo IS NOT TRUE THEN 1 ELSE 0 END) AS INTEGER) AS academias_inativas, "
+                    + "CASE WHEN COUNT(*) > 0 "
+                    + "  THEN CAST(COALESCE(SUM(COALESCE(total_alunos, 0)), 0) AS DOUBLE) / COUNT(*) "
+                    + "  ELSE 0.0 END AS media_alunos "
+                    + "FROM academia"
+                );
+            }
+            $$
+            """;
+
+    private static final String H2_FN_RELATORIO = """
+            CREATE ALIAS IF NOT EXISTS fn_relatorio_frequencia AS $$
+            java.sql.ResultSet fn_relatorio_frequencia(java.sql.Connection conn, long academiaId, java.sql.Timestamp inicio, java.sql.Timestamp fim) throws Exception {
+                java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "SELECT u.nome, CAST(COUNT(*) AS BIGINT) "
+                    + "FROM checkin c "
+                    + "JOIN usuario u ON u.id = c.id_aluno "
+                    + "WHERE c.id_academia = ? AND c.data_hora BETWEEN ? AND ? "
+                    + "GROUP BY u.nome ORDER BY u.nome"
+                );
+                ps.setLong(1, academiaId);
+                ps.setTimestamp(2, inicio);
+                ps.setTimestamp(3, fim);
+                return ps.executeQuery();
+            }
+            $$
+            """;
+
+    private static final String H2_FN_INATIVOS = """
+            CREATE ALIAS IF NOT EXISTS fn_alunos_inativos AS $$
+            java.sql.ResultSet fn_alunos_inativos(java.sql.Connection conn, long academiaId, int dias) throws Exception {
+                java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "SELECT CAST(u.id AS BIGINT), u.nome, u.email, MAX(c.data_hora) "
+                    + "FROM checkin c "
+                    + "JOIN usuario u ON u.id = c.id_aluno "
+                    + "WHERE c.id_academia = ? "
+                    + "GROUP BY u.id, u.nome, u.email"
+                );
+                ps.setLong(1, academiaId);
+                java.sql.ResultSet raw = ps.executeQuery();
+                org.h2.tools.SimpleResultSet srs = new org.h2.tools.SimpleResultSet();
+                srs.addColumn("ALUNO_ID", java.sql.Types.BIGINT, 20, 0);
+                srs.addColumn("ALUNO_NOME", java.sql.Types.VARCHAR, 255, 0);
+                srs.addColumn("EMAIL", java.sql.Types.VARCHAR, 255, 0);
+                srs.addColumn("DIAS_SEM_TREINO", java.sql.Types.BIGINT, 20, 0);
+                srs.addColumn("ATIVO", java.sql.Types.BOOLEAN, 1, 0);
+                long millisPerDay = 86400000L;
+                long now = System.currentTimeMillis();
+                while (raw.next()) {
+                    java.sql.Timestamp lastTraining = raw.getTimestamp(4);
+                    if (lastTraining == null) continue;
+                    long diffDays = (now - lastTraining.getTime()) / millisPerDay;
+                    if (diffDays > dias) {
+                        srs.addRow(raw.getLong(1), raw.getString(2), raw.getString(3), diffDays, false);
+                    }
+                }
+                return srs;
+            }
+            $$
+            """;
+
     @Override
     public void migrate(Context context) throws Exception {
         String db = context.getConnection().getMetaData().getDatabaseProductName();
         if (db != null && db.toUpperCase().contains("H2")) {
+            try (Statement st = context.getConnection().createStatement()) {
+                st.execute(H2_FN_DASHBOARD);
+                st.execute(H2_FN_RELATORIO);
+                st.execute(H2_FN_INATIVOS);
+            }
             return;
         }
         try (Statement st = context.getConnection().createStatement()) {
