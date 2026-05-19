@@ -51,17 +51,8 @@ class AcademiaServiceUnitTest {
 
     @Test
     void dashboardCalculaTotaisDeAcademias() {
-        User responsavel = user(1L, UserRole.GERENTE);
-        Academia ativa = academia(10L, responsavel);
-        ativa.setTotalStudents(20);
-        ativa.setTotalInstructors(2);
-        Academia inativa = academia(11L, responsavel);
-        inativa.setActive(false);
-        inativa.setTotalStudents(10);
-        inativa.setTotalInstructors(1);
-
-        when(academiaRepository.findAll()).thenReturn(List.of(ativa, inativa));
-        when(academiaRepository.findByActiveTrue()).thenReturn(List.of(ativa));
+        when(academiaRepository.dashboard())
+                .thenReturn(List.<Object[]>of(new Object[]{2L, 30, 3, 1, 1, 15.0}));
 
         var response = service.obterDashboard();
 

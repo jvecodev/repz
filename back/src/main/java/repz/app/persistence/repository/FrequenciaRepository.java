@@ -18,6 +18,14 @@ public interface FrequenciaRepository extends JpaRepository<Frequencia, Long> {
 
     List<Frequencia> findByAluno_IdOrderByDataHoraDesc(Long alunoId);
 
-    @Query(value = "SELECT f.* FROM frequencia f WHERE f.id_academia = :academiaId ORDER BY f.data_hora DESC LIMIT 1 OFFSET 0", nativeQuery = true)
+    @Query(value = "SELECT f.* FROM checkin f WHERE f.id_academia = :academiaId ORDER BY f.data_hora DESC LIMIT 1 OFFSET 0", nativeQuery = true)
     Frequencia findLatestByAcademia(@Param("academiaId") Long academiaId);
+
+    @Query(value = "SELECT * FROM fn_relatorio_frequencia(:academiaId, :inicio, :fim)", nativeQuery = true)
+    List<Object[]> relatorioFrequencia(@Param("academiaId") Long academiaId,
+                                       @Param("inicio") LocalDateTime inicio,
+                                       @Param("fim") LocalDateTime fim);
+
+    @Query(value = "SELECT * FROM fn_alunos_inativos(:academiaId, :dias)", nativeQuery = true)
+    List<Object[]> alunosInativos(@Param("academiaId") Long academiaId, @Param("dias") int dias);
 }

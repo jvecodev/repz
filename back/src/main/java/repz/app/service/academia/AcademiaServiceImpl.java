@@ -112,27 +112,15 @@ public class AcademiaServiceImpl implements AcademiaService {
 
     @Transactional(readOnly = true)
     public AcademiaDashboardResponse obterDashboard() {
-        List<Academia> allAcademias = academiaRepository.findAll();
-        List<Academia> activeAcademias = academiaRepository.findByActiveTrue();
-
-        long totalAcademies = allAcademias.size();
-        int totalStudents = allAcademias.stream()
-                .mapToInt(a -> a.getTotalStudents() != null ? a.getTotalStudents() : 0)
-                .sum();
-        int totalInstructors = allAcademias.stream()
-                .mapToInt(a -> a.getTotalInstructors() != null ? a.getTotalInstructors() : 0)
-                .sum();
-        int totalActive = activeAcademias.size();
-        int totalInactive = (int) (totalAcademies - totalActive);
-        double averageStudents = totalAcademies > 0 ? (double) totalStudents / totalAcademies : 0;
+        Object[] r = academiaRepository.dashboard().getFirst();
 
         return new AcademiaDashboardResponse(
-                totalAcademies,
-                totalStudents,
-                totalInstructors,
-                totalActive,
-                totalInactive,
-                averageStudents
+                ((Number) r[0]).longValue(),
+                ((Number) r[1]).intValue(),
+                ((Number) r[2]).intValue(),
+                ((Number) r[3]).intValue(),
+                ((Number) r[4]).intValue(),
+                ((Number) r[5]).doubleValue()
         );
     }
 }

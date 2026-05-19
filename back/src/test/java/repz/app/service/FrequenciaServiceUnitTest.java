@@ -144,8 +144,8 @@ class FrequenciaServiceUnitTest {
 
         when(userRepository.findByEmail(academiaUser.getEmail())).thenReturn(Optional.of(academiaUser));
         when(academiaContextService.resolveRequired(auth(academiaUser), academia.getId())).thenReturn(academia.getId());
-        when(frequenciaRepository.findByAcademiaIdAndPeriodo(academia.getId(), inicio, fim))
-                .thenReturn(List.of(frequencia(1L, aluno, academia, null, LocalDateTime.now())));
+        when(frequenciaRepository.relatorioFrequencia(academia.getId(), inicio, fim))
+                .thenReturn(List.<Object[]>of(new Object[]{aluno.getName(), 1L}));
 
         FrequenciaRelatorioResponse response = service.obterRelatorio(academia.getId(), inicio, fim, auth(academiaUser));
 
@@ -160,13 +160,11 @@ class FrequenciaServiceUnitTest {
         User academiaUser = user(20L, UserRole.GERENTE);
         Academia academia = academia(30L, academiaUser);
         User alunoInativo = user(10L, UserRole.ALUNO);
-        User alunoAtivo = user(11L, UserRole.ALUNO);
 
         when(academiaContextService.resolveRequired(auth(academiaUser), academia.getId())).thenReturn(academia.getId());
         when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
-        when(frequenciaRepository.findAll()).thenReturn(List.of(
-                frequencia(1L, alunoInativo, academia, null, LocalDateTime.now().minusDays(10)),
-                frequencia(2L, alunoAtivo, academia, null, LocalDateTime.now().minusDays(2))
+        when(frequenciaRepository.alunosInativos(academia.getId(), 7)).thenReturn(List.<Object[]>of(
+                new Object[]{alunoInativo.getId(), alunoInativo.getName(), alunoInativo.getEmail(), 10L, false}
         ));
 
         List<AlunoInativoResponse> response = service.obterAlunosInativos(academia.getId(), auth(academiaUser));

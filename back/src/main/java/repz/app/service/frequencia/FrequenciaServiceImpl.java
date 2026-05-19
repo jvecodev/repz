@@ -20,8 +20,9 @@ import repz.app.persistence.repository.UserRepository;
 import repz.app.service.academia.AcademiaContextService;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -109,34 +110,14 @@ public class FrequenciaServiceImpl implements FrequenciaService {
         academiaRepository.findById(resolvedAcademiaId)
                 .orElseThrow(() -> new RuntimeException(mensagens.get("academia.nao.encontrada")));
 
-        List<Frequencia> frequencias = frequenciaRepository.findAll().stream()
-                .filter(f -> f.getAcademia().getId().equals(resolvedAcademiaId))
-                .toList();
-
-        return frequencias.stream()
-                .collect(Collectors.groupingBy(Frequencia::getAluno))
-                .entrySet().stream()
-                .map(entry -> {
-                    User aluno = entry.getKey();
-                    List<Frequencia> frequenciasList = entry.getValue();
-                    LocalDateTime lastFrequencia = frequenciasList.stream()
-                            .map(Frequencia::getDataHora)
-                            .max(LocalDateTime::compareTo)
-                            .orElse(null);
-
-                    long diasSemTreino = lastFrequencia != null
-                            ? ChronoUnit.DAYS.between(lastFrequencia, LocalDateTime.now())
-                            : Long.MAX_VALUE;
-
-                    return new AlunoInativoResponse(
-                            aluno.getId(),
-                            aluno.getName(),
-                            aluno.getEmail(),
-                            diasSemTreino,
-                            diasSemTreino <= 7
-                    );
-                })
-                .filter(response -> response.getDiasSemTreino() > 7)
+        return frequenciaRepository.alunosInativos(resolvedAcademiaId, 7).stream()
+                .map(r -> new AlunoInativoResponse(
+                        ((Number) r[0]).longValue(),
+                        (String) r[1],
+                        (String) r[2],
+                        ((Number) r[3]).longValue(),
+                        (Boolean) r[4]
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -150,18 +131,19 @@ public class FrequenciaServiceImpl implements FrequenciaService {
         }
 
         Long resolvedAcademiaId = academiaContextService.resolveRequired(auth, academiaId);
-        List<Frequencia> frequencias = frequenciaRepository.findByAcademiaIdAndPeriodo(resolvedAcademiaId, inicio, fim);
 
-        var frequenciaPorAluno = frequencias.stream()
-                .collect(Collectors.groupingByConcurrent(
-                        f -> f.getAluno().getName(),
-                        Collectors.counting()
-                ));
+        Map<String, Long> frequenciaPorAluno = new LinkedHashMap<>();
+        long total = 0;
+        for (Object[] row : frequenciaRepository.relatorioFrequencia(resolvedAcademiaId, inicio, fim)) {
+            long count = ((Number) row[1]).longValue();
+            frequenciaPorAluno.put((String) row[0], count);
+            total += count;
+        }
 
         FrequenciaRelatorioResponse response = new FrequenciaRelatorioResponse();
         response.setAcademiaId(resolvedAcademiaId);
         response.setPeriodo(java.util.Map.of("inicio", inicio, "fim", fim));
-        response.setTotalFrequencias((long) frequencias.size());
+        response.setTotalFrequencias(total);
         response.setFrequenciaPorAluno(frequenciaPorAluno);
 
         return response;
