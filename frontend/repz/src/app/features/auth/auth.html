@@ -54,13 +54,13 @@
               type="password"
               autocomplete="current-password"
               formControlName="password"
-              placeholder="••••••••"
+              placeholder="•••••"
               [class.p-invalid]="lPassword.invalid && lPassword.touched"
             />
             @if (lPassword.touched && lPassword.errors?.['required']) {
               <small class="field__error">Senha obrigatória.</small>
             } @else if (lPassword.touched && lPassword.errors?.['minlength']) {
-              <small class="field__error">Mínimo de 6 caracteres.</small>
+              <small class="field__error">Mínimo de 5 caracteres.</small>
             }
           </div>
 
@@ -182,7 +182,7 @@
             @if (rNewPassword.touched && rNewPassword.errors?.['required']) {
               <small class="field__error">Nova senha obrigatória.</small>
             } @else if (rNewPassword.touched && rNewPassword.errors?.['minlength']) {
-              <small class="field__error">Mínimo de 6 caracteres.</small>
+              <small class="field__error">Mínimo de 5 caracteres.</small>
             }
           </div>
 

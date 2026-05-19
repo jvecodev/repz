@@ -11,9 +11,9 @@ public record ResetPasswordRequest(
         @NotBlank(message = "Código inválido.")
         String token,
 
-        @Schema(description = "Nova senha com no mínimo 6 caracteres", example = "novaSenha123")
+        @Schema(description = "Nova senha com no mínimo 5 caracteres", example = "novaSenha123")
         @NotBlank(message = "Insira a nova senha.")
-        @Size(min = 6, message = "A senha precisa ter no mínimo {min} caracteres.")
+        @Size(min = 5, message = "A senha precisa ter no mínimo {min} caracteres.")
         String newPassword
 ) {
 }

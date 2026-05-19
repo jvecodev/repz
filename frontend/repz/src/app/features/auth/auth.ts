@@ -30,7 +30,7 @@ export class Auth {
 
   readonly loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required, Validators.minLength(5)]],
   });
 
   readonly esqueciForm = this.fb.group({
@@ -40,7 +40,7 @@ export class Auth {
   readonly redefinirForm = this.fb.group(
     {
       token: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(5)]],
       confirmarSenha: ['', [Validators.required]],
     },
     { validators: senhasIguaisValidator },
