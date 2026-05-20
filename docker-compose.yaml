@@ -60,5 +60,15 @@ services:
     depends_on:
       - api
 
+  ai-service:
+    build: ./ai-service
+    container_name: repzai
+    volumes:
+      - ./ai-service:/app
+    ports:
+      - "8055:8000"
+    env_file: ./ai-service/.env
+    restart: unless-stopped
+
 volumes:
   minio_data:
