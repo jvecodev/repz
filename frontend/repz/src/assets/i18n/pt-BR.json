@@ -1,0 +1,33 @@
+{
+  "COMMON": {
+    "SAVE": "Salvar",
+    "CANCEL": "Cancelar",
+    "EDIT": "Editar",
+    "DELETE": "Excluir"
+  },
+
+  "MENU": {
+    "HOME": "Início",
+    "USERS": "Usuários",
+    "SETTINGS": "Configurações",
+    "LOGOUT": "Sair"
+  },
+
+  "LOGIN": {
+    "TITLE": "Entrar",
+    "EMAIL": "E-mail",
+    "PASSWORD": "Senha",
+    "BUTTON": "Acessar"
+  },
+
+  "VALIDATION": {
+    "REQUIRED": "Campo obrigatório",
+    "INVALID_EMAIL": "E-mail inválido",
+    "MIN_LENGTH": "Quantidade mínima de caracteres inválida"
+  },
+
+  "MESSAGES": {
+    "SUCCESS": "Operação realizada com sucesso",
+    "ERROR": "Erro ao processar operação"
+  }
+}
