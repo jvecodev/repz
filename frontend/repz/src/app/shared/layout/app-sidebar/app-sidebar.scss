@@ -9,8 +9,7 @@
   position: sticky;
   top: 0;
   height: 100dvh;
-  overflow: hidden; /* impede conteúdo de vazar — o scroll fica só no .nav */
-  min-height: 0;
+  overflow: visible;
 }
 
 svg {
@@ -94,23 +93,7 @@ svg {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1 1 auto;
-  min-height: 0; /* essencial pra flex item permitir overflow */
-  overflow-y: auto;
-  /* scrollbar discreta */
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-  }
+  flex: 1;
 }
 
 .nav-item {
@@ -133,12 +116,6 @@ svg {
     width: 18px;
     height: 18px;
     flex: 0 0 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    i {
-      font-size: 16px;
-    }
   }
 
   &:hover {
@@ -149,82 +126,6 @@ svg {
   &.active {
     background: var(--mint-soft);
     color: var(--mint);
-  }
-}
-
-/* ---- Grupos colapsáveis ---- */
-.nav-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 4px;
-}
-
-.nav-group-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 10px 12px;
-  border: none;
-  background: transparent;
-  border-radius: var(--r-sm);
-  color: var(--text-2);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  text-align: left;
-  transition: background 0.15s, color 0.15s;
-
-  .icon {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    i {
-      font-size: 15px;
-    }
-  }
-
-  .label {
-    flex: 1;
-  }
-
-  .chev {
-    font-size: 11px;
-    transition: transform 0.2s ease;
-    opacity: 0.6;
-  }
-
-  &:hover {
-    background: var(--surface-hover);
-    color: var(--text);
-  }
-}
-
-.nav-group.is-open .nav-group-header .chev {
-  transform: rotate(180deg);
-}
-
-.nav-group-items {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding-left: 8px;
-  margin-top: 2px;
-  border-left: 1px solid var(--border);
-  margin-left: 18px;
-
-  &.is-hidden {
-    display: none;
-  }
-
-  .nav-item {
-    padding: 8px 10px;
-    font-size: 13px;
   }
 }
 
@@ -268,23 +169,17 @@ svg {
   border-radius: var(--r-md);
 }
 
-/* ---- botão de logout ---- */
-.sidebar-logout {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-
 .logout-btn {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
   padding: 11px 12px;
+  margin-top: 8px;
   border: none;
-  background: transparent;
   border-radius: var(--r-sm);
-  color: var(--text-2);
+  background: transparent;
+  color: var(--text-3);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -293,18 +188,18 @@ svg {
     background 0.15s,
     color 0.15s;
 
-  i {
+  .icon {
     width: 18px;
-    font-size: 16px;
+    height: 18px;
+    flex: 0 0 18px;
   }
 
   &:hover {
     background: var(--surface-hover);
-    color: #ef4444; /* red-500 — sutil sinalizando ação destrutiva */
+    color: var(--red, #ef4444);
   }
 }
 
-/* ---- estado colapsado (iOS rail) ---- */
 :host(.is-collapsed) {
   .logo {
     justify-content: center;
@@ -328,32 +223,6 @@ svg {
     padding: 12px 0;
     .pb-info {
       display: none;
-    }
-  }
-
-  .logout-btn {
-    justify-content: center;
-    padding: 10px 0;
-    .label {
-      display: none;
-    }
-  }
-
-  /* Rail mode: vira lista plana de ícones — sem headers nem indentação. */
-  .nav-group-header {
-    display: none;
-  }
-  .nav-group-items {
-    display: flex !important;
-    padding-left: 0;
-    margin-left: 0;
-    border-left: none;
-    .nav-item {
-      justify-content: center;
-      padding: 10px 0;
-      .label {
-        display: none;
-      }
     }
   }
 
@@ -383,6 +252,14 @@ svg {
   ::ng-deep .cta-mini {
     display: inline-flex;
   }
+
+  .logout-btn {
+    justify-content: center;
+    padding: 11px 0;
+    .label {
+      display: none;
+    }
+  }
 }
 
 @include mobile {
@@ -396,15 +273,20 @@ svg {
     box-shadow: var(--shadow-lg);
   }
 
-  /* no mobile, colapsada = gaveta fechada */
   :host(.is-collapsed) {
     transform: translateX(-100%);
     box-shadow: none;
 
     .profile-block .pb-info,
     .nav-item .label,
+    .logout-btn .label,
     .cta-card {
       display: revert;
+    }
+
+    .logout-btn {
+      justify-content: flex-start;
+      padding: 11px 12px;
     }
     ::ng-deep .cta-mini {
       display: none;

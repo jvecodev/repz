@@ -1,8 +1,6 @@
-/* ============================================================
-   REPZ — Design System global (tokens + primitivos reutilizáveis)
-   ============================================================ */
+
 :root {
-  /* superfícies */
+
   --bg: #0b0d11;
   --bg-elev: #12151b;
   --card: #1a1d23;
@@ -11,48 +9,44 @@
   --border: rgba(255, 255, 255, 0.06);
   --border-strong: rgba(255, 255, 255, 0.1);
 
-  /* texto */
   --text: #f3f5f7;
   --text-2: #b6bcc6;
   --text-3: #7c8493;
   --text-4: #555c68;
 
-  /* marca */
   --mint: #34d399;
   --mint-2: #2bbf87;
   --mint-3: #1f8f66;
   --mint-soft: rgba(52, 211, 153, 0.12);
   --mint-soft-2: rgba(52, 211, 153, 0.22);
 
-  /* raios */
+  --success: #34d399;
+  --warn: #f59e0b;
+  --warn-soft: rgba(245, 158, 11, 0.14);
+  --error: #f87171;
+  --error-soft: rgba(248, 113, 113, 0.14);
+
   --r-xs: 6px;
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 16px;
 
-  /* sombras */
   --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
 
-  /* interação (tokens que mudam entre temas) */
   --surface-hover: rgba(255, 255, 255, 0.04);
   --row-hover: rgba(255, 255, 255, 0.025);
   --tag-muted-bg: rgba(255, 255, 255, 0.05);
 
-  /* transição de tema */
   --transition-tema: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 
-  /* tipografia */
   --font:
     'Inter', 'Helvetica Neue', Helvetica, Arial, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-/* ============================================================
-   Modo claro (tokens quentes/off-white)
-   ============================================================ */
 [data-theme='light'] {
-  /* superfícies */
+
   --bg: #f5f4f1;
   --bg-elev: #eeede9;
   --card: #fefefe;
@@ -61,17 +55,14 @@
   --border: rgba(0, 0, 0, 0.07);
   --border-strong: rgba(0, 0, 0, 0.14);
 
-  /* texto */
   --text: #2c2c2c;
   --text-2: #555555;
   --text-3: #888888;
   --text-4: #aaaaaa;
 
-  /* sombras */
   --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.18);
 
-  /* interação */
   --surface-hover: rgba(0, 0, 0, 0.05);
   --row-hover: rgba(0, 0, 0, 0.03);
   --tag-muted-bg: rgba(0, 0, 0, 0.06);
@@ -93,10 +84,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   transition: var(--transition-tema);
 }
-
-/* ============================================================
-   Primitivos reutilizáveis (avatar, divisórias e helpers)
-   ============================================================ */
 
 .avatar {
   width: 34px;
@@ -126,7 +113,6 @@ body {
   margin: 14px 0;
 }
 
-/* cabeçalho de página (padrão reutilizável entre telas) */
 .page-enter {
   animation: fadeUp 0.2s ease-out;
 }
@@ -162,7 +148,6 @@ body {
   max-width: 680px;
 }
 
-/* helpers tipográficos */
 .font-semibold {
   font-weight: 600;
 }
@@ -185,7 +170,6 @@ body {
   width: 100%;
 }
 
-/* PrimeNG alinhado aos tokens visuais do REPZ */
 .p-card.repz-card {
   background: var(--card);
   color: var(--text);
@@ -423,6 +407,158 @@ body {
   }
 
   .dash-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.p-card.repz-card.kpi-card .p-card-body {
+  padding: 18px 20px;
+}
+
+.kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kpi-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.kpi-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: var(--r-sm);
+  background: var(--mint-soft);
+  color: var(--mint);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+}
+
+.kpi-value {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--text);
+  margin: 12px 0 4px;
+}
+
+.kpi-value .kpi-unit {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.kpi-value.kpi-value-sm {
+  font-size: 20px;
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.kpi-delta.neg {
+  color: var(--error);
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 150px;
+  padding-top: 8px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bar-col .bar {
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  min-height: 4px;
+  background: linear-gradient(180deg, var(--mint) 0%, var(--mint-3) 100%);
+  transition: filter 0.15s;
+}
+
+.bar-col .bar:hover {
+  filter: brightness(1.15);
+}
+
+.bar-col .bar.muted {
+  background: var(--card-2);
+}
+
+.bar-col .bar-label {
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bar-col .bar-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.section-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.dash-split {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .dash-split {
     grid-template-columns: 1fr;
   }
 }
