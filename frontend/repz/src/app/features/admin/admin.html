@@ -1,55 +1,93 @@
 <app-shell
   ativo="dashboard"
   [crumbs]="['Admin', 'Dashboard']"
-  nome="Admin"
+  [nome]="userService.nomeUsuario() || 'Administrador'"
   subtitulo="Administração"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Administração</div>
-      <div class="page-subtitle">Acesso rápido aos cadastros mantidos pelo perfil ADMIN.</div>
+      <div class="page-title">Painel administrativo</div>
+      <div class="page-subtitle">Visão geral da operação — academias, alunos e personais.</div>
     </div>
   </div>
 
-  <div class="dash-grid">
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Cadastro</div>
-      <h2>Academias</h2>
-      <p>CRUD completo das academias da plataforma.</p>
-      <p-button
-        label="Abrir"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        styleClass="repz-primary"
-        routerLink="/admin/academias"
-      />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Pessoas</div>
-      <h2>Personais</h2>
-      <p>Gerencie personais de todas as academias.</p>
-      <p-button
-        label="Abrir"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        styleClass="repz-primary"
-        routerLink="/admin/personais"
-      />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Pessoas</div>
-      <h2>Alunos</h2>
-      <p>Gerencie matrículas de alunos em qualquer academia.</p>
-      <p-button
-        label="Abrir"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        styleClass="repz-primary"
-        routerLink="/admin/alunos"
-      />
-    </p-card>
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
   </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro() && dashboard() as d">
+    <div class="kpi-grid">
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Academias</span>
+          <span class="kpi-icon"><i class="pi pi-building"></i></span>
+        </div>
+        <div class="kpi-value">{{ d.totalAcademies }}</div>
+        <div class="kpi-sub">
+          {{ d.totalActiveAcademies }} ativas · {{ d.totalInactiveAcademies }} inativas
+        </div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Alunos</span>
+          <span class="kpi-icon"><i class="pi pi-users"></i></span>
+        </div>
+        <div class="kpi-value">{{ d.totalStudents }}</div>
+        <div class="kpi-sub">total na plataforma</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Personais</span>
+          <span class="kpi-icon"><i class="pi pi-id-card"></i></span>
+        </div>
+        <div class="kpi-value">{{ d.totalInstructors }}</div>
+        <div class="kpi-sub">instrutores ativos</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Média</span>
+          <span class="kpi-icon"><i class="pi pi-chart-bar"></i></span>
+        </div>
+        <div class="kpi-value">{{ mediaAlunos() }}</div>
+        <div class="kpi-sub">alunos por academia</div>
+      </p-card>
+    </div>
+
+    <div class="dash-grid">
+      <p-card styleClass="repz-card dash-card">
+        <div class="dash-kicker">Gestão</div>
+        <h2>Academias</h2>
+        <p>Consulte todas as academias da plataforma, ative ou desative unidades.</p>
+        <p-button
+          label="Gerenciar academias"
+          icon="pi pi-building"
+          styleClass="repz-primary"
+          routerLink="/admin/academias"
+        />
+      </p-card>
+
+      <p-card styleClass="repz-card dash-card">
+        <div class="dash-kicker">Acessos</div>
+        <h2>Usuários</h2>
+        <p>Administre todos os usuários do sistema entre aluno, personal, gerente e admin.</p>
+        <p-button
+          label="Gerenciar usuários"
+          icon="pi pi-users"
+          styleClass="repz-primary"
+          routerLink="/admin/usuarios"
+        />
+      </p-card>
+    </div>
+  </ng-container>
 </app-shell>

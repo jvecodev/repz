@@ -1,0 +1,194 @@
+<app-shell
+  ativo="usuarios"
+  [crumbs]="['Admin', 'Usuários']"
+  [nome]="userService.nomeUsuario() || 'Administrador'"
+  subtitulo="Administração"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Usuários</div>
+      <div class="page-subtitle">
+        @if (!carregando()) {
+          {{ usuarios().length }} usuário(s) no sistema
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro()">
+
+    <p-message
+      *ngIf="aviso()"
+      [severity]="avisoSeverity()"
+      styleClass="w-full aviso"
+      [text]="aviso()!"
+    />
+
+    <div class="filtros" *ngIf="usuarios().length > 0">
+      <span class="search-wrap">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="Buscar por nome ou e-mail…"
+          [ngModel]="busca()"
+          (ngModelChange)="busca.set($event)"
+          class="search-input"
+        />
+      </span>
+
+      <div class="role-pills">
+        <button
+          *ngFor="let r of roles"
+          type="button"
+          class="role-pill"
+          [class.active]="filtroRole() === r.value"
+          (click)="filtroRole.set(r.value)"
+        >
+          {{ r.label }}
+        </button>
+      </div>
+    </div>
+
+    <p-card styleClass="repz-card" *ngIf="usuarios().length === 0">
+      <div class="empty-state">
+        <i class="pi pi-users empty-icon"></i>
+        <div class="empty-title">Nenhum usuário cadastrado</div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="repz-card" *ngIf="usuarios().length > 0">
+      <p-table
+        [value]="usuariosFiltrados()"
+        styleClass="repz-table"
+        [tableStyle]="{ 'min-width': '720px' }"
+        [paginator]="usuariosFiltrados().length > 12"
+        [rows]="12"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Usuário</th>
+            <th>Perfil</th>
+            <th>Último login</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-u>
+          <tr>
+            <td>
+              <div class="cell-strong">
+                {{ u.name }}
+                <span class="voce-tag" *ngIf="ehProprioUsuario(u)">você</span>
+              </div>
+              <div class="cell-sub">{{ u.email }}</div>
+            </td>
+            <td>
+              <p-tag [styleClass]="classeTagRole(u.role)" [value]="rotuloRole(u.role)" />
+            </td>
+            <td class="cell-sub">{{ u.lastLogin || '—' }}</td>
+            <td>
+              <p-tag
+                [styleClass]="u.active ? 'repz-tag-success' : 'repz-tag-muted'"
+                [value]="u.active ? 'Ativo' : 'Inativo'"
+              />
+            </td>
+            <td class="td-action">
+              <p-button
+                icon="pi pi-pencil"
+                label="Editar"
+                size="small"
+                styleClass="repz-ghost"
+                [disabled]="!podeEditar(u)"
+                [title]="!podeEditar(u) ? 'Você não pode editar outro admin' : ''"
+                (onClick)="abrirEdicao(u)"
+              />
+              <p-button
+                [label]="u.active ? 'Desativar' : 'Ativar'"
+                [icon]="u.active ? 'pi pi-ban' : 'pi pi-check'"
+                size="small"
+                [styleClass]="u.active ? 'repz-ghost' : 'repz-primary'"
+                [loading]="alterandoId() === u.id"
+                [disabled]="
+                  ehProprioUsuario(u) || (alterandoId() !== null && alterandoId() !== u.id)
+                "
+                [title]="ehProprioUsuario(u) ? 'Você não pode desativar a si mesmo' : ''"
+                (onClick)="alternarStatus(u)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="empty-row">Nenhum usuário corresponde aos filtros.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </ng-container>
+
+  <p-dialog
+    header="Editar usuário"
+    [visible]="editando() !== null"
+    (visibleChange)="$event ? null : fecharEdicao()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '440px' }"
+    styleClass="repz-dialog"
+  >
+    <div class="edit-form" *ngIf="editando()">
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input pInputText [(ngModel)]="formNome" class="w-full" placeholder="Nome completo" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input
+          pInputText
+          type="email"
+          [(ngModel)]="formEmail"
+          class="w-full"
+          placeholder="email@exemplo.com"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Perfil</label>
+        <select class="form-select" [(ngModel)]="formRole" [disabled]="editandoProprioPerfil()">
+          <option *ngFor="let r of rolesEdicao" [value]="r.value">{{ r.label }}</option>
+        </select>
+        <div class="form-hint" *ngIf="editandoProprioPerfil()">
+          Você não pode alterar o próprio perfil.
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        styleClass="repz-ghost"
+        (onClick)="fecharEdicao()"
+        [disabled]="salvandoEdicao()"
+      />
+      <p-button
+        label="Salvar"
+        icon="pi pi-check"
+        styleClass="repz-primary"
+        [loading]="salvandoEdicao()"
+        (onClick)="salvarEdicao()"
+      />
+    </ng-template>
+  </p-dialog>
+</app-shell>
