@@ -1,55 +1,272 @@
 <app-shell
   ativo="dashboard"
-  [crumbs]="['Academia', 'Dashboard']"
-  nome="Academia"
-  subtitulo="Gestão"
+  [crumbs]="['Gestor da Academia', 'Painel']"
+  [nome]="userService.nomeUsuario() || 'Gerente'"
+  subtitulo="Gestão da academia"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Minha academia</div>
-      <div class="page-subtitle">Acesso rápido às operações da sua academia.</div>
+      <div class="page-title">Painel da academia</div>
+      <div class="page-subtitle" *ngIf="academia() as a">
+        <strong>{{ a.name }}</strong> · {{ a.address || 'sem endereço' }}
+      </div>
+    </div>
+    <div class="header-actions">
+      <p-button
+        label="Editar academia"
+        icon="pi pi-pencil"
+        styleClass="repz-ghost"
+        (onClick)="abrirEdicao()"
+        [disabled]="!academia()"
+      />
+      <p-button
+        label="Ver relatórios"
+        icon="pi pi-chart-line"
+        styleClass="repz-primary"
+        routerLink="/academia/relatorios"
+      />
     </div>
   </div>
 
-  <div class="dash-grid">
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Catálogo</div>
-      <h2>Planos</h2>
-      <p>Crie, edite e inative os planos oferecidos.</p>
-      <p-button
-        label="Abrir"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        styleClass="repz-primary"
-        routerLink="/academia/planos"
-      />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Pessoas</div>
-      <h2>Personais</h2>
-      <p>Gerencie o time de personais da sua academia.</p>
-      <p-button
-        label="Abrir"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        styleClass="repz-primary"
-        routerLink="/academia/personais"
-      />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Pessoas</div>
-      <h2>Alunos</h2>
-      <p>Cadastre matrículas, vincule planos e personais.</p>
-      <p-button
-        label="Abrir"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        styleClass="repz-primary"
-        routerLink="/academia/alunos"
-      />
-    </p-card>
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
   </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro() && academia()">
+
+    <p-message
+      *ngIf="aviso()"
+      [severity]="avisoSeverity()"
+      [text]="aviso()!"
+      styleClass="w-full aviso-global"
+    />
+
+    <div class="kpi-grid">
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Alunos</span>
+          <span class="kpi-icon"><i class="pi pi-users"></i></span>
+        </div>
+        <div class="kpi-value">{{ totalAlunos() }}</div>
+        <div class="kpi-sub">matriculados na academia</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Ativos</span>
+          <span class="kpi-icon"><i class="pi pi-check"></i></span>
+        </div>
+        <div class="kpi-value">{{ totalAtivos() }}</div>
+        <div class="kpi-sub" *ngIf="totalAlunos() > 0">
+          {{ ((totalAtivos() / totalAlunos()) * 100) | number: '1.0-0' }}% da base
+        </div>
+        <div class="kpi-sub" *ngIf="totalAlunos() === 0">sem alunos</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Personais</span>
+          <span class="kpi-icon"><i class="pi pi-id-card"></i></span>
+        </div>
+        <div class="kpi-value">{{ totalPersonais() }}</div>
+        <div class="kpi-sub">vinculados à unidade</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Ausentes (>14d)</span>
+          <span class="kpi-icon kpi-icon-warn"><i class="pi pi-exclamation-triangle"></i></span>
+        </div>
+        <div class="kpi-value">{{ ausentes() }}</div>
+        <div class="kpi-sub">{{ ausentes() > 0 ? 'considere contato' : 'tudo em dia' }}</div>
+      </p-card>
+    </div>
+
+    <div class="dash-split">
+
+      <p-card styleClass="repz-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Personais da academia</div>
+            <div class="section-sub">{{ totalPersonais() }} vinculado(s)</div>
+          </div>
+          <p-button
+            label="Ver todos"
+            size="small"
+            styleClass="repz-ghost"
+            (onClick)="irParaPersonais()"
+          />
+        </div>
+
+        <div class="empty-inline text-3" *ngIf="personais().length === 0">
+          Nenhum personal cadastrado ainda.
+        </div>
+
+        <p-table
+          *ngIf="personais().length > 0"
+          [value]="personais().slice(0, 5)"
+          styleClass="repz-table"
+          [tableStyle]="{ 'min-width': '420px' }"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Personal</th>
+              <th>Especialidade</th>
+              <th>Status</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-p>
+            <tr>
+              <td>
+                <div class="cell-aluno">
+                  <div class="avatar avatar-md">{{ inicial(p.userName) }}</div>
+                  <div>
+                    <div class="cell-strong">{{ p.userName }}</div>
+                    <div class="cell-sub">{{ p.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="cell-sub">{{ p.especialidade || '—' }}</td>
+              <td>
+                <p-tag
+                  [styleClass]="p.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
+                  [value]="p.ativo ? 'Ativo' : 'Inativo'"
+                />
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+
+      <p-card styleClass="repz-card cadastro-card">
+        <div class="section-title">Cadastro rápido</div>
+        <div class="section-sub">cria aluno ou personal vinculado à sua academia</div>
+
+        <div class="cad-tabs">
+          <button
+            type="button"
+            class="cad-tab"
+            [class.active]="abaCadastro() === 'aluno'"
+            (click)="trocarAba('aluno')"
+          >
+            Aluno
+          </button>
+          <button
+            type="button"
+            class="cad-tab"
+            [class.active]="abaCadastro() === 'personal'"
+            (click)="trocarAba('personal')"
+          >
+            Personal
+          </button>
+        </div>
+
+        <div class="cad-form">
+          <div class="form-group">
+            <label class="form-label">Nome completo</label>
+            <input
+              pInputText
+              [(ngModel)]="cadNome"
+              placeholder="Ex: João Silva"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input
+              pInputText
+              type="email"
+              [(ngModel)]="cadEmail"
+              placeholder="joao@email.com"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-group" *ngIf="abaCadastro() === 'aluno' && planos().length > 0">
+            <label class="form-label">Plano</label>
+            <select class="form-select" [(ngModel)]="cadPlanoId">
+              <option *ngFor="let p of planos()" [ngValue]="p.id">
+                {{ p.nome }} — R$ {{ p.valor ?? '—' }}
+              </option>
+            </select>
+          </div>
+
+          <p-button
+            label="Cadastrar"
+            icon="pi pi-plus"
+            styleClass="repz-primary w-full"
+            [loading]="cadastrando()"
+            (onClick)="cadastrar()"
+          />
+        </div>
+      </p-card>
+    </div>
+  </ng-container>
+
+  <p-dialog
+    header="Editar dados da academia"
+    [visible]="editando()"
+    (visibleChange)="$event ? null : fecharEdicao()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '500px' }"
+    styleClass="repz-dialog"
+  >
+    <div class="edit-form">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input pInputText [(ngModel)]="formNome" class="w-full" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">CNPJ *</label>
+          <input pInputText [(ngModel)]="formCnpj" class="w-full" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço *</label>
+        <input pInputText [(ngModel)]="formEndereco" class="w-full" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Responsável *</label>
+        <input pInputText [(ngModel)]="formResponsavel" class="w-full" />
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input pInputText type="email" [(ngModel)]="formEmail" class="w-full" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input pInputText [(ngModel)]="formTelefone" class="w-full" />
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        styleClass="repz-ghost"
+        (onClick)="fecharEdicao()"
+        [disabled]="salvando()"
+      />
+      <p-button
+        label="Salvar"
+        icon="pi pi-check"
+        styleClass="repz-primary"
+        [loading]="salvando()"
+        (onClick)="salvarAcademia()"
+      />
+    </ng-template>
+  </p-dialog>
 </app-shell>
