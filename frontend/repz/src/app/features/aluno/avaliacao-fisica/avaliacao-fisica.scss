@@ -4,9 +4,6 @@
   display: block;
 }
 
-// ============================================================
-// Layout da página
-// ============================================================
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -24,15 +21,11 @@
   gap: 20px;
 }
 
-// ============================================================
-// Card do gráfico — sem padding no corpo (gerenciado internamente)
-// ============================================================
 :host ::ng-deep .chart-card .p-card-body,
 :host ::ng-deep .chart-card .p-card-content {
   padding: 0;
 }
 
-// ---- pills de métrica ----
 .card-tabs-row {
   display: flex;
   align-items: center;
@@ -98,7 +91,6 @@
   }
 }
 
-// ---- barra de estatísticas ----
 .stats-row {
   display: flex;
   align-items: stretch;
@@ -158,7 +150,6 @@
   background: var(--border);
 }
 
-// ---- gráfico ----
 .chart-wrap {
   padding: 18px;
 }
@@ -182,11 +173,8 @@
   font-size: 13px;
 }
 
-// ============================================================
-// Histórico
-// ============================================================
 :host ::ng-deep .historico .p-card-body {
-  padding: 18px 0 6px;
+  padding: 18px 22px;
 }
 
 :host ::ng-deep .historico .p-card-content {
@@ -198,7 +186,100 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 22px 16px;
+  padding: 0 0 16px;
+}
+
+.av-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.av-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px;
+  background: var(--card-2);
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+}
+
+.av-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.av-data {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.av-resumo {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.av-delta {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+
+  &.up {
+    color: var(--warn);
+    background: var(--warn-soft);
+  }
+
+  &.down {
+    color: var(--mint);
+    background: var(--mint-soft);
+  }
+}
+
+.av-medidas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px 16px;
+}
+
+.av-medida {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-4);
+  }
+
+  strong {
+    font-size: 14px;
+    color: var(--text);
+  }
+}
+
+.av-personal {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  i {
+    color: var(--text-4);
+  }
 }
 
 .hist-personal {
@@ -226,9 +307,6 @@
   padding: 0 22px 18px;
 }
 
-// ============================================================
-// Formulário
-// ============================================================
 :host ::ng-deep .form-card-shell .p-card-content {
   display: flex;
   flex-direction: column;
@@ -280,7 +358,6 @@
   }
 }
 
-// IMC estimado — read-only inline no grid
 .imc-inline {
   display: flex;
   align-items: center;
@@ -305,9 +382,6 @@
   width: 100%;
 }
 
-// ============================================================
-// Estados (loading / erro)
-// ============================================================
 :host ::ng-deep .state-card .p-card-content {
   display: flex;
   align-items: center;
@@ -343,9 +417,6 @@
   height: 18px;
 }
 
-// ============================================================
-// Responsivo
-// ============================================================
 @include tablet {
   .layout {
     grid-template-columns: 1fr;

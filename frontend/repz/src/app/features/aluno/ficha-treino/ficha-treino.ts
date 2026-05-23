@@ -3,7 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
-import { AuthService, FichaTreinoService, SolicitacaoFichaService } from '@core/services';
+import {
+  AuthService,
+  FichaTreinoService,
+  FrequenciaService,
+  SolicitacaoFichaService,
+} from '@core/services';
 import type { SolicitacaoFichaResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
@@ -46,6 +51,7 @@ export class FichaTreino implements OnInit {
   private readonly solicitacaoService = inject(SolicitacaoFichaService);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  protected readonly freq = inject(FrequenciaService);
 
   readonly ficha = signal<FichaVM | null>(null);
   readonly historico = signal<HistoricoVM[]>([]);
@@ -54,7 +60,6 @@ export class FichaTreino implements OnInit {
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
 
-  // Solicitação de nova ficha
   readonly dialogAberto = signal(false);
   readonly mensagemSolicitacao = signal('');
   readonly enviando = signal(false);
@@ -74,10 +79,11 @@ export class FichaTreino implements OnInit {
     return f ? Object.values(f.treinos).reduce((acc, d) => acc + d.exercicios.length, 0) : 0;
   });
 
-  /** Apenas alunos logados (não personal visitando aluno) podem solicitar. */
   readonly podesolicitar = computed(() => this.auth.getUserRole() === 'ALUNO');
 
   ngOnInit(): void {
+    this.freq.carregarStatusHoje();
+
     const idParam = this.route.snapshot.paramMap.get('id');
     const alunoId = idParam ? Number(idParam) : null;
 
@@ -88,7 +94,6 @@ export class FichaTreino implements OnInit {
       ? this.service.obterHistoricoDoAluno(alunoId)
       : this.service.obterMeuHistorico();
 
-    // Só busca solicitação pendente se for o próprio aluno logado
     const pendente$ = !alunoId
       ? this.solicitacaoService.pendente().pipe(catchError(() => of(null)))
       : of(null);

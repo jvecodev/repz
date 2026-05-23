@@ -3,74 +3,148 @@
   [crumbs]="['Aluno', 'Dashboard']"
   nome="Aluno"
   subtitulo="Área do aluno"
+  [mostrarCta]="!freq.jaFezCheckinHoje()"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Dashboard</div>
-      <div class="page-subtitle">Atalhos para tudo que você precisa do dia a dia.</div>
+      <div class="page-title">Olá, {{ primeiroNome() }} 👋</div>
+      <div class="page-subtitle">Bom te ver de volta. Continue firme no treino.</div>
     </div>
     <p-button
-      label="Ir para o treino"
-      icon="pi pi-list-check"
-      routerLink="/aluno/ficha-treino"
-      styleClass="repz-primary"
+      [label]="freq.jaFezCheckinHoje() ? 'Presença registrada hoje' : 'Fazer check-in'"
+      [icon]="freq.jaFezCheckinHoje() ? 'pi pi-check' : 'pi pi-bolt'"
+      routerLink="/aluno/frequencia"
+      [styleClass]="freq.jaFezCheckinHoje() ? 'repz-ghost' : 'repz-primary'"
     />
   </div>
 
-  <div class="dash-grid">
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Hoje</div>
-      <h2>Meu treino</h2>
-      <p>Consulte divisões, exercícios, cargas e observações cadastradas pelo personal.</p>
-      <p-button
-        label="Abrir treino"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        routerLink="/aluno/ficha-treino"
-        styleClass="repz-primary"
-      />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Esta semana</div>
-      <h2>Frequência</h2>
-      <p>Veja seus check-ins e a sequência atual de dias treinados.</p>
-      <p-button
-        label="Ver frequência"
-        icon="pi pi-calendar"
-        routerLink="/aluno/frequencia"
-        severity="secondary"
-        [outlined]="true"
-        styleClass="repz-ghost"
-      />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Evolução</div>
-      <h2>Avaliação física</h2>
-      <p>Acompanhe peso, IMC e medidas com histórico organizado por data.</p>
-      <p-button
-        label="Abrir evolução"
-        icon="pi pi-chart-line"
-        routerLink="/aluno/evolucao"
-        severity="secondary"
-        [outlined]="true"
-        styleClass="repz-ghost"
-      />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Conta</div>
-      <h2>Meu perfil</h2>
-      <p>Veja seus dados, plano vigente e personal vinculado.</p>
-      <p-button
-        label="Abrir perfil"
-        icon="pi pi-user"
-        routerLink="/aluno/perfil"
-        severity="secondary"
-        [outlined]="true"
-        styleClass="repz-ghost"
-      />
-    </p-card>
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
   </div>
+
+  <ng-container *ngIf="!carregando()">
+
+    <div class="kpi-grid">
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Frequência do mês</span>
+          <span class="kpi-icon"><i class="pi pi-calendar"></i></span>
+        </div>
+        <div class="kpi-value">{{ totalMes() }}<span class="kpi-unit"> dias</span></div>
+        <div class="kpi-delta" *ngIf="deltaMes() > 0">
+          <i class="pi pi-arrow-up"></i> +{{ deltaMes() }} vs. mês anterior
+        </div>
+        <div class="kpi-sub" *ngIf="deltaMes() <= 0">presenças registradas no mês</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Treino atual</span>
+          <span class="kpi-icon"><i class="pi pi-list-check"></i></span>
+        </div>
+        <div class="kpi-value kpi-value-sm">
+          {{ primeiraDivisao() ? 'Treino ' + primeiraDivisao()!.divisao : 'Sem ficha' }}
+        </div>
+        <div class="kpi-sub" *ngIf="primeiraDivisao() as d">
+          {{ focoPrimeira() }} · {{ d.exercicios.length }} exercícios
+        </div>
+        <div class="kpi-sub" *ngIf="!primeiraDivisao()">nenhuma ficha ativa</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Peso atual</span>
+          <span class="kpi-icon"><i class="pi pi-chart-line"></i></span>
+        </div>
+        <div class="kpi-value">
+          {{ pesoAtual() != null ? pesoAtual() : '—'
+          }}<span class="kpi-unit" *ngIf="pesoAtual() != null"> kg</span>
+        </div>
+        <div class="kpi-sub" *ngIf="deltaPeso() != null">
+          {{ deltaPeso()! > 0 ? '+' : '' }}{{ deltaPeso() }} kg desde a última avaliação
+        </div>
+        <div class="kpi-sub" *ngIf="deltaPeso() == null">
+          {{ pesoAtual() != null ? 'última avaliação física' : 'sem avaliação registrada' }}
+        </div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Plano ativo</span>
+          <span class="kpi-icon"><i class="pi pi-star"></i></span>
+        </div>
+        <div class="kpi-value kpi-value-sm">{{ planoNome() }}</div>
+        <div class="kpi-sub">{{ objetivo() || 'plano de matrícula' }}</div>
+      </p-card>
+    </div>
+
+    <div class="dash-split">
+
+      <p-card styleClass="repz-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Seu treino</div>
+            <div class="section-sub" *ngIf="primeiraDivisao() as d">{{ d.nome }}</div>
+          </div>
+          <p-button
+            label="Ver completo"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            size="small"
+            styleClass="repz-ghost"
+            routerLink="/aluno/ficha-treino"
+          />
+        </div>
+
+        <ng-container *ngIf="primeiraDivisao() as d; else semFicha">
+          <div class="ex-list">
+            <div class="ex-item" *ngFor="let ex of d.exercicios.slice(0, 5)">
+              <div class="ex-thumb"><i class="pi pi-bolt"></i></div>
+              <div class="ex-meta">
+                <div class="ex-nome">{{ ex.nomeExercicio }}</div>
+                <div class="ex-det">
+                  {{ ex.series || '—' }} séries · {{ ex.repeticoes || '—' }} reps
+                  <span *ngIf="ex.cargaKg"> · {{ ex.cargaKg }} kg</span>
+                </div>
+              </div>
+              <p-tag
+                *ngIf="ex.grupoMuscular"
+                styleClass="repz-tag-muted"
+                [value]="ex.grupoMuscular"
+              />
+            </div>
+          </div>
+          <div class="ex-mais" *ngIf="d.exercicios.length > 5">
+            +{{ d.exercicios.length - 5 }} exercícios na ficha completa
+          </div>
+        </ng-container>
+        <ng-template #semFicha>
+          <div class="vazio-inline">
+            <i class="pi pi-clipboard"></i>
+            <span>Você ainda não tem uma ficha de treino ativa.</span>
+          </div>
+        </ng-template>
+      </p-card>
+
+      <p-card styleClass="repz-card">
+        <div class="section-head">
+          <div class="section-title">Frequência da semana</div>
+        </div>
+        <div class="bar-chart">
+          <div class="bar-col" *ngFor="let d of semana()">
+            <div class="bar" [class.muted]="!d.ativo" [style.height.px]="d.altura"></div>
+            <div class="bar-label">{{ d.label }}</div>
+          </div>
+        </div>
+        <div class="semana-resumo">
+          <i class="pi pi-flag"></i>
+          <span>{{ totalMes() }} presença(s) registrada(s) este mês</span>
+        </div>
+        <div class="semana-resumo">
+          <i class="pi pi-user"></i>
+          <span>Seu personal: <strong>{{ personalNome() }}</strong></span>
+        </div>
+      </p-card>
+    </div>
+  </ng-container>
 </app-shell>
