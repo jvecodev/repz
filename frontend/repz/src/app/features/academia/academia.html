@@ -52,32 +52,35 @@
     <div class="kpi-grid">
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Alunos</span>
+          <span class="kpi-label">Alunos ativos</span>
           <span class="kpi-icon"><i class="pi pi-users"></i></span>
-        </div>
-        <div class="kpi-value">{{ totalAlunos() }}</div>
-        <div class="kpi-sub">matriculados na academia</div>
-      </p-card>
-
-      <p-card styleClass="repz-card kpi-card">
-        <div class="kpi-head">
-          <span class="kpi-label">Ativos</span>
-          <span class="kpi-icon"><i class="pi pi-check"></i></span>
         </div>
         <div class="kpi-value">{{ totalAtivos() }}</div>
         <div class="kpi-sub" *ngIf="totalAlunos() > 0">
-          {{ ((totalAtivos() / totalAlunos()) * 100) | number: '1.0-0' }}% da base
+          de {{ totalAlunos() }} ({{ ((totalAtivos() / totalAlunos()) * 100) | number: '1.0-0' }}%)
         </div>
-        <div class="kpi-sub" *ngIf="totalAlunos() === 0">sem alunos</div>
+        <div class="kpi-sub" *ngIf="totalAlunos() === 0">nenhum aluno na unidade</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Personais</span>
+          <span class="kpi-label">Personais ativos</span>
           <span class="kpi-icon"><i class="pi pi-id-card"></i></span>
         </div>
-        <div class="kpi-value">{{ totalPersonais() }}</div>
-        <div class="kpi-sub">vinculados à unidade</div>
+        <div class="kpi-value">{{ personaisAtivos() }}</div>
+        <div class="kpi-sub" *ngIf="totalPersonais() > 0">
+          de {{ totalPersonais() }} vinculado(s) à unidade
+        </div>
+        <div class="kpi-sub" *ngIf="totalPersonais() === 0">nenhum personal vinculado</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Frequência média</span>
+          <span class="kpi-icon"><i class="pi pi-chart-line"></i></span>
+        </div>
+        <div class="kpi-value">{{ frequenciaMedia() }}</div>
+        <div class="kpi-sub">check-ins por aluno ativo neste mês</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">

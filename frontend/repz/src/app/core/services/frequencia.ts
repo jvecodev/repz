@@ -79,10 +79,13 @@ export class FrequenciaService {
     });
   }
 
-  listarPeriodo(inicio: Date, fim: Date): Observable<FrequenciaResponse[]> {
-    return this.http.get<FrequenciaResponse[]>(this.base, {
-      params: { inicio: isoLocal(inicio), fim: isoLocal(fim) },
-    });
+  listarPeriodo(inicio: Date, fim: Date, academiaId?: number): Observable<FrequenciaResponse[]> {
+    const params: Record<string, string | number> = {
+      inicio: isoLocal(inicio),
+      fim: isoLocal(fim),
+    };
+    if (academiaId != null) params['academia'] = academiaId;
+    return this.http.get<FrequenciaResponse[]>(this.base, { params });
   }
 
   alunosInativos(): Observable<AlunoInativoResponse[]> {

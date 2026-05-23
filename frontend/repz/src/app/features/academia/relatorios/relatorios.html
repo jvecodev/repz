@@ -7,12 +7,53 @@
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Relatórios</div>
+      <div class="page-title">Relatório de frequência</div>
       <div class="page-subtitle">
-        Indicadores operacionais dos últimos 6 meses, baseados nos check-ins da academia.
+        Indicadores operacionais da unidade no período selecionado, baseados nos check-ins.
       </div>
     </div>
   </div>
+
+  <p-card styleClass="repz-card filtro-card">
+    <div class="filtro-row">
+      <div class="form-group">
+        <label class="form-label">Início</label>
+        <input
+          type="date"
+          class="form-input"
+          [(ngModel)]="dataInicio"
+          [max]="dataFim || null"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fim</label>
+        <input
+          type="date"
+          class="form-input"
+          [(ngModel)]="dataFim"
+          [min]="dataInicio || null"
+        />
+      </div>
+      <div class="filtro-actions">
+        <p-button
+          label="Aplicar"
+          icon="pi pi-filter"
+          styleClass="repz-primary"
+          (onClick)="aplicar()"
+          [disabled]="carregando()"
+        />
+      </div>
+      <div class="filtro-presets">
+        <button type="button" class="preset-btn" (click)="preset(1)">Mês atual</button>
+        <button type="button" class="preset-btn" (click)="preset(3)">3 meses</button>
+        <button type="button" class="preset-btn" (click)="preset(6)">6 meses</button>
+        <button type="button" class="preset-btn" (click)="preset(12)">12 meses</button>
+      </div>
+    </div>
+    <div class="filtro-info" *ngIf="periodoLabel()">
+      Período aplicado: <strong>{{ periodoLabel() }}</strong>
+    </div>
+  </p-card>
 
   <div class="loading-wrap" *ngIf="carregando()">
     <p-progressSpinner strokeWidth="4" />
@@ -30,20 +71,20 @@
     <div class="kpi-grid">
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Check-ins (6 meses)</span>
+          <span class="kpi-label">Check-ins no período</span>
           <span class="kpi-icon"><i class="pi pi-bolt"></i></span>
         </div>
         <div class="kpi-value">{{ checkinsMes() }}</div>
-        <div class="kpi-sub">total no período carregado</div>
+        <div class="kpi-sub">total de presenças registradas</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Média por aluno</span>
+          <span class="kpi-label">Frequência média</span>
           <span class="kpi-icon"><i class="pi pi-users"></i></span>
         </div>
         <div class="kpi-value">{{ mediaPorAluno() }}</div>
-        <div class="kpi-sub">check-ins por aluno ativo (6 meses)</div>
+        <div class="kpi-sub">check-ins por aluno ativo no período</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
@@ -63,7 +104,7 @@
     <div class="dash-split">
       <p-card styleClass="repz-card">
         <div class="section-head">
-          <div class="section-title">Check-ins por mês (últimos 6 meses)</div>
+          <div class="section-title">Check-ins por mês</div>
         </div>
         <div class="chart-box">
           <p-chart type="line" [data]="mesData()" [options]="mesOptions" />

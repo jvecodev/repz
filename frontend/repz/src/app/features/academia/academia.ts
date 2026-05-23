@@ -74,10 +74,18 @@ export class Academia implements OnInit {
   readonly personais = signal<PersonalResponse[]>([]);
   readonly planos = signal<PlanoResponse[]>([]);
   readonly ausentes = signal(0);
+  readonly checkinsMes = signal(0);
 
   readonly totalAlunos = computed(() => this.alunos().length);
   readonly totalAtivos = computed(() => this.alunos().filter((a) => a.ativo).length);
   readonly totalPersonais = computed(() => this.personais().length);
+  readonly personaisAtivos = computed(() => this.personais().filter((p) => p.ativo).length);
+
+  readonly frequenciaMedia = computed(() => {
+    const ativos = this.totalAtivos();
+    if (ativos === 0) return 0;
+    return Math.round((this.checkinsMes() / ativos) * 10) / 10;
+  });
 
   readonly editando = signal(false);
   readonly salvando = signal(false);
@@ -124,8 +132,19 @@ export class Academia implements OnInit {
       this.ausentes.set(inativos.filter((i) => (i.diasSemTreino ?? 0) >= 14).length);
       const primeiroPlano = planos.find((p) => p.ativo) ?? planos[0];
       if (primeiroPlano) this.cadPlanoId = primeiroPlano.id;
+      this.carregarFrequenciaMes(academia.id);
       this.carregando.set(false);
     });
+  }
+
+  private carregarFrequenciaMes(academiaId: number): void {
+    const now = new Date();
+    const inicio = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+    const fim = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    this.freqService
+      .listarPeriodo(inicio, fim, academiaId)
+      .pipe(catchError(() => of([])))
+      .subscribe((checkins) => this.checkinsMes.set(checkins.length));
   }
 
   abrirEdicao(): void {
