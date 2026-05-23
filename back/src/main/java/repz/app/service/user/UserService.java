@@ -4,6 +4,7 @@ import org.springframework.security.core.Authentication;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
+import repz.app.dto.request.UserSelfUpdateRequest;
 import repz.app.dto.response.UserGetResponse;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public interface UserService {
     void criarAdmin(AdminCreateRequest dto);
 
     void atualizar(Integer id, UserPutRequest userPutRequest);
+
+    void atualizarMeuPerfil(UserSelfUpdateRequest request, Authentication auth);
 
     void desativar(Integer id);
 

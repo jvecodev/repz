@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
+import repz.app.dto.request.UserSelfUpdateRequest;
 import repz.app.dto.response.UserGetResponse;
 
 import java.util.List;
@@ -74,6 +75,17 @@ public interface UserController {
     })
     ResponseEntity<Void> criarAdmin(
             @RequestBody @Valid AdminCreateRequest adminCreateRequest);
+
+    @PutMapping("/me")
+    @Operation(summary = "Atualizar meu perfil", description = "Atualiza nome, e-mail e senha do usuário autenticado. Disponível para qualquer perfil.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido")
+    })
+    ResponseEntity<Void> atualizarMeuPerfil(
+            @RequestBody @Valid UserSelfUpdateRequest userSelfUpdateRequest,
+            @Parameter(hidden = true) Authentication authentication);
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar usuário", description = "Atualiza os dados de um usuário. Requer perfil ADMIN.")

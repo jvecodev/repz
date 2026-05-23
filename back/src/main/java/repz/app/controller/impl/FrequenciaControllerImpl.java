@@ -50,8 +50,7 @@ public class FrequenciaControllerImpl implements FrequenciaController {
 
     @Override
     public List<FrequenciaResponse> meuHistorico(Authentication auth) {
-        Long userId = Long.parseLong(auth.getName());
-        return frequenciaService.meuHistorico(userId);
+        return frequenciaService.meuHistorico(auth);
     }
 
     @Override

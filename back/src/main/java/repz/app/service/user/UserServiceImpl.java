@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
+import repz.app.dto.request.UserSelfUpdateRequest;
 import repz.app.dto.response.UserGetResponse;
 import repz.app.message.Mensagens;
 import repz.app.persistence.entity.*;
@@ -146,8 +147,50 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 mensagens.get("usuario.nao.encontrado")));
+
+        if (!user.getEmail().equalsIgnoreCase(dto.email())) {
+            garantirEmailDisponivel(dto.email());
+            user.setEmail(dto.email());
+        }
         user.setName(dto.name());
+        if (dto.role() != null) {
+            user.setRole(dto.role());
+        }
+        if (dto.active() != null) {
+            user.setActive(dto.active());
+        }
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void atualizarMeuPerfil(UserSelfUpdateRequest dto, Authentication auth) {
+
+        if (auth == null || auth.getName() == null) {
+            throw new AccessDeniedException(mensagens.get("auth.usuario.nao.autenticado"));
+        }
+
+        User user = userRepository.findByEmail(auth.getName())
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                mensagens.get("usuario.nao.encontrado")));
+
+        if (!user.getEmail().equalsIgnoreCase(dto.email())) {
+            garantirEmailDisponivel(dto.email());
+            user.setEmail(dto.email());
+        }
+        user.setName(dto.name());
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.senha()));
+        }
+        userRepository.save(user);
+    }
+
+    private void garantirEmailDisponivel(String email) {
+        userRepository.findByEmail(email).ifPresent(outro -> {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    mensagens.get("usuario.email.ja.cadastrado"));
+        });
     }
 
     @Override

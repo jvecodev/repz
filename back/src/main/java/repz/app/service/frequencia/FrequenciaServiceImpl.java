@@ -100,8 +100,10 @@ public class FrequenciaServiceImpl implements FrequenciaService {
         return toDTO(frequencia);
     }
 
-    public List<FrequenciaResponse> meuHistorico(Long alunoId) {
-        List<Frequencia> frequencias = frequenciaRepository.findByAluno_IdOrderByDataHoraDesc(alunoId);
+    public List<FrequenciaResponse> meuHistorico(Authentication auth) {
+        User user = userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
+        List<Frequencia> frequencias = frequenciaRepository.findByAluno_IdOrderByDataHoraDesc(user.getId());
         return frequencias.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
@@ -175,7 +177,6 @@ public class FrequenciaServiceImpl implements FrequenciaService {
 
         return resolvedAcademiaId;
     }
-
 
     private FrequenciaResponse toDTO(Frequencia frequencia) {
         return new FrequenciaResponse(
