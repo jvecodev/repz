@@ -9,6 +9,10 @@
     <div>
       <div class="page-title">Olá, {{ primeiroNome() }} 👋</div>
       <div class="page-subtitle">Bom te ver de volta. Continue firme no treino.</div>
+      <div class="ultimo-checkin">
+        <i class="pi pi-clock"></i>
+        <span>Último check-in: <strong>{{ ultimoCheckinTexto() }}</strong></span>
+      </div>
     </div>
     <p-button
       [label]="freq.jaFezCheckinHoje() ? 'Presença registrada hoje' : 'Fazer check-in'"
@@ -39,16 +43,16 @@
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Treino atual</span>
+          <span class="kpi-label">Treino de hoje</span>
           <span class="kpi-icon"><i class="pi pi-list-check"></i></span>
         </div>
         <div class="kpi-value kpi-value-sm">
-          {{ primeiraDivisao() ? 'Treino ' + primeiraDivisao()!.divisao : 'Sem ficha' }}
+          {{ treinoDoDia() ? 'Treino ' + treinoDoDia()!.divisao : 'Sem ficha' }}
         </div>
-        <div class="kpi-sub" *ngIf="primeiraDivisao() as d">
-          {{ focoPrimeira() }} · {{ d.exercicios.length }} exercícios
+        <div class="kpi-sub" *ngIf="treinoDoDia() as d">
+          {{ focoDoDia() }} · {{ d.exercicios.length }} exercícios
         </div>
-        <div class="kpi-sub" *ngIf="!primeiraDivisao()">nenhuma ficha ativa</div>
+        <div class="kpi-sub" *ngIf="!treinoDoDia()">nenhuma ficha ativa</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
@@ -83,8 +87,8 @@
       <p-card styleClass="repz-card">
         <div class="section-head">
           <div>
-            <div class="section-title">Seu treino</div>
-            <div class="section-sub" *ngIf="primeiraDivisao() as d">{{ d.nome }}</div>
+            <div class="section-title">Seu treino de hoje</div>
+            <div class="section-sub" *ngIf="treinoDoDia() as d">{{ d.nome }}</div>
           </div>
           <p-button
             label="Ver completo"
@@ -96,7 +100,7 @@
           />
         </div>
 
-        <ng-container *ngIf="primeiraDivisao() as d; else semFicha">
+        <ng-container *ngIf="treinoDoDia() as d; else semFicha">
           <div class="ex-list">
             <div class="ex-item" *ngFor="let ex of d.exercicios.slice(0, 5)">
               <div class="ex-thumb"><i class="pi pi-bolt"></i></div>

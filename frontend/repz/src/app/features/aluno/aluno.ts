@@ -63,15 +63,30 @@ export class Aluno implements OnInit {
   readonly deltaPeso = signal<number | null>(null);
   readonly divisoes = signal<TreinoResponse[]>([]);
   readonly semana = signal<DiaSemana[]>([]);
+  readonly ultimoCheckin = signal<Date | null>(null);
 
   readonly primeiroNome = computed(() => this.nome().trim().split(' ')[0]);
-  readonly primeiraDivisao = computed(() => this.divisoes()[0] ?? null);
 
-  readonly focoPrimeira = computed(() => {
-    const d = this.primeiraDivisao();
+  readonly treinoDoDia = computed<TreinoResponse | null>(() => {
+    const divs = this.divisoes();
+    if (divs.length === 0) return null;
+    const indice = this.totalGeral() % divs.length;
+    return divs[indice] ?? divs[0];
+  });
+
+  readonly focoDoDia = computed(() => {
+    const d = this.treinoDoDia();
     if (!d?.nome) return '';
     const partes = d.nome.split(/[—-]/);
     return partes.length > 1 ? partes[partes.length - 1].trim() : d.nome.trim();
+  });
+
+  readonly ultimoCheckinTexto = computed(() => {
+    const d = this.ultimoCheckin();
+    if (!d) return 'Nenhum check-in ainda';
+    const data = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `${data} às ${hora}`;
   });
 
   ngOnInit(): void {
@@ -109,6 +124,11 @@ export class Aluno implements OnInit {
     const hoje = new Date();
 
     this.totalGeral.set(datas.length);
+
+    if (datas.length > 0) {
+      const ordenado = [...datas].sort((a, b) => b.getTime() - a.getTime());
+      this.ultimoCheckin.set(ordenado[0]);
+    }
 
     const noMes = (d: Date, ref: Date) =>
       d.getMonth() === ref.getMonth() && d.getFullYear() === ref.getFullYear();
