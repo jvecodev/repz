@@ -44,6 +44,11 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
+    public ResponseEntity<UserGetResponse> obterMeuPerfil(Authentication authentication) {
+        return ResponseEntity.ok(userService.obterMeuPerfil(authentication));
+    }
+
+    @Override
     public ResponseEntity<Void> atualizarMeuPerfil(UserSelfUpdateRequest userSelfUpdateRequest,
                                                    Authentication authentication) {
         userService.atualizarMeuPerfil(userSelfUpdateRequest, authentication);

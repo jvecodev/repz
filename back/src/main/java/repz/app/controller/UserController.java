@@ -76,6 +76,16 @@ public interface UserController {
     ResponseEntity<Void> criarAdmin(
             @RequestBody @Valid AdminCreateRequest adminCreateRequest);
 
+    @GetMapping("/me")
+    @Operation(summary = "Meu perfil", description = "Retorna os dados do usuário autenticado.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Perfil retornado"),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    ResponseEntity<UserGetResponse> obterMeuPerfil(
+            @Parameter(hidden = true) Authentication authentication);
+
     @PutMapping("/me")
     @Operation(summary = "Atualizar meu perfil", description = "Atualiza nome, e-mail e senha do usuário autenticado. Disponível para qualquer perfil.")
     @ApiResponses({

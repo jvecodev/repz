@@ -163,6 +163,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserGetResponse obterMeuPerfil(Authentication auth) {
+        if (auth == null || auth.getName() == null) {
+            throw new AccessDeniedException(mensagens.get("auth.usuario.nao.autenticado"));
+        }
+        User user = userRepository.findByEmail(auth.getName())
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                mensagens.get("usuario.nao.encontrado")));
+        return userMapper.toResponse(user);
+    }
+
+    @Override
     @Transactional
     public void atualizarMeuPerfil(UserSelfUpdateRequest dto, Authentication auth) {
 

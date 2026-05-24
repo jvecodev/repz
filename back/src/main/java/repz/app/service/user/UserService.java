@@ -22,6 +22,8 @@ public interface UserService {
 
     void atualizar(Integer id, UserPutRequest userPutRequest);
 
+    UserGetResponse obterMeuPerfil(Authentication auth);
+
     void atualizarMeuPerfil(UserSelfUpdateRequest request, Authentication auth);
 
     void desativar(Integer id);
