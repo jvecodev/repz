@@ -1,7 +1,9 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs/operators';
 import { catchError, forkJoin, of } from 'rxjs';
 import { AlunoService, FrequenciaService, PersonalService } from '@core/services';
 import type { AlunoDetalheResponse, FrequenciaResponse } from '@core/services';
@@ -55,6 +57,24 @@ export class PersonalAlunos implements OnInit {
   private readonly alunoService = inject(AlunoService);
   private readonly freqService = inject(FrequenciaService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  private readonly foco = toSignal(
+    this.route.queryParamMap.pipe(map((p) => p.get('foco') ?? 'alunos')),
+    { initialValue: 'alunos' },
+  );
+  readonly ativoSidebar = computed(() => {
+    const f = this.foco();
+    if (f === 'ficha') return 'fichas';
+    if (f === 'avaliacao') return 'avaliacoes';
+    return 'alunos';
+  });
+  readonly tituloPagina = computed(() => {
+    const f = this.foco();
+    if (f === 'ficha') return 'Fichas dos alunos';
+    if (f === 'avaliacao') return 'Avaliações dos alunos';
+    return 'Meus alunos';
+  });
 
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);

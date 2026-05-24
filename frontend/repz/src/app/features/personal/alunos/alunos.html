@@ -1,13 +1,13 @@
 <app-shell
-  ativo="alunos"
-  [crumbs]="['Personal Trainer', 'Meus Alunos']"
+  [ativo]="ativoSidebar()"
+  [crumbs]="['Personal Trainer', tituloPagina()]"
   [nome]="personalService.nomePersonal()"
   subtitulo="Personal Trainer"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Meus alunos</div>
+      <div class="page-title">{{ tituloPagina() }}</div>
       <div class="page-subtitle">
         @if (!carregando()) {
           {{ rows().length }} aluno(s) vinculado(s) à sua conta.

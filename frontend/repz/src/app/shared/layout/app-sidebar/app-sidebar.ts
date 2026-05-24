@@ -8,6 +8,7 @@ export interface NavItem {
   key: string;
   label: string;
   link: string;
+  queryParams?: Record<string, string>;
 }
 
 const NAV_ALUNO: NavItem[] = [
@@ -19,8 +20,10 @@ const NAV_ALUNO: NavItem[] = [
 ];
 
 const NAV_PERSONAL: NavItem[] = [
-  { key: 'dashboard', label: 'Dashboard', link: '/personal' },
+  { key: 'dashboard', label: 'Painel', link: '/personal' },
   { key: 'alunos', label: 'Meus alunos', link: '/personal/alunos' },
+  { key: 'fichas', label: 'Fichas', link: '/personal/alunos', queryParams: { foco: 'ficha' } },
+  { key: 'avaliacoes', label: 'Avaliações', link: '/personal/alunos', queryParams: { foco: 'avaliacao' } },
   { key: 'perfil', label: 'Perfil', link: '/personal/perfil' },
 ];
 
