@@ -55,11 +55,13 @@
 
     <p-card styleClass="repz-card kpi-card">
       <div class="kpi-head">
-        <span class="kpi-label">Ausentes (>14d)</span>
+        <span class="kpi-label">Ausentes (>7d)</span>
         <span class="kpi-icon kpi-icon-warn"><i class="pi pi-exclamation-triangle"></i></span>
       </div>
-      <div class="kpi-value">{{ ausentes14d() }}</div>
-      <div class="kpi-sub">{{ ausentes14d() > 0 ? 'considere contato' : 'tudo em dia' }}</div>
+      <div class="kpi-value">{{ ausentes7d() }}</div>
+      <div class="kpi-sub">
+        {{ ausentes14d() > 0 ? ausentes14d() + ' crítico(s) >14d' : 'sem casos críticos' }}
+      </div>
     </p-card>
 
     <p-card styleClass="repz-card kpi-card">
@@ -105,12 +107,16 @@
           <th>Plano</th>
           <th>Frequência (mês)</th>
           <th>Último check-in</th>
-          <th>Status</th>
+          <th>Status treino</th>
+          <th>Matrícula</th>
           <th>Ações</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-r>
-        <tr>
+        <tr
+          [class.row-warn]="r.statusTreino === 'atencao'"
+          [class.row-danger]="r.statusTreino === 'ausente'"
+        >
           <td>
             <div class="al-cell">
               <div class="avatar avatar-md">{{ inicial(r.nome) }}</div>
@@ -129,7 +135,24 @@
               <span class="freq-num">{{ r.freqMes }}d</span>
             </div>
           </td>
-          <td class="cell-sub">{{ r.ultimoCheckin ?? '—' }}</td>
+          <td class="cell-sub">
+            <span>{{ r.ultimoCheckin ?? '—' }}</span>
+            <span class="dias-sub" *ngIf="r.diasSemTreino != null && r.diasSemTreino > 0">
+              há {{ r.diasSemTreino }}d
+            </span>
+          </td>
+          <td>
+            <p-tag [styleClass]="statusClass(r.statusTreino)" [value]="statusLabel(r.statusTreino)" />
+            <i
+              *ngIf="r.statusTreino === 'atencao' || r.statusTreino === 'ausente'"
+              class="pi pi-exclamation-triangle alerta-icon"
+              [title]="
+                r.statusTreino === 'ausente'
+                  ? 'Sem treinar há mais de 14 dias'
+                  : 'Sem treinar há mais de 7 dias'
+              "
+            ></i>
+          </td>
           <td>
             <p-tag
               [styleClass]="r.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
@@ -143,7 +166,7 @@
               [rounded]="true"
               size="small"
               styleClass="repz-icon-button"
-              title="Ver detalhes"
+              title="Ver perfil completo"
               (onClick)="verDetalhes(r)"
             />
             <p-button
@@ -152,7 +175,7 @@
               [rounded]="true"
               size="small"
               styleClass="repz-icon-button"
-              title="Editar ficha"
+              title="Criar/editar ficha de treino"
               (onClick)="verFicha(r)"
             />
           </td>

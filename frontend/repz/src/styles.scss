@@ -249,6 +249,22 @@ body {
   padding: 3px 10px;
 }
 
+.p-tag.repz-tag-warn {
+  color: var(--warn);
+  background: var(--warn-soft);
+  border-radius: 999px;
+  font-weight: 700;
+  padding: 3px 10px;
+}
+
+.p-tag.repz-tag-danger {
+  color: var(--error);
+  background: var(--error-soft);
+  border-radius: 999px;
+  font-weight: 700;
+  padding: 3px 10px;
+}
+
 .p-inputtext,
 .p-inputnumber-input {
   width: 100%;

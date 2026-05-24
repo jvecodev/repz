@@ -29,6 +29,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 
+export type StatusTreino = 'em_dia' | 'atencao' | 'ausente' | 'sem_checkin';
+
 interface AlunoRow {
   userId: number;
   nome: string;
@@ -37,6 +39,19 @@ interface AlunoRow {
   ativo: boolean;
   freqMes: number;
   ultimoCheckin: string | null;
+  diasSemTreino: number | null;
+  statusTreino: StatusTreino;
+}
+
+function diasEntre(a: Date, b: Date): number {
+  return Math.floor((b.getTime() - a.getTime()) / 86400000);
+}
+
+function classificarStatus(dias: number | null): StatusTreino {
+  if (dias == null) return 'sem_checkin';
+  if (dias <= 7) return 'em_dia';
+  if (dias <= 14) return 'atencao';
+  return 'ausente';
 }
 
 function parseBR(s: string): Date {
@@ -80,9 +95,15 @@ export class Personal implements OnInit {
 
   readonly carregando = signal(true);
   readonly rows = signal<AlunoRow[]>([]);
-  readonly ausentes14d = signal(0);
   readonly avaliacoesMes = signal(0);
   readonly busca = signal('');
+
+  readonly ausentes7d = computed(
+    () => this.rows().filter((r) => r.statusTreino === 'atencao' || r.statusTreino === 'ausente').length,
+  );
+  readonly ausentes14d = computed(
+    () => this.rows().filter((r) => r.statusTreino === 'ausente').length,
+  );
 
   readonly totalAlunos = computed(() => this.rows().length);
   readonly ativos = computed(() => this.rows().filter((r) => r.ativo).length);
@@ -124,8 +145,6 @@ export class Personal implements OnInit {
         .alunosInativos()
         .pipe(catchError(() => of([] as AlunoInativoResponse[]))),
     }).subscribe(({ alunos, inativos }) => {
-      this.ausentes14d.set(inativos.filter((a) => (a.diasSemTreino ?? 0) >= 14).length);
-
       if (alunos.length === 0) {
         this.rows.set([]);
         this.avaliacoesMes.set(0);
@@ -146,7 +165,7 @@ export class Personal implements OnInit {
 
       forkJoin({ freqs: forkJoin(freqCalls), avs: forkJoin(avCalls) }).subscribe(
         ({ freqs, avs }) => {
-          this.rows.set(this.montarRows(alunos, freqs));
+          this.rows.set(this.montarRows(alunos, freqs, inativos));
           this.avaliacoesMes.set(this.contarAvaliacoesNoMes(avs, mesInicio, mesFim));
           this.carregando.set(false);
         },
@@ -157,13 +176,30 @@ export class Personal implements OnInit {
   private montarRows(
     alunos: AlunoDetalheResponse[],
     freqs: FrequenciaResponse[][],
+    inativos: AlunoInativoResponse[],
   ): AlunoRow[] {
+    const inativoPorId = new Map<number, AlunoInativoResponse>();
+    for (const i of inativos) inativoPorId.set(i.alunoId, i);
+    const hoje = new Date();
+
     return alunos.map((a, i) => {
       const lista = freqs[i] ?? [];
       const ordenado = [...lista].sort(
         (x, y) => parseBR(y.dataHora).getTime() - parseBR(x.dataHora).getTime(),
       );
-      const ultimo = ordenado[0]?.dataHora?.split(' ')[0] ?? null;
+      const ultimoData = ordenado[0]?.dataHora ?? null;
+      const ultimo = ultimoData?.split(' ')[0] ?? null;
+
+      let diasSemTreino: number | null;
+      const inativoInfo = inativoPorId.get(a.userId);
+      if (inativoInfo) {
+        diasSemTreino = inativoInfo.diasSemTreino;
+      } else if (ultimoData) {
+        diasSemTreino = diasEntre(parseBR(ultimoData), hoje);
+      } else {
+        diasSemTreino = null;
+      }
+
       return {
         userId: a.userId,
         nome: a.nome,
@@ -172,8 +208,36 @@ export class Personal implements OnInit {
         ativo: a.ativo,
         freqMes: lista.length,
         ultimoCheckin: ultimo,
+        diasSemTreino,
+        statusTreino: classificarStatus(diasSemTreino),
       };
     });
+  }
+
+  statusLabel(s: StatusTreino): string {
+    switch (s) {
+      case 'em_dia':
+        return 'Em dia';
+      case 'atencao':
+        return 'Atenção';
+      case 'ausente':
+        return 'Ausente';
+      case 'sem_checkin':
+        return 'Sem check-in';
+    }
+  }
+
+  statusClass(s: StatusTreino): string {
+    switch (s) {
+      case 'em_dia':
+        return 'repz-tag-success';
+      case 'atencao':
+        return 'repz-tag-warn';
+      case 'ausente':
+        return 'repz-tag-danger';
+      case 'sem_checkin':
+        return 'repz-tag-muted';
+    }
   }
 
   private contarAvaliacoesNoMes(
