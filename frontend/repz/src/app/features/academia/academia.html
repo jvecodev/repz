@@ -198,7 +198,7 @@
             <label class="form-label">Plano</label>
             <select class="form-select" [(ngModel)]="cadPlanoId">
               <option *ngFor="let p of planos()" [ngValue]="p.id">
-                {{ p.nome }} — R$ {{ p.valor ?? '—' }}
+                {{ p.nome }} — {{ p.valor | currency: 'BRL' }}
               </option>
             </select>
           </div>
