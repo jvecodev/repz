@@ -27,9 +27,10 @@ export interface AlunoUpdateRequest {
 }
 
 export interface AlunoMeUpdateRequest {
+  nome?: string;
   telefone?: string;
-  objetivo?: string;
   fotoUrl?: string;
+  senha?: string;
 }
 
 @Injectable({ providedIn: 'root' })

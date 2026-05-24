@@ -24,15 +24,17 @@ export interface PersonalSelfUpdateRequest {
 }
 
 export interface AlunoResumo {
-  alunoId: number;
+  id: number;
   nome: string;
   email: string;
-  ativo: boolean;
 }
 
 export interface PersonalAlunosResponse {
   personalId: number;
   personalNome: string;
+  especialidade?: string;
+  academiaId?: number;
+  academiaNome?: string;
   alunos: AlunoResumo[];
 }
 
