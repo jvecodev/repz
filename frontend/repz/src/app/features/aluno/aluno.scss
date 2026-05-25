@@ -1,0 +1,152 @@
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.ultimo-checkin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-3);
+
+  i {
+    color: var(--mint);
+    font-size: 14px;
+  }
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 480px) {
+  :host ::ng-deep .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  :host ::ng-deep .kpi-value {
+    font-size: 26px;
+  }
+
+  :host ::ng-deep .kpi-value.kpi-value-sm {
+    font-size: 18px;
+  }
+
+  .ultimo-checkin {
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+
+  .ex-item {
+    padding: 10px;
+  }
+
+  .ex-nome {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  :host ::ng-deep .kpi-value {
+    font-size: 22px;
+  }
+
+  .ex-thumb {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+}
+
+.ex-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ex-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card-2);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  transition: border-color 0.15s;
+}
+
+.ex-item:hover {
+  border-color: var(--border-strong);
+}
+
+.ex-thumb {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: var(--r-sm);
+  background: var(--mint-soft);
+  color: var(--mint);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+}
+
+.ex-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.ex-nome {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ex-det {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.ex-mais {
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+  padding: 10px 0 2px;
+}
+
+.vazio-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13px;
+
+  i {
+    font-size: 28px;
+    color: var(--text-4);
+  }
+}
+
+.semana-resumo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-3);
+
+  i {
+    color: var(--mint);
+  }
+}

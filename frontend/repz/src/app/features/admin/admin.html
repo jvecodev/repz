@@ -1,31 +1,172 @@
 <app-shell
   ativo="dashboard"
   [crumbs]="['Admin', 'Dashboard']"
-  nome="Admin"
+  [nome]="userService.nomeUsuario() || 'Administrador'"
   subtitulo="Administração"
   [mostrarCta]="false"
 >
+  <p-toast />
+  <p-confirmDialog />
+
   <div class="page-header">
     <div>
-      <div class="page-title">Administração</div>
-      <div class="page-subtitle">Painel inicial para manter a operação organizada.</div>
+      <div class="page-title">Painel global</div>
+      <div class="page-subtitle">Visão consolidada de todas as academias da plataforma.</div>
     </div>
-    <p-button label="Revisar acessos" icon="pi pi-id-card" styleClass="repz-primary" />
+    <div class="header-actions">
+      <p-button
+        label="Gerenciar academias"
+        icon="pi pi-building"
+        styleClass="repz-ghost"
+        routerLink="/admin/academias"
+      />
+      <p-button
+        label="Gerenciar usuários"
+        icon="pi pi-users"
+        styleClass="repz-primary"
+        routerLink="/admin/usuarios"
+      />
+    </div>
   </div>
 
-  <div class="dash-grid">
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Perfis</div>
-      <h2>Controle de acesso</h2>
-      <p>Administre usuários e valide permissões entre aluno, personal e academia.</p>
-      <p-tag styleClass="repz-tag-success" value="Centralizado" />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Operação</div>
-      <h2>Dados da plataforma</h2>
-      <p>Acompanhe cadastros e pontos de integração que sustentam as telas principais.</p>
-      <p-tag styleClass="repz-tag-muted" value="Em expansão" />
-    </p-card>
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
   </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro() && dashboard() as d">
+    <div class="kpi-grid">
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Academias</span>
+          <span class="kpi-icon"><i class="pi pi-building"></i></span>
+        </div>
+        <div class="kpi-value">{{ d.totalAcademies }}</div>
+        <div class="kpi-sub">
+          {{ d.totalActiveAcademies }} ativas · {{ d.totalInactiveAcademies }} inativas
+        </div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Alunos</span>
+          <span class="kpi-icon"><i class="pi pi-users"></i></span>
+        </div>
+        <div class="kpi-value">{{ d.totalStudents }}</div>
+        <div class="kpi-sub">total na plataforma</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Personais</span>
+          <span class="kpi-icon"><i class="pi pi-id-card"></i></span>
+        </div>
+        <div class="kpi-value">{{ d.totalInstructors }}</div>
+        <div class="kpi-sub">instrutores ativos</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Média</span>
+          <span class="kpi-icon"><i class="pi pi-chart-bar"></i></span>
+        </div>
+        <div class="kpi-value">{{ mediaAlunos() }}</div>
+        <div class="kpi-sub">alunos por academia</div>
+      </p-card>
+    </div>
+  </ng-container>
+
+  <p-card styleClass="repz-card">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Academias da plataforma</div>
+        <div class="section-sub" *ngIf="!carregandoTabela()">
+          {{ totalAcademias() }} cadastrada(s) · {{ ativas() }} ativa(s) · {{ inativas() }} inativa(s)
+        </div>
+      </div>
+    </div>
+
+    <div class="loading-wrap" *ngIf="carregandoTabela()">
+      <p-progressSpinner strokeWidth="4" />
+    </div>
+
+    <div class="empty-inline text-3" *ngIf="!carregandoTabela() && rows().length === 0">
+      Nenhuma academia cadastrada ainda.
+    </div>
+
+    <p-table
+      *ngIf="!carregandoTabela() && rows().length > 0"
+      [value]="rows()"
+      styleClass="repz-table"
+      [tableStyle]="{ 'min-width': '880px' }"
+      [paginator]="rows().length > 10"
+      [rows]="10"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Academia</th>
+          <th>Alunos ativos</th>
+          <th>Personais ativos</th>
+          <th>Frequência média</th>
+          <th>Status</th>
+          <th class="th-action">Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr [class.row-muted]="!r.active">
+          <td>
+            <div class="ac-cell">
+              <div class="avatar avatar-md">{{ inicial(r.name) }}</div>
+              <div>
+                <div class="cell-strong">{{ r.name }}</div>
+                <div class="cell-sub">Resp.: {{ r.responsible }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="metric-val">{{ r.alunosAtivos }}</span>
+          </td>
+          <td>
+            <span class="metric-val">{{ r.personaisAtivos }}</span>
+          </td>
+          <td>
+            <span class="metric-val">{{ r.frequenciaMedia }}</span>
+            <span class="metric-sub">check-ins/aluno (mês)</span>
+          </td>
+          <td>
+            <p-tag
+              [styleClass]="r.active ? 'repz-tag-success' : 'repz-tag-muted'"
+              [value]="r.active ? 'Ativa' : 'Inativa'"
+            />
+          </td>
+          <td class="td-action">
+            <p-button
+              [icon]="r.active ? 'pi pi-ban' : 'pi pi-check'"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              styleClass="repz-icon-button"
+              [title]="r.active ? 'Inativar academia' : 'Ativar academia'"
+              (onClick)="confirmarToggleAtivo(r)"
+            />
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              styleClass="repz-icon-button"
+              title="Editar dados"
+              routerLink="/admin/academias"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
 </app-shell>

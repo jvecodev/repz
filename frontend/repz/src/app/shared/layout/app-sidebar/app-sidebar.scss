@@ -169,7 +169,37 @@ svg {
   border-radius: var(--r-md);
 }
 
-/* ---- estado colapsado (iOS rail) ---- */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  margin-top: 8px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+  }
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--red, #ef4444);
+  }
+}
+
 :host(.is-collapsed) {
   .logo {
     justify-content: center;
@@ -222,6 +252,14 @@ svg {
   ::ng-deep .cta-mini {
     display: inline-flex;
   }
+
+  .logout-btn {
+    justify-content: center;
+    padding: 11px 0;
+    .label {
+      display: none;
+    }
+  }
 }
 
 @include mobile {
@@ -235,15 +273,20 @@ svg {
     box-shadow: var(--shadow-lg);
   }
 
-  /* no mobile, colapsada = gaveta fechada */
   :host(.is-collapsed) {
     transform: translateX(-100%);
     box-shadow: none;
 
     .profile-block .pb-info,
     .nav-item .label,
+    .logout-btn .label,
     .cta-card {
       display: revert;
+    }
+
+    .logout-btn {
+      justify-content: flex-start;
+      padding: 11px 12px;
     }
     ::ng-deep .cta-mini {
       display: none;

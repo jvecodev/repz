@@ -1,0 +1,145 @@
+<app-shell
+  ativo="relatorios"
+  [crumbs]="['Gestor da Academia', 'Relatórios']"
+  [nome]="userService.nomeUsuario() || 'Gerente'"
+  subtitulo="Gestão da academia"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Relatório de frequência</div>
+      <div class="page-subtitle">
+        Indicadores operacionais da unidade no período selecionado, baseados nos check-ins.
+      </div>
+    </div>
+  </div>
+
+  <p-card styleClass="repz-card filtro-card">
+    <div class="filtro-row">
+      <div class="form-group">
+        <label class="form-label">Início</label>
+        <input
+          type="date"
+          class="form-input"
+          [(ngModel)]="dataInicio"
+          [max]="dataFim || null"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fim</label>
+        <input
+          type="date"
+          class="form-input"
+          [(ngModel)]="dataFim"
+          [min]="dataInicio || null"
+        />
+      </div>
+      <div class="filtro-actions">
+        <p-button
+          label="Aplicar"
+          icon="pi pi-filter"
+          styleClass="repz-primary"
+          (onClick)="aplicar()"
+          [disabled]="carregando()"
+        />
+      </div>
+      <div class="filtro-presets">
+        <button type="button" class="preset-btn" (click)="preset(1)">Mês atual</button>
+        <button type="button" class="preset-btn" (click)="preset(3)">3 meses</button>
+        <button type="button" class="preset-btn" (click)="preset(6)">6 meses</button>
+        <button type="button" class="preset-btn" (click)="preset(12)">12 meses</button>
+      </div>
+    </div>
+    <div class="filtro-info" *ngIf="periodoLabel()">
+      Período aplicado: <strong>{{ periodoLabel() }}</strong>
+    </div>
+  </p-card>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro()">
+
+    <div class="kpi-grid">
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Check-ins no período</span>
+          <span class="kpi-icon"><i class="pi pi-bolt"></i></span>
+        </div>
+        <div class="kpi-value">{{ checkinsMes() }}</div>
+        <div class="kpi-sub">total de presenças registradas</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Frequência média</span>
+          <span class="kpi-icon"><i class="pi pi-users"></i></span>
+        </div>
+        <div class="kpi-value">{{ mediaPorAluno() }}</div>
+        <div class="kpi-sub">check-ins por aluno ativo no período</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Horário de pico</span>
+          <span class="kpi-icon"><i class="pi pi-clock"></i></span>
+        </div>
+        <div class="kpi-value kpi-value-sm">
+          {{ horaPico().count > 0 ? (horaPico().hora + 'h') : '—' }}
+        </div>
+        <div class="kpi-sub">
+          {{ horaPico().count > 0 ? horaPico().count + ' check-ins nessa faixa' : 'sem dados ainda' }}
+        </div>
+      </p-card>
+    </div>
+
+    <div class="dash-split">
+      <p-card styleClass="repz-card">
+        <div class="section-head">
+          <div class="section-title">Check-ins por mês</div>
+        </div>
+        <div class="chart-box">
+          <p-chart type="line" [data]="mesData()" [options]="mesOptions" />
+        </div>
+      </p-card>
+
+      <p-card styleClass="repz-card placeholder-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Relatórios financeiros</div>
+            <div class="section-sub">receita acumulada · ticket médio · renovações</div>
+          </div>
+        </div>
+        <div class="placeholder-content">
+          <i class="pi pi-lock"></i>
+          <strong>Em breve</strong>
+          <p>
+            Indicadores financeiros (receita, ticket médio e retenção) virão com a próxima
+            integração de pagamentos. Hoje o backend não armazena cobranças, então não há
+            como calcular esses números de forma confiável.
+          </p>
+        </div>
+      </p-card>
+    </div>
+
+    <p-card styleClass="repz-card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Ocupação por horário</div>
+          <div class="section-sub">distribuição dos check-ins ao longo do dia (06h–22h)</div>
+        </div>
+      </div>
+      <div class="chart-box chart-tall">
+        <p-chart type="bar" [data]="ocupacaoData()" [options]="ocupacaoOptions" />
+      </div>
+    </p-card>
+  </ng-container>
+</app-shell>

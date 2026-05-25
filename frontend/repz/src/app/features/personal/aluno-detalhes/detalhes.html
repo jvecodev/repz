@@ -1,0 +1,207 @@
+<app-shell
+  ativo="alunos"
+  [crumbs]="['Personal Trainer', 'Detalhes']"
+  [nome]="personalService.nomePersonal()"
+  subtitulo="Personal Trainer"
+  [mostrarCta]="false"
+>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro() && aluno() as a">
+
+    <div class="page-header">
+      <div class="back-btn">
+        <p-button
+          icon="pi pi-arrow-left"
+          [text]="true"
+          [rounded]="true"
+          styleClass="repz-icon-button"
+          (onClick)="voltar()"
+        />
+      </div>
+      <div class="aluno-id">
+        <div class="avatar avatar-lg">{{ inicial(a.nome) }}</div>
+        <div>
+          <div class="aluno-nome">{{ a.nome }}</div>
+          <div class="aluno-contato">
+            {{ a.email }}<span *ngIf="a.telefone"> · {{ a.telefone }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <p-button
+          label="Avaliação"
+          icon="pi pi-pencil"
+          styleClass="repz-ghost"
+          [routerLink]="['/personal/aluno', a.userId, 'avaliacao-nova']"
+          [queryParams]="{ nome: a.nome }"
+        />
+        <p-button
+          label="Editar ficha"
+          icon="pi pi-list-check"
+          styleClass="repz-primary"
+          [routerLink]="['/personal/aluno', a.userId, 'ficha-treino']"
+          [queryParams]="{ nome: a.nome }"
+        />
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Peso atual</span>
+          <span class="kpi-icon"><i class="pi pi-chart-line"></i></span>
+        </div>
+        <div class="kpi-value">
+          {{ pesoAtual() != null ? pesoAtual() : '—'
+          }}<span class="kpi-unit" *ngIf="pesoAtual() != null"> kg</span>
+        </div>
+        <div class="kpi-sub">última avaliação</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Altura</span>
+          <span class="kpi-icon"><i class="pi pi-arrows-v"></i></span>
+        </div>
+        <div class="kpi-value">
+          {{ alturaAtual() != null ? alturaAtual() : '—'
+          }}<span class="kpi-unit" *ngIf="alturaAtual() != null"> cm</span>
+        </div>
+        <div class="kpi-sub">registrada na avaliação</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Frequência (mês)</span>
+          <span class="kpi-icon"><i class="pi pi-calendar"></i></span>
+        </div>
+        <div class="kpi-value">{{ freqMes() }}<span class="kpi-unit"> d</span></div>
+        <div class="kpi-sub">presenças neste mês</div>
+      </p-card>
+
+      <p-card styleClass="repz-card kpi-card">
+        <div class="kpi-head">
+          <span class="kpi-label">Objetivo</span>
+          <span class="kpi-icon"><i class="pi pi-flag"></i></span>
+        </div>
+        <div class="kpi-value kpi-value-sm">{{ a.objetivo ?? '—' }}</div>
+        <div class="kpi-sub">{{ a.planoNome ?? 'sem plano' }}</div>
+      </p-card>
+    </div>
+
+    <div class="dash-split">
+
+      <p-card styleClass="repz-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Ficha de treino atual</div>
+            <div class="section-sub">
+              {{ divisoes().length }} divisão(ões) ativa(s)
+            </div>
+          </div>
+          <p-tag
+            *ngIf="divisoes().length > 0"
+            styleClass="repz-tag-success"
+            value="Ativa"
+          />
+        </div>
+
+        <div class="ficha-list" *ngIf="divisoes().length > 0; else semFicha">
+          <div class="ficha-item" *ngFor="let d of divisoes()">
+            <div class="ficha-badge">{{ d.divisao }}</div>
+            <div class="ficha-info">
+              <div class="ficha-nome">{{ d.nome }}</div>
+              <div class="ficha-meta text-3">
+                {{ focoDivisao(d) }} · {{ d.exercicios.length }} exercícios
+              </div>
+            </div>
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              styleClass="repz-icon-button"
+              [routerLink]="['/personal/aluno', a.userId, 'ficha-treino']"
+              [queryParams]="{ nome: a.nome }"
+              title="Editar"
+            />
+          </div>
+        </div>
+        <ng-template #semFicha>
+          <div class="vazio-inline">
+            <i class="pi pi-clipboard"></i>
+            <span>Sem ficha ativa.</span>
+            <p-button
+              label="Criar ficha"
+              icon="pi pi-plus"
+              size="small"
+              styleClass="repz-primary"
+              [routerLink]="['/personal/aluno', a.userId, 'ficha-treino']"
+              [queryParams]="{ nome: a.nome }"
+            />
+          </div>
+        </ng-template>
+      </p-card>
+
+      <p-card styleClass="repz-card">
+        <div class="section-head">
+          <div class="section-title">Última avaliação</div>
+        </div>
+
+        <ng-container *ngIf="ultimaAvaliacao() as u; else semAv">
+          <div class="ult-data">{{ u.dataAvaliacao.split(' ')[0] }}</div>
+          <div class="ult-grid">
+            <div class="ult-item" *ngIf="u.percentualGordura != null">
+              <span>% Gordura</span><strong>{{ u.percentualGordura }}%</strong>
+            </div>
+            <div class="ult-item" *ngIf="massaMagra() != null">
+              <span>Massa magra</span><strong>{{ massaMagra() }} kg</strong>
+            </div>
+            <div class="ult-item" *ngIf="u.cinturaCm != null">
+              <span>Cintura</span><strong>{{ u.cinturaCm }} cm</strong>
+            </div>
+            <div class="ult-item" *ngIf="u.bracoCm != null">
+              <span>Braço</span><strong>{{ u.bracoCm }} cm</strong>
+            </div>
+          </div>
+
+          <div class="chart-block" *ngIf="avaliacoes().length > 1">
+            <div class="chart-title">Evolução do peso</div>
+            <div class="chart-mini">
+              <p-chart
+                type="line"
+                [data]="chartData()"
+                [options]="chartOptions"
+              />
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #semAv>
+          <div class="vazio-inline">
+            <i class="pi pi-chart-line"></i>
+            <span>Nenhuma avaliação registrada.</span>
+            <p-button
+              label="Registrar"
+              icon="pi pi-plus"
+              size="small"
+              styleClass="repz-primary"
+              [routerLink]="['/personal/aluno', a.userId, 'avaliacao-nova']"
+              [queryParams]="{ nome: a.nome }"
+            />
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+  </ng-container>
+</app-shell>

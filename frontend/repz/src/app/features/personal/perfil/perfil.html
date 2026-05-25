@@ -1,0 +1,136 @@
+<app-shell
+  ativo="perfil"
+  [crumbs]="['Personal', 'Perfil']"
+  [nome]="perfil()?.userName ?? 'Personal'"
+  subtitulo="Meu perfil"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Meu perfil</div>
+      <div class="page-subtitle">Visualize e edite suas informações de personal.</div>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <div class="perfil-grid" *ngIf="!carregando() && !erro() && perfil()">
+
+    <div class="perfil-form-col">
+      <p-card styleClass="repz-card">
+        <div class="card-title">Editar informações</div>
+
+        <div class="form-group">
+          <label class="form-label" for="nome">Nome</label>
+          <input id="nome" pInputText [(ngModel)]="nome" placeholder="Seu nome" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <input
+            id="email"
+            pInputText
+            type="email"
+            [(ngModel)]="email"
+            placeholder="voce@email.com"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="especialidade">Especialidade</label>
+          <input
+            id="especialidade"
+            pInputText
+            [(ngModel)]="especialidade"
+            placeholder="Ex.: Musculação, Funcional, CrossFit…"
+            class="w-full"
+          />
+          <div class="form-hint">Exibida para os alunos vinculados a você.</div>
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="form-section-label">Alterar senha (opcional)</div>
+
+        <div class="form-group">
+          <label class="form-label" for="senha">Nova senha</label>
+          <input
+            id="senha"
+            pInputText
+            type="password"
+            [(ngModel)]="novaSenha"
+            placeholder="Deixe em branco para manter"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmar">Confirmar nova senha</label>
+          <input
+            id="confirmar"
+            pInputText
+            type="password"
+            [(ngModel)]="confirmarSenha"
+            placeholder="Repita a nova senha"
+            class="w-full"
+          />
+        </div>
+
+        <p-message
+          *ngIf="aviso()"
+          [severity]="avisoSeverity()"
+          styleClass="w-full mt-3"
+          [text]="aviso()!"
+        />
+
+        <div class="form-actions">
+          <p-button
+            label="Salvar"
+            icon="pi pi-check"
+            styleClass="repz-primary"
+            [loading]="salvando()"
+            (onClick)="salvar()"
+          />
+        </div>
+      </p-card>
+    </div>
+
+    <div class="perfil-info-col">
+
+      <p-card styleClass="repz-card avatar-card">
+        <div class="avatar avatar-xl">{{ (perfil()?.userName ?? 'P').charAt(0).toUpperCase() }}</div>
+        <div class="avatar-name">{{ perfil()?.userName }}</div>
+        <p-tag
+          [styleClass]="perfil()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
+          [value]="perfil()?.ativo ? 'Ativo' : 'Inativo'"
+        />
+      </p-card>
+
+      <p-card styleClass="repz-card info-card">
+        <div class="card-title">Informações</div>
+
+        <div class="info-row">
+          <span class="info-label">E-mail</span>
+          <span class="info-value">{{ perfil()?.email }}</span>
+        </div>
+        <div class="info-row" *ngIf="perfil()?.academiaNome">
+          <span class="info-label">Academia</span>
+          <span class="info-value">{{ perfil()?.academiaNome }}</span>
+        </div>
+        <div class="info-row" *ngIf="perfil()?.especialidade">
+          <span class="info-label">Especialidade</span>
+          <span class="info-value">{{ perfil()?.especialidade }}</span>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</app-shell>

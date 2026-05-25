@@ -34,32 +34,58 @@ export interface TreinoResponse {
   exercicios: ExercicioTreinoResponse[];
 }
 
+export interface ExercicioCreateRequest {
+  nomeExercicio: string;
+  grupoMuscular?: string;
+  series?: number;
+  repeticoes?: string;
+  cargaKg?: number;
+  descansoSegundos?: number;
+  ordem?: number;
+  observacao?: string;
+}
+
+export interface TreinoCreateRequest {
+  alunoId: number;
+  nome: string;
+  divisao: string;
+  objetivo?: string;
+  observacoes?: string;
+
+  validadeAte?: string;
+  exercicios?: ExercicioCreateRequest[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class FichaTreinoService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/treinos`;
 
-  /** Aluno autenticado consulta a própria ficha ativa. */
   obterMinhaFichaAtiva(): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}/me`);
   }
 
-  /** Aluno autenticado consulta o próprio histórico de fichas. */
   obterMeuHistorico(): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}/me/historico`);
   }
 
-  /** Perfis de gestão consultam a ficha ativa de um aluno específico. */
   obterFichaAtivaDoAluno(alunoId: number): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}`, {
       params: { aluno: alunoId },
     });
   }
 
-  /** Perfis de gestão consultam o histórico de fichas de um aluno específico. */
   obterHistoricoDoAluno(alunoId: number): Observable<TreinoResponse[]> {
     return this.http.get<TreinoResponse[]>(`${this.base}/historico`, {
       params: { aluno: alunoId },
     });
+  }
+
+  criarDivisao(req: TreinoCreateRequest): Observable<TreinoResponse> {
+    return this.http.post<TreinoResponse>(this.base, req);
+  }
+
+  desativarDivisao(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.base}/${id}/desativar`, {});
   }
 }

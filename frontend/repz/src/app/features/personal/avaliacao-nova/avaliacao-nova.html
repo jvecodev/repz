@@ -1,0 +1,272 @@
+<app-shell
+  ativo="alunos"
+  [crumbs]="['Personal Trainer', 'Avaliações']"
+  [nome]="personalService.nomePersonal()"
+  subtitulo="Personal Trainer"
+  [mostrarCta]="false"
+>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro()">
+
+    <div class="page-header">
+      <div class="hd-left">
+        <p-button
+          icon="pi pi-arrow-left"
+          [text]="true"
+          [rounded]="true"
+          styleClass="repz-icon-button"
+          (onClick)="voltar()"
+        />
+        <div>
+          <div class="page-title">Registrar avaliação física</div>
+          <div class="page-subtitle">
+            Aluno: <strong>{{ alunoNome() }}</strong>
+            <span *ngIf="ultima()"> · Última avaliação {{ dataUltimaStr() }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="hd-actions">
+        <p-button
+          label="Cancelar"
+          styleClass="repz-ghost"
+          (onClick)="voltar()"
+          [disabled]="salvando()"
+        />
+        <p-button
+          label="Salvar avaliação"
+          icon="pi pi-check"
+          styleClass="repz-primary"
+          [loading]="salvando()"
+          (onClick)="salvar()"
+        />
+      </div>
+    </div>
+
+    <p-message
+      *ngIf="aviso()"
+      [severity]="avisoSeverity()"
+      [text]="aviso()!"
+      styleClass="w-full aviso-global"
+    />
+
+    <div class="layout">
+
+      <p-card styleClass="repz-card">
+        <div class="form-title">Medidas de hoje ({{ dataHoje }})</div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Peso (kg) *</label>
+            <input
+              pInputText
+              type="number"
+              step="0.1"
+              [ngModel]="fPeso()"
+              (ngModelChange)="fPeso.set($event)"
+              class="w-full"
+              placeholder="0.0"
+            />
+            <span class="form-prev" *ngIf="ultima()?.pesoKg != null">
+              Última: {{ ultima()!.pesoKg }} kg
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">% Gordura</label>
+            <input
+              pInputText
+              type="number"
+              step="0.1"
+              [ngModel]="fGordura()"
+              (ngModelChange)="fGordura.set($event)"
+              class="w-full"
+              placeholder="0.0"
+            />
+            <span class="form-prev" *ngIf="ultima()?.percentualGordura != null">
+              Última: {{ ultima()!.percentualGordura }} %
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Massa magra (kg)</label>
+            <input
+              pInputText
+              [value]="fMassaMagra() ?? ''"
+              disabled
+              class="w-full"
+              placeholder="Calculada automaticamente"
+            />
+            <span class="form-prev" *ngIf="massaMagraAnterior() != null">
+              Última: {{ massaMagraAnterior() }} kg
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Altura (cm) *</label>
+            <input
+              pInputText
+              type="number"
+              step="1"
+              [ngModel]="fAltura()"
+              (ngModelChange)="fAltura.set($event)"
+              class="w-full"
+              placeholder="0"
+            />
+            <span class="form-prev" *ngIf="ultima()?.alturaCm != null">
+              Última: {{ ultima()!.alturaCm }} cm
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cintura (cm)</label>
+            <input
+              pInputText
+              type="number"
+              step="0.1"
+              [ngModel]="fCintura()"
+              (ngModelChange)="fCintura.set($event)"
+              class="w-full"
+              placeholder="0"
+            />
+            <span class="form-prev" *ngIf="ultima()?.cinturaCm != null">
+              Última: {{ ultima()!.cinturaCm }} cm
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Braço (cm)</label>
+            <input
+              pInputText
+              type="number"
+              step="0.1"
+              [ngModel]="fBraco()"
+              (ngModelChange)="fBraco.set($event)"
+              class="w-full"
+              placeholder="0"
+            />
+            <span class="form-prev" *ngIf="ultima()?.bracoCm != null">
+              Última: {{ ultima()!.bracoCm }} cm
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Coxa (cm)</label>
+            <input
+              pInputText
+              type="number"
+              step="0.1"
+              [ngModel]="fCoxa()"
+              (ngModelChange)="fCoxa.set($event)"
+              class="w-full"
+              placeholder="0"
+            />
+            <span class="form-prev" *ngIf="ultima()?.coxaCm != null">
+              Última: {{ ultima()!.coxaCm }} cm
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <textarea
+            pTextarea
+            [(ngModel)]="observacoes"
+            rows="3"
+            class="w-full"
+            placeholder="Notas para a próxima avaliação… (não enviadas ao backend)"
+            [autoResize]="false"
+          ></textarea>
+        </div>
+      </p-card>
+
+      <p-card styleClass="repz-card compare-card" *ngIf="ultima(); else semCompare">
+        <div class="form-title">Comparativo com última avaliação</div>
+
+        <div class="cmp-list">
+          <div class="cmp-item">
+            <div class="cmp-info">
+              <span class="cmp-label">Peso</span>
+              <strong class="cmp-cur">
+                {{ fPeso() != null ? fPeso() + ' kg' : '—' }}
+              </strong>
+            </div>
+            <div class="cmp-prev">
+              <span class="cmp-prev-label">Anterior: {{ ultima()!.pesoKg ?? '—' }} kg</span>
+              <span class="cmp-delta" [class.up]="(deltaPeso() ?? 0) > 0" [class.down]="(deltaPeso() ?? 0) < 0">
+                {{ fmtDelta(deltaPeso(), 'kg') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="cmp-item">
+            <div class="cmp-info">
+              <span class="cmp-label">% Gordura</span>
+              <strong class="cmp-cur">
+                {{ fGordura() != null ? fGordura() + ' %' : '—' }}
+              </strong>
+            </div>
+            <div class="cmp-prev">
+              <span class="cmp-prev-label">Anterior: {{ ultima()!.percentualGordura ?? '—' }} %</span>
+              <span class="cmp-delta" [class.up]="(deltaGordura() ?? 0) > 0" [class.down]="(deltaGordura() ?? 0) < 0">
+                {{ fmtDelta(deltaGordura(), '%') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="cmp-item">
+            <div class="cmp-info">
+              <span class="cmp-label">Massa magra</span>
+              <strong class="cmp-cur">
+                {{ fMassaMagra() != null ? fMassaMagra() + ' kg' : '—' }}
+              </strong>
+            </div>
+            <div class="cmp-prev">
+              <span class="cmp-prev-label">
+                Anterior: {{ massaMagraAnterior() != null ? massaMagraAnterior() + ' kg' : '—' }}
+              </span>
+              <span class="cmp-delta" [class.up]="(deltaMassaMagra() ?? 0) > 0" [class.down]="(deltaMassaMagra() ?? 0) < 0">
+                {{ fmtDelta(deltaMassaMagra(), 'kg') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="cmp-item">
+            <div class="cmp-info">
+              <span class="cmp-label">Cintura</span>
+              <strong class="cmp-cur">
+                {{ fCintura() != null ? fCintura() + ' cm' : '—' }}
+              </strong>
+            </div>
+            <div class="cmp-prev">
+              <span class="cmp-prev-label">Anterior: {{ ultima()!.cinturaCm ?? '—' }} cm</span>
+              <span class="cmp-delta" [class.up]="(deltaCintura() ?? 0) > 0" [class.down]="(deltaCintura() ?? 0) < 0">
+                {{ fmtDelta(deltaCintura(), 'cm') }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <ng-template #semCompare>
+        <p-card styleClass="repz-card compare-card">
+          <div class="form-title">Comparativo</div>
+          <div class="cmp-empty">
+            <i class="pi pi-info-circle"></i>
+            <span>Esta é a primeira avaliação do aluno. Comparativos aparecerão a partir da próxima.</span>
+          </div>
+        </p-card>
+      </ng-template>
+    </div>
+  </ng-container>
+</app-shell>

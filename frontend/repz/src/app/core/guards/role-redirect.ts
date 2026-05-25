@@ -1,8 +1,8 @@
-import { inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth';
 
-/** Rota inicial de cada perfil. */
 export function homePorRole(role: string | null): string {
   switch (role) {
     case 'ADMIN':
@@ -18,13 +18,11 @@ export function homePorRole(role: string | null): string {
   }
 }
 
-/**
- * Lógica comum dos guards:
- *  - não autenticado  -> /auth
- *  - autenticado mas perfil errado -> home do próprio perfil (não /auth)
- *  - perfil permitido -> libera
- */
 export function checarAcesso(rolesPermitidos: string[]): boolean {
+  if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+    return true;
+  }
+
   const router = inject(Router);
   const auth = inject(AuthService);
   const role = auth.getUserRole();
@@ -38,7 +36,6 @@ export function checarAcesso(rolesPermitidos: string[]): boolean {
     return true;
   }
 
-  // Usuário autenticado sem permissão volta para a página inicial do próprio perfil.
   router.navigate([homePorRole(role)]);
   return false;
 }

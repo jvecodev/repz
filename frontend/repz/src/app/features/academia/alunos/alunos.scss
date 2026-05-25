@@ -1,0 +1,161 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.aviso {
+  margin-bottom: 16px;
+}
+
+.search-row {
+  margin-bottom: 16px;
+}
+
+.search-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 420px;
+
+  i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-4);
+    font-size: 14px;
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding-left: 2.4rem !important;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 36px;
+  color: var(--text-4);
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.empty-row {
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13px;
+  padding: 24px 0;
+}
+
+.cell-strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cell-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.td-action {
+  text-align: right;
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.form-readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.form-readonly-value {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.form-select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-input, var(--bg-elev));
+  color: var(--text);
+  font-size: 14px;
+  appearance: auto;
+
+  &:focus {
+    outline: 2px solid var(--mint);
+    outline-offset: -1px;
+  }
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--text-4);
+  padding: 8px 12px;
+  background: var(--bg-elev);
+  border-radius: var(--r-sm);
+  margin-top: 4px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}

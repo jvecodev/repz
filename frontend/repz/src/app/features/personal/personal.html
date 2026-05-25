@@ -1,55 +1,203 @@
 <app-shell
   ativo="dashboard"
-  [crumbs]="['Personal', 'Dashboard']"
-  nome="Personal"
-  subtitulo="Gestão de alunos"
+  [crumbs]="['Personal Trainer', 'Painel']"
+  [nome]="nomePersonal()"
+  subtitulo="Personal Trainer"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Dashboard do personal</div>
+      <div class="page-title">Painel do Personal</div>
       <div class="page-subtitle">
-        Visão inicial para acompanhar fichas, avaliações e alunos ativos.
+        Bem-vindo de volta, {{ nomePersonal() }}.
+        @if (!carregando()) {
+          Você tem {{ ativos() }} aluno(s) ativo(s) hoje.
+        }
       </div>
+    </div>
+    <div class="header-actions">
+      <p-button
+        label="Nova ficha"
+        icon="pi pi-list-check"
+        styleClass="repz-ghost"
+        routerLink="/personal/alunos"
+      />
+      <p-button
+        label="Registrar avaliação"
+        icon="pi pi-pencil"
+        styleClass="repz-primary"
+        routerLink="/personal/alunos"
+      />
     </div>
   </div>
 
-  <!-- Solicitações pendentes de nova ficha -->
-  <p-card styleClass="repz-card sol-card">
-    <div class="sol-head">
+  <div class="kpi-grid" *ngIf="!carregando()">
+    <p-card styleClass="repz-card kpi-card">
+      <div class="kpi-head">
+        <span class="kpi-label">Meus alunos</span>
+        <span class="kpi-icon"><i class="pi pi-users"></i></span>
+      </div>
+      <div class="kpi-value">{{ totalAlunos() }}</div>
+      <div class="kpi-sub">vinculados à sua conta</div>
+    </p-card>
+
+    <p-card styleClass="repz-card kpi-card">
+      <div class="kpi-head">
+        <span class="kpi-label">Ativos</span>
+        <span class="kpi-icon"><i class="pi pi-check"></i></span>
+      </div>
+      <div class="kpi-value">{{ ativos() }}</div>
+      <div class="kpi-sub" *ngIf="totalAlunos() > 0">
+        {{ ((ativos() / totalAlunos()) * 100) | number: '1.0-0' }}% da base
+      </div>
+      <div class="kpi-sub" *ngIf="totalAlunos() === 0">sem alunos vinculados</div>
+    </p-card>
+
+    <p-card styleClass="repz-card kpi-card">
+      <div class="kpi-head">
+        <span class="kpi-label">Ausentes (>7d)</span>
+        <span class="kpi-icon kpi-icon-warn"><i class="pi pi-exclamation-triangle"></i></span>
+      </div>
+      <div class="kpi-value">{{ ausentes7d() }}</div>
+      <div class="kpi-sub">
+        {{ ausentes14d() > 0 ? ausentes14d() + ' crítico(s) >14d' : 'sem casos críticos' }}
+      </div>
+    </p-card>
+
+    <p-card styleClass="repz-card kpi-card">
+      <div class="kpi-head">
+        <span class="kpi-label">Avaliações no mês</span>
+        <span class="kpi-icon"><i class="pi pi-pencil"></i></span>
+      </div>
+      <div class="kpi-value">{{ avaliacoesMes() }}</div>
+      <div class="kpi-sub">registradas este mês</div>
+    </p-card>
+  </div>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-card styleClass="repz-card" *ngIf="!carregando() && rows().length > 0">
+    <div class="section-head">
+      <div class="section-title">Meus alunos</div>
+      <div class="search-wrap-sm">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="Buscar aluno…"
+          [ngModel]="busca()"
+          (ngModelChange)="busca.set($event)"
+          class="search-input"
+        />
+      </div>
+    </div>
+
+    <p-table
+      [value]="rowsFiltradas()"
+      styleClass="repz-table"
+      [tableStyle]="{ 'min-width': '900px' }"
+      [paginator]="rowsFiltradas().length > 8"
+      [rows]="8"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Aluno</th>
+          <th>Plano</th>
+          <th>Frequência (mês)</th>
+          <th>Último check-in</th>
+          <th>Status treino</th>
+          <th>Matrícula</th>
+          <th>Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr
+          [class.row-warn]="r.statusTreino === 'atencao'"
+          [class.row-danger]="r.statusTreino === 'ausente'"
+        >
+          <td>
+            <div class="al-cell">
+              <div class="avatar avatar-md">{{ inicial(r.nome) }}</div>
+              <div>
+                <div class="cell-strong">{{ r.nome }}</div>
+                <div class="cell-sub">{{ r.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ r.planoNome }}</td>
+          <td>
+            <div class="freq-cell">
+              <div class="freq-bar">
+                <div class="freq-fill" [style.width.%]="freqPct(r.freqMes)"></div>
+              </div>
+              <span class="freq-num">{{ r.freqMes }}d</span>
+            </div>
+          </td>
+          <td class="cell-sub">
+            <span>{{ r.ultimoCheckin ?? '—' }}</span>
+            <span class="dias-sub" *ngIf="r.diasSemTreino != null && r.diasSemTreino > 0">
+              há {{ r.diasSemTreino }}d
+            </span>
+          </td>
+          <td>
+            <p-tag [styleClass]="statusClass(r.statusTreino)" [value]="statusLabel(r.statusTreino)" />
+            <i
+              *ngIf="r.statusTreino === 'atencao' || r.statusTreino === 'ausente'"
+              class="pi pi-exclamation-triangle alerta-icon"
+              [title]="
+                r.statusTreino === 'ausente'
+                  ? 'Sem treinar há mais de 14 dias'
+                  : 'Sem treinar há mais de 7 dias'
+              "
+            ></i>
+          </td>
+          <td>
+            <p-tag
+              [styleClass]="r.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
+              [value]="r.ativo ? 'Ativo' : 'Inativo'"
+            />
+          </td>
+          <td class="td-action">
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              styleClass="repz-icon-button"
+              title="Ver perfil completo"
+              (onClick)="verDetalhes(r)"
+            />
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              styleClass="repz-icon-button"
+              title="Criar/editar ficha de treino"
+              (onClick)="verFicha(r)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <p-card styleClass="repz-card sol-card" *ngIf="!carregandoSol() && solicitacoes().length > 0">
+    <div class="section-head">
       <div>
-        <div class="font-semibold">Solicitações de nova ficha</div>
-        <div class="text-3 text-sm" *ngIf="!carregandoSol()">
-          {{ solicitacoes().length === 0 ? 'Nenhuma pendente' : solicitacoes().length + ' pendente(s)' }}
-        </div>
+        <div class="section-title">Solicitações de nova ficha</div>
+        <div class="section-sub">{{ totalPendentes() }} pendente(s)</div>
       </div>
-      <p-tag
-        *ngIf="!carregandoSol() && solicitacoes().length > 0"
-        styleClass="repz-tag-success"
-        [value]="solicitacoes().length.toString()"
-      />
+      <p-tag styleClass="repz-tag-success" [value]="totalPendentes().toString()" />
     </div>
 
-    <!-- Skeleton enquanto carrega -->
-    <ng-container *ngIf="carregandoSol()">
-      <div class="sol-skeleton" *ngFor="let _ of [1,2]">
-        <p-skeleton width="60%" height="14px" />
-        <p-skeleton width="40%" height="12px" styleClass="mt-1" />
-      </div>
-    </ng-container>
-
-    <!-- Vazio -->
-    <div class="sol-empty text-3" *ngIf="!carregandoSol() && solicitacoes().length === 0">
-      <i class="pi pi-check-circle"></i>
-      <span>Todos os alunos estão com fichas em dia.</span>
-    </div>
-
-    <!-- Lista de solicitações -->
-    <div class="sol-list" *ngIf="!carregandoSol() && solicitacoes().length > 0">
+    <div class="sol-list">
       <div *ngFor="let s of solicitacoes()" class="sol-item">
         <div class="sol-item-row">
           <div class="sol-aluno">
-            <div class="avatar avatar-sm">{{ s.alunoNome.charAt(0).toUpperCase() }}</div>
+            <div class="avatar avatar-md">{{ s.alunoNome.charAt(0).toUpperCase() }}</div>
             <div>
               <div class="sol-aluno-nome">{{ s.alunoNome }}</div>
               <div class="sol-data text-3">Solicitado em {{ s.criadaEm }}</div>
@@ -66,18 +214,16 @@
           </div>
         </div>
 
-        <!-- Mensagem do aluno -->
         <div class="sol-msg" *ngIf="s.mensagem">
           <i class="pi pi-comment"></i>
           <span>{{ s.mensagem }}</span>
         </div>
 
-        <!-- Área de resposta inline -->
         <div class="sol-reply" *ngIf="respondendoId() === s.id">
           <textarea
             pTextarea
             rows="3"
-            placeholder="Comentário opcional (ex: vou preparar até sexta-feira)…"
+            placeholder="Comentário opcional…"
             [ngModel]="respostaTexto()"
             (ngModelChange)="respostaTexto.set($event)"
             class="sol-reply-textarea"
@@ -118,20 +264,4 @@
       </div>
     </div>
   </p-card>
-
-  <div class="dash-grid">
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Treinos</div>
-      <h2>Fichas dos alunos</h2>
-      <p>Revise as fichas ativas e mantenha cargas, divisões e observações alinhadas.</p>
-      <p-tag styleClass="repz-tag-muted" value="Em breve" />
-    </p-card>
-
-    <p-card styleClass="repz-card dash-card">
-      <div class="dash-kicker">Avaliações</div>
-      <h2>Evolução física</h2>
-      <p>Registre medidas e compare os pontos de evolução ao longo do tempo.</p>
-      <p-tag styleClass="repz-tag-success" value="Disponível por aluno" />
-    </p-card>
-  </div>
 </app-shell>

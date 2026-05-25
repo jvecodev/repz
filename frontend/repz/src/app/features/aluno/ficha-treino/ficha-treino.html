@@ -3,6 +3,7 @@
   [crumbs]="['Aluno', 'Meu treino']"
   [nome]="aluno()"
   [subtitulo]="alunoObjetivo()"
+  [mostrarCta]="!freq.jaFezCheckinHoje()"
 >
   <div class="page-header">
     <div>
@@ -40,7 +41,6 @@
     <div class="layout">
       <p-card styleClass="repz-card list-card">
 
-        <!-- Cabeçalho com navegação de treinos -->
         <div class="card-tabs-row">
           <div class="tab-group">
             <button
@@ -63,7 +63,6 @@
 
         <div class="list-divider"></div>
 
-        <!-- Lista de exercícios -->
         <div class="ex-stack" *ngIf="treinoAtual() as t">
           <div *ngFor="let ex of t.exercicios; let idx = index" class="ex-card">
             <div class="ex-row">
@@ -129,7 +128,7 @@
           </div>
 
           <ng-container *ngIf="podesolicitar()">
-            <!-- Já tem solicitação pendente -->
+
             <div class="sol-status" *ngIf="solicitacaoPendente()">
               <i class="pi pi-clock"></i>
               <div>
@@ -138,7 +137,6 @@
               </div>
             </div>
 
-            <!-- Pode solicitar -->
             <div class="sol-btn-wrap" *ngIf="!solicitacaoPendente()">
               <p-button
                 label="Solicitar nova ficha"
@@ -207,7 +205,7 @@
       </ng-template>
     </p-table>
   </p-card>
-<!-- Dialog: solicitar nova ficha -->
+
 <p-dialog
   header="Solicitar nova ficha"
   [visible]="dialogAberto()"

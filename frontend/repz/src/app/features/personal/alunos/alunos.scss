@@ -1,0 +1,148 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.search-row {
+  margin-bottom: 16px;
+}
+
+.search-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 420px;
+
+  i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-4);
+    font-size: 14px;
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding-left: 2.4rem !important;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 36px;
+  color: var(--text-4);
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: var(--text-3);
+  max-width: 320px;
+}
+
+.empty-row {
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13px;
+  padding: 24px 0;
+}
+
+.avatar-md {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #b1846b 0%, #6b3e2f 100%);
+  color: #fefefe;
+  font-weight: 700;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+}
+
+.al-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cell-strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cell-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.td-action {
+  text-align: right;
+  white-space: nowrap;
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.freq-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+}
+
+.freq-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--card-2);
+  border-radius: 999px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.freq-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--mint) 0%, var(--mint-3) 100%);
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+
+.freq-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}

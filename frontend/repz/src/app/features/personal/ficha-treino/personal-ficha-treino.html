@@ -1,0 +1,278 @@
+<app-shell
+  ativo="alunos"
+  [crumbs]="['Personal Trainer', 'Fichas']"
+  [nome]="personalService.nomePersonal()"
+  subtitulo="Personal Trainer"
+  [mostrarCta]="false"
+>
+
+  <div class="page-header">
+    <div class="hd-left">
+      <p-button
+        icon="pi pi-arrow-left"
+        [text]="true"
+        [rounded]="true"
+        styleClass="repz-icon-button"
+        (onClick)="voltar()"
+      />
+      <div>
+        <div class="page-title">Editar ficha</div>
+        <div class="page-subtitle">Aluno: <strong>{{ alunoNome() }}</strong></div>
+      </div>
+    </div>
+    <div class="hd-actions" *ngIf="criando()">
+      <p-button
+        label="Cancelar"
+        styleClass="repz-ghost"
+        (onClick)="cancelarFormulario()"
+        [disabled]="salvando()"
+      />
+      <p-button
+        label="Salvar ficha"
+        icon="pi pi-check"
+        styleClass="repz-primary"
+        [loading]="salvando()"
+        [disabled]="!novaDivisao || !novoNome.trim()"
+        (onClick)="criarDivisao()"
+      />
+    </div>
+  </div>
+
+  <p-message
+    *ngIf="aviso() && !criando()"
+    [severity]="avisoSeverity()"
+    [text]="aviso()!"
+    styleClass="w-full aviso-global"
+  />
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    [text]="erro()!"
+    styleClass="w-full"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro()">
+
+    <div class="tabs-row">
+      <button
+        *ngFor="let d of divisoes()"
+        type="button"
+        class="tab-pill"
+        [class.active]="tabAtiva() === d.id && !criando()"
+        (click)="selecionarTab(d.id)"
+      >
+        Treino {{ d.divisao }}
+      </button>
+      <button
+        type="button"
+        class="tab-pill tab-add"
+        [class.active]="criando() && editandoDivisaoId() === null"
+        (click)="abrirFormulario()"
+      >
+        <i class="pi pi-plus"></i> Nova divisão
+      </button>
+    </div>
+
+    <p-card
+      *ngIf="!criando() && divisaoAtiva() as d"
+      styleClass="repz-card divisao-card"
+    >
+      <div class="div-header">
+        <div class="div-badge">{{ d.divisao }}</div>
+        <div class="div-info">
+          <div class="div-nome">{{ d.nome }}</div>
+          <div class="div-objetivo text-3" *ngIf="d.objetivo">{{ d.objetivo }}</div>
+        </div>
+        <p-tag *ngIf="d.validadeAte" styleClass="repz-tag-muted" [value]="'Vence ' + d.validadeAte" />
+        <p-button
+          label="Reeditar"
+          icon="pi pi-pencil"
+          size="small"
+          styleClass="repz-ghost"
+          (onClick)="reeditarDivisao(d)"
+        />
+        <p-button
+          icon="pi pi-trash"
+          [text]="true"
+          [rounded]="true"
+          severity="danger"
+          [loading]="removendo() === d.id"
+          (onClick)="removerDivisao(d.id)"
+          title="Remover divisão"
+        />
+      </div>
+
+      <div class="div-obs text-3" *ngIf="d.observacoes">
+        <i class="pi pi-info-circle"></i> {{ d.observacoes }}
+      </div>
+
+      <div class="div-exercicios" *ngIf="d.exercicios && d.exercicios.length > 0">
+        <div *ngFor="let ex of d.exercicios; let i = index" class="ex-row">
+          <span class="ex-num">{{ (i + 1).toString().padStart(2, '0') }}</span>
+          <div class="ex-body">
+            <span class="ex-nome">{{ ex.nomeExercicio }}</span>
+            <span class="ex-detail">
+              <span class="ex-tag" *ngIf="ex.grupoMuscular">{{ ex.grupoMuscular }}</span>
+              <span *ngIf="ex.series">{{ ex.series }}x{{ ex.repeticoes }}</span>
+              <span *ngIf="ex.cargaKg" class="ex-carga">{{ ex.cargaKg }} kg</span>
+              <span *ngIf="ex.descansoSegundos" class="text-3">{{ ex.descansoSegundos }}s</span>
+            </span>
+            <span class="ex-obs text-3" *ngIf="ex.observacao">{{ ex.observacao }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="div-sem-ex text-3" *ngIf="!d.exercicios || d.exercicios.length === 0">
+        Nenhum exercício cadastrado nesta divisão.
+      </div>
+    </p-card>
+
+    <p-card *ngIf="criando()" styleClass="repz-card form-card">
+      <div class="form-section-title">
+        {{ editandoDivisaoId() ? 'Reeditar divisão' : 'Nova divisão de treino' }}
+        <span class="form-hint" *ngIf="editandoDivisaoId()">
+          (a divisão anterior será substituída ao salvar)
+        </span>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Divisão *</label>
+          <select class="form-select" [(ngModel)]="novaDivisao">
+            <option value="">Selecione…</option>
+            <option *ngFor="let l of LETRAS" [value]="l">Treino {{ l }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nome da divisão *</label>
+          <input
+            pInputText
+            [(ngModel)]="novoNome"
+            placeholder="Ex: Treino A — Peito e Tríceps"
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Objetivo</label>
+          <input pInputText [(ngModel)]="novoObjetivo" placeholder="Ex: Hipertrofia muscular" class="w-full" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Válido até</label>
+          <input pInputText type="date" [(ngModel)]="novaValidade" class="w-full" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Observações gerais</label>
+        <textarea
+          pTextarea
+          [(ngModel)]="novoObservacoes"
+          rows="2"
+          placeholder="Ex: Aquecer 10 min na esteira antes…"
+          class="w-full"
+          [autoResize]="false"
+        ></textarea>
+      </div>
+
+      <div class="ex-section">
+        <div class="ex-section-title">
+          Exercícios
+          <span class="ex-count" *ngIf="exerciciosDraft().length > 0">
+            {{ exerciciosDraft().length }} adicionado(s) · arraste para reordenar
+          </span>
+        </div>
+
+        <div
+          cdkDropList
+          (cdkDropListDropped)="reordenarExerciciosDraft($event)"
+          class="ex-draft-list"
+          *ngIf="exerciciosDraft().length > 0"
+        >
+          <div
+            *ngFor="let ex of exerciciosDraft(); let i = index"
+            cdkDrag
+            class="ex-draft-row"
+          >
+            <button class="ex-drag-handle" cdkDragHandle type="button" title="Arrastar">
+              <i class="pi pi-bars"></i>
+            </button>
+            <span class="ex-num">{{ (i + 1).toString().padStart(2, '0') }}</span>
+            <div class="ex-body">
+              <span class="ex-nome">{{ ex.nomeExercicio }}</span>
+              <span class="ex-detail">
+                <span class="ex-tag" *ngIf="ex.grupoMuscular">{{ ex.grupoMuscular }}</span>
+                <span *ngIf="ex.series">{{ ex.series }}x{{ ex.repeticoes }}</span>
+                <span *ngIf="ex.cargaKg" class="ex-carga">{{ ex.cargaKg }} kg</span>
+              </span>
+            </div>
+            <button class="ex-remove-btn" (click)="removerExercicioDraft(i)" type="button" title="Remover">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="ex-add-form">
+          <div class="ex-add-title">Adicionar exercício</div>
+          <div class="form-row-3">
+            <div class="form-group ex-nome-group">
+              <label class="form-label">Nome *</label>
+              <input pInputText [(ngModel)]="exNome" placeholder="Ex: Supino reto" class="w-full" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Grupo muscular</label>
+              <input pInputText [(ngModel)]="exGrupo" placeholder="Ex: Peito" class="w-full" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Séries</label>
+              <input pInputText type="number" [(ngModel)]="exSeries" placeholder="4" class="w-full" min="1" />
+            </div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Repetições</label>
+              <input pInputText [(ngModel)]="exReps" placeholder="8-12" class="w-full" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Carga (kg)</label>
+              <input pInputText type="number" [(ngModel)]="exCarga" placeholder="60" class="w-full" step="0.5" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descanso (s)</label>
+              <input pInputText type="number" [(ngModel)]="exDescanso" placeholder="90" class="w-full" min="0" />
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Observação</label>
+              <input pInputText [(ngModel)]="exObs" placeholder="Ex: Fase excêntrica em 3s" class="w-full" />
+            </div>
+            <div class="form-group form-group-btn">
+              <p-button
+                label="Adicionar exercício"
+                icon="pi pi-plus"
+                styleClass="repz-ghost"
+                size="small"
+                [disabled]="!exNome.trim()"
+                (onClick)="adicionarExercicioDraft()"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p-message
+        *ngIf="aviso() && criando()"
+        [severity]="avisoSeverity()"
+        [text]="aviso()!"
+        styleClass="w-full mt-3"
+      />
+    </p-card>
+  </ng-container>
+</app-shell>

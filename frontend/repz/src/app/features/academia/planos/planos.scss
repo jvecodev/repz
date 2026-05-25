@@ -1,0 +1,77 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.page-subtitle {
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+.state-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.hist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.empty-message {
+  padding: 24px 12px;
+  text-align: center;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.form-plano {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 8px;
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.85rem;
+
+    input,
+    p-inputnumber {
+      width: 100%;
+    }
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .aviso {
+    width: 100%;
+  }
+}

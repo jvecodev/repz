@@ -58,7 +58,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
-
     importProvidersFrom(
       TranslateModule.forRoot({
         defaultLanguage: 'pt-BR',

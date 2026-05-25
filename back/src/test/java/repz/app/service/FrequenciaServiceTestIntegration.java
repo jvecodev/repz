@@ -77,7 +77,7 @@ class FrequenciaServiceTestIntegration extends ServiceIntegrationSupport {
 
         assertThat(frequenciaService.filtrarPorAcademiaEPeriodo(academia.getId(), inicio, fim, autenticar(academiaUser)))
                 .hasSize(2);
-        assertThat(frequenciaService.meuHistorico(alunoAtivo.getId()))
+        assertThat(frequenciaService.meuHistorico(autenticar(alunoAtivo)))
                 .extracting("alunoId")
                 .containsOnly(alunoAtivo.getId());
 

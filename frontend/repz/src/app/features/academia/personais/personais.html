@@ -1,0 +1,241 @@
+<app-shell
+  ativo="personais"
+  [crumbs]="['Academia', 'Personais']"
+  [nome]="userService.nomeUsuario() || 'Gerente'"
+  subtitulo="Gestão da academia"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Personais</div>
+      <div class="page-subtitle">
+        @if (!carregando()) {
+          {{ personais().length }} personal(is) vinculado(s) à academia
+        }
+      </div>
+    </div>
+    <p-button
+      label="Adicionar personal"
+      icon="pi pi-plus"
+      styleClass="repz-primary"
+      (onClick)="abrirCadastro()"
+    />
+  </div>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <ng-container *ngIf="!carregando() && !erro()">
+    <p-message
+      *ngIf="aviso()"
+      [severity]="avisoSeverity()"
+      styleClass="w-full aviso"
+      [text]="aviso()!"
+    />
+
+    <div class="search-row" *ngIf="personais().length > 0">
+      <span class="search-wrap">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="Buscar por nome, e-mail ou especialidade…"
+          [ngModel]="busca()"
+          (ngModelChange)="busca.set($event)"
+          class="search-input"
+        />
+      </span>
+    </div>
+
+    <p-card styleClass="repz-card" *ngIf="personais().length === 0">
+      <div class="empty-state">
+        <i class="pi pi-id-card empty-icon"></i>
+        <div class="empty-title">Nenhum personal vinculado</div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="repz-card" *ngIf="personais().length > 0">
+      <p-table
+        [value]="personaisFiltrados()"
+        styleClass="repz-table"
+        [tableStyle]="{ 'min-width': '680px' }"
+        [paginator]="personaisFiltrados().length > 10"
+        [rows]="10"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Personal</th>
+            <th>Especialidade</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-p>
+          <tr>
+            <td>
+              <div class="cell-strong">{{ p.userName }}</div>
+              <div class="cell-sub">{{ p.email }}</div>
+            </td>
+            <td class="cell-sub">{{ p.especialidade || '—' }}</td>
+            <td>
+              <p-tag
+                [styleClass]="p.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
+                [value]="p.ativo ? 'Ativo' : 'Inativo'"
+              />
+            </td>
+            <td class="td-action">
+              <p-button
+                icon="pi pi-pencil"
+                label="Editar"
+                size="small"
+                styleClass="repz-ghost"
+                (onClick)="abrirEdicao(p)"
+              />
+              <p-button
+                [label]="p.ativo ? 'Desativar' : 'Ativar'"
+                [icon]="p.ativo ? 'pi pi-ban' : 'pi pi-check'"
+                size="small"
+                [styleClass]="p.ativo ? 'repz-ghost' : 'repz-primary'"
+                [loading]="alterandoId() === p.id"
+                [disabled]="alterandoId() !== null && alterandoId() !== p.id"
+                (onClick)="alternarStatus(p)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="empty-row">Nenhum personal corresponde à busca.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </ng-container>
+
+  <p-dialog
+    header="Editar personal"
+    [visible]="editando() !== null"
+    (visibleChange)="$event ? null : fecharEdicao()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '420px' }"
+    styleClass="repz-dialog"
+  >
+    <div class="edit-form" *ngIf="editando() as p">
+      <div class="form-readonly">
+        <span class="form-label">Personal</span>
+        <span class="form-readonly-value">{{ p.userName }} · {{ p.email }}</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Especialidade *</label>
+        <input
+          pInputText
+          [(ngModel)]="formEspecialidade"
+          class="w-full"
+          placeholder="Ex.: Musculação, Funcional…"
+        />
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        styleClass="repz-ghost"
+        (onClick)="fecharEdicao()"
+        [disabled]="salvandoEdicao()"
+      />
+      <p-button
+        label="Salvar"
+        icon="pi pi-check"
+        styleClass="repz-primary"
+        [loading]="salvandoEdicao()"
+        (onClick)="salvarEdicao()"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog
+    header="Cadastrar personal trainer"
+    [visible]="cadastrando()"
+    (visibleChange)="$event ? null : fecharCadastro()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '520px' }"
+    styleClass="repz-dialog"
+  >
+    <div class="edit-form">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Nome completo *</label>
+          <input
+            pInputText
+            [(ngModel)]="cadNome"
+            placeholder="Ex: João Silva"
+            class="w-full"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail *</label>
+          <input
+            pInputText
+            type="email"
+            [(ngModel)]="cadEmail"
+            placeholder="joao@email.com"
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">CREF</label>
+          <input
+            pInputText
+            [(ngModel)]="cadCref"
+            placeholder="000000-G/UF"
+            class="w-full"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Especialidade</label>
+          <input
+            pInputText
+            [(ngModel)]="cadEspecialidade"
+            placeholder="Ex: Funcional"
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      <div class="form-hint">
+        Uma senha temporária será gerada automaticamente e exibida após o cadastro.
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        styleClass="repz-ghost"
+        (onClick)="fecharCadastro()"
+        [disabled]="salvandoCad()"
+      />
+      <p-button
+        label="Cadastrar"
+        icon="pi pi-check"
+        styleClass="repz-primary"
+        [loading]="salvandoCad()"
+        (onClick)="salvarCadastro()"
+      />
+    </ng-template>
+  </p-dialog>
+</app-shell>

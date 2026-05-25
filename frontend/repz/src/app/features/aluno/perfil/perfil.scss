@@ -1,0 +1,48 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.page-title { font-size: 1.4rem; font-weight: 600; }
+.page-subtitle { color: var(--text-color-secondary); font-size: 0.9rem; }
+
+.state-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  @media (min-width: 720px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface-100, rgba(0,0,0,0.04));
+
+  .info-label {
+    font-size: 0.75rem;
+    color: var(--text-color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .info-value {
+    font-weight: 500;
+  }
+}
+
+.placeholder-msg { width: 100%; }

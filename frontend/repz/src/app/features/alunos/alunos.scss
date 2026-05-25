@@ -1,0 +1,82 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.page-title { font-size: 1.4rem; font-weight: 600; }
+.page-subtitle { color: var(--text-color-secondary); font-size: 0.9rem; }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.state-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.hist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.empty-message {
+  padding: 24px 12px;
+  text-align: center;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.readonly-block {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--surface-100, rgba(0,0,0,0.04));
+  margin-bottom: 4px;
+}
+
+.form-aluno {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 8px;
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.85rem;
+
+    input,
+    p-select { width: 100%; }
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .aviso { width: 100%; }
+}

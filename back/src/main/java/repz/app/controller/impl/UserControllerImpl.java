@@ -9,6 +9,7 @@ import repz.app.controller.UserController;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
+import repz.app.dto.request.UserSelfUpdateRequest;
 import repz.app.dto.response.UserGetResponse;
 import repz.app.service.user.UserService;
 
@@ -40,6 +41,18 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<Void> criarAdmin(AdminCreateRequest adminCreateRequest) {
         userService.criarAdmin(adminCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Override
+    public ResponseEntity<UserGetResponse> obterMeuPerfil(Authentication authentication) {
+        return ResponseEntity.ok(userService.obterMeuPerfil(authentication));
+    }
+
+    @Override
+    public ResponseEntity<Void> atualizarMeuPerfil(UserSelfUpdateRequest userSelfUpdateRequest,
+                                                   Authentication authentication) {
+        userService.atualizarMeuPerfil(userSelfUpdateRequest, authentication);
+        return ResponseEntity.ok().build();
     }
 
     @Override

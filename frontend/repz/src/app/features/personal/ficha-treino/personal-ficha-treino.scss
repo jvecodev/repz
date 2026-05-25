@@ -1,0 +1,477 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  margin-bottom: 12px;
+}
+
+.header-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.aviso-global {
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 36px;
+  color: var(--text-4);
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: var(--text-3);
+  max-width: 360px;
+}
+
+.divisoes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+:host ::ng-deep .divisao-card .p-card-body {
+  padding: 20px 22px;
+}
+
+.div-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.div-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--mint-soft);
+  color: var(--mint);
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+}
+
+.div-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.div-nome {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.div-objetivo {
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+:host ::ng-deep .btn-remover {
+  margin-left: auto;
+}
+
+.div-obs {
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+
+  i {
+    margin-top: 2px;
+    flex: 0 0 auto;
+  }
+}
+
+.div-exercicios {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.ex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.ex-num {
+  font-size: 12px;
+  color: var(--text-4);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 22px;
+  padding-top: 2px;
+}
+
+.ex-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ex-nome {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ex-detail {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.ex-tag {
+  background: var(--mint-soft);
+  color: var(--mint);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ex-carga {
+  font-weight: 600;
+}
+
+.ex-obs {
+  font-size: 12px;
+  font-style: italic;
+}
+
+.div-sem-ex {
+  font-size: 13px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+:host ::ng-deep .form-card .p-card-body {
+  padding: 24px;
+}
+
+.form-section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.form-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-input, var(--bg-elev));
+  color: var(--text);
+  font-size: 14px;
+  appearance: auto;
+
+  &:focus {
+    outline: 2px solid var(--mint);
+    outline-offset: -1px;
+  }
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ex-section {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px;
+  margin-bottom: 20px;
+  background: var(--surface, var(--bg-elev));
+}
+
+.ex-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-2);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ex-count {
+  font-size: 12px;
+  background: var(--mint-soft);
+  color: var(--mint);
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-weight: 600;
+}
+
+.ex-draft-list {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+}
+
+.ex-draft-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.ex-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-4);
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  margin-left: auto;
+
+  &:hover {
+    color: var(--red, #ef4444);
+    background: rgba(239, 68, 68, 0.08);
+  }
+}
+
+.ex-add-form {
+  background: var(--card);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  border: 1px dashed var(--border);
+}
+
+.ex-add-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-4);
+  margin-bottom: 12px;
+}
+
+.ex-nome-group {
+  grid-column: span 1;
+}
+
+.form-group-btn {
+  justify-content: flex-end;
+  padding-top: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.hd-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hd-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+  overflow-x: auto;
+}
+
+.tab-pill {
+  background: transparent;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--text-2);
+  }
+
+  &.active {
+    color: var(--mint);
+    border-bottom-color: var(--mint);
+    font-weight: 600;
+  }
+}
+
+.tab-pill.tab-add {
+  margin-left: auto;
+  color: var(--mint);
+
+  i {
+    margin-right: 4px;
+    font-size: 12px;
+  }
+}
+
+.form-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-3);
+  margin-left: 8px;
+}
+
+.ex-drag-handle {
+  background: transparent;
+  border: none;
+  color: var(--text-4);
+  cursor: grab;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--text-2);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.ex-draft-row {
+  cursor: default;
+}
+
+:host ::ng-deep .cdk-drag-preview {
+  box-shadow: var(--shadow-md);
+  background: var(--card-2);
+  border: 1px solid var(--mint);
+  border-radius: var(--r-sm);
+  opacity: 0.9;
+}
+
+:host ::ng-deep .cdk-drag-placeholder {
+  opacity: 0.3;
+  background: var(--mint-soft);
+}
+
+:host ::ng-deep .cdk-drop-list-dragging .ex-draft-row:not(.cdk-drag-placeholder) {
+  transition: transform 0.2s cubic-bezier(0, 0, 0.2, 1);
+}

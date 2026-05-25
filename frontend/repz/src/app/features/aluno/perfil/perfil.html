@@ -1,0 +1,71 @@
+<app-shell
+  ativo="perfil"
+  [crumbs]="['Aluno', 'Perfil']"
+  [nome]="aluno()?.nome ?? 'Aluno'"
+  subtitulo="Meu perfil"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Meu perfil</div>
+      <div class="page-subtitle">Dados da sua matrícula e contato.</div>
+    </div>
+  </div>
+
+  <p-card styleClass="repz-card state-card" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
+    <span>Carregando perfil…</span>
+  </p-card>
+
+  <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ erro() }}</span>
+  </p-card>
+
+  <p-card styleClass="repz-card" *ngIf="!carregando() && !erro() && aluno() as a">
+    <div class="perfil-grid">
+      <div class="info-row">
+        <span class="info-label">Nome</span>
+        <span class="info-value">{{ a.nome }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">E-mail</span>
+        <span class="info-value">{{ a.email || emailSessao() }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Telefone</span>
+        <span class="info-value">{{ a.telefone || '—' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Academia</span>
+        <span class="info-value">{{ a.academiaNome || '—' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Plano</span>
+        <span class="info-value">{{ a.planoNome || '—' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Personal</span>
+        <span class="info-value">{{ a.personalNome || 'Sem personal' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Objetivo</span>
+        <span class="info-value">{{ a.objetivo || '—' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span class="info-value">
+          <p-tag
+            [value]="a.ativo ? 'Ativo' : 'Inativo'"
+            [severity]="a.ativo ? 'success' : 'danger'"
+          />
+        </span>
+      </div>
+    </div>
+
+    <p-message
+      severity="info"
+      styleClass="placeholder-msg"
+      text="Edição de dados pessoais (nome, telefone, foto, senha) será disponibilizada em breve."
+    />
+  </p-card>
+</app-shell>

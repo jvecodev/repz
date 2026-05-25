@@ -28,7 +28,7 @@ public interface FrequenciaService {
 
     FrequenciaResponse findById(Long id);
 
-    List<FrequenciaResponse> meuHistorico(Long alunoId);
+    List<FrequenciaResponse> meuHistorico(Authentication auth);
 
     List<AlunoInativoResponse> obterAlunosInativos(Long academiaId, Authentication auth);
 

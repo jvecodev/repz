@@ -1,0 +1,182 @@
+<app-shell
+  ativo="academias"
+  [crumbs]="['Admin', 'Academias']"
+  nome="Administrador"
+  subtitulo="Gestão de academias"
+  [mostrarCta]="false"
+>
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Academias</div>
+      <div class="page-subtitle">CRUD completo de academias cadastradas no sistema.</div>
+    </div>
+    <p-button
+      label="Nova academia"
+      icon="pi pi-plus"
+      styleClass="repz-primary"
+      (onClick)="novo()"
+    />
+  </div>
+
+  <p-card styleClass="repz-card state-card" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
+    <span>Carregando academias…</span>
+  </p-card>
+
+  <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ erro() }}</span>
+    <p-button label="Tentar novamente" icon="pi pi-refresh" (onClick)="carregar()" />
+  </p-card>
+
+  <p-card styleClass="repz-card" *ngIf="!carregando() && !erro()">
+    <div class="hist-head">
+      <div class="font-semibold">Academias cadastradas</div>
+      <div class="text-3 text-sm">{{ lista().length }} registro(s)</div>
+    </div>
+
+    <div class="empty-message text-3 text-sm" *ngIf="lista().length === 0">
+      Nenhuma academia cadastrada. Clique em "Nova academia" para começar.
+    </div>
+
+    <p-table
+      *ngIf="lista().length > 0"
+      [value]="lista()"
+      styleClass="repz-table"
+      [tableStyle]="{ 'min-width': '880px' }"
+      [paginator]="lista().length > 10"
+      [rows]="10"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nome</th>
+          <th>CNPJ</th>
+          <th>Responsável</th>
+          <th>Contato</th>
+          <th>Alunos</th>
+          <th>Status</th>
+          <th style="width: 180px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-a>
+        <tr>
+          <td>
+            <strong>{{ a.name }}</strong>
+            <div class="text-3 text-sm">{{ a.address }}</div>
+          </td>
+          <td>{{ a.cnpj }}</td>
+          <td>{{ a.responsible }}</td>
+          <td>
+            <div>{{ a.email || '—' }}</div>
+            <div class="text-3 text-sm">{{ a.phone || '' }}</div>
+          </td>
+          <td>{{ a.totalStudents ?? 0 }}</td>
+          <td>
+            <p-tag
+              [value]="a.active ? 'Ativa' : 'Inativa'"
+              [severity]="a.active ? 'success' : 'danger'"
+            />
+          </td>
+          <td class="actions-cell">
+            <p-button
+              icon="pi pi-pencil"
+              text
+              rounded
+              severity="secondary"
+              (onClick)="editar(a)"
+            />
+            <p-button
+              [icon]="a.active ? 'pi pi-ban' : 'pi pi-check'"
+              text
+              rounded
+              [severity]="a.active ? 'danger' : 'success'"
+              (onClick)="confirmarToggleAtivo(a)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Dialog de formulário (criar/editar) -->
+  <p-dialog
+    [(visible)]="dialogAberto"
+    [modal]="true"
+    [closable]="!salvando()"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '560px' }"
+    [header]="editando() ? 'Editar academia' : 'Nova academia'"
+    (onHide)="fecharDialog()"
+  >
+    <form #f="ngForm" (ngSubmit)="salvar(f)" class="form-academia">
+      <label class="field">
+        <span>Nome *</span>
+        <input pInputText name="name" [(ngModel)]="form().name" required maxlength="120" />
+      </label>
+
+      <div class="grid2">
+        <label class="field">
+          <span>CNPJ *</span>
+          <input
+            pInputText
+            name="cnpj"
+            [(ngModel)]="form().cnpj"
+            required
+            maxlength="14"
+            placeholder="14 dígitos"
+          />
+        </label>
+        <label class="field">
+          <span>Responsável *</span>
+          <input pInputText name="responsible" [(ngModel)]="form().responsible" required />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Endereço *</span>
+        <input pInputText name="address" [(ngModel)]="form().address" required />
+      </label>
+
+      <div class="grid2">
+        <label class="field">
+          <span>E-mail</span>
+          <input pInputText type="email" name="email" [(ngModel)]="form().email" />
+        </label>
+        <label class="field">
+          <span>Telefone</span>
+          <input pInputText name="phone" [(ngModel)]="form().phone" maxlength="20" />
+        </label>
+      </div>
+
+      <p-message
+        *ngIf="erroForm()"
+        severity="error"
+        styleClass="aviso"
+        [text]="erroForm() ?? ''"
+      />
+
+      <div class="form-actions">
+        <p-button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          text
+          [disabled]="salvando()"
+          (onClick)="fecharDialog()"
+        />
+        <p-button
+          type="submit"
+          [label]="editando() ? 'Salvar' : 'Criar'"
+          icon="pi pi-save"
+          [loading]="salvando()"
+          [disabled]="salvando()"
+          styleClass="repz-primary"
+        />
+      </div>
+    </form>
+  </p-dialog>
+</app-shell>

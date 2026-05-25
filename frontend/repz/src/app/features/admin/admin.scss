@@ -1,0 +1,144 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+:host ::ng-deep .stat-card .p-card-body {
+  padding: 20px;
+}
+
+.stat-kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  color: var(--text-4);
+}
+
+.stat-value {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+  margin: 8px 0 4px;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.stat-on {
+  color: var(--mint);
+  font-weight: 600;
+}
+
+.stat-off {
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+:host ::ng-deep .dash-card .p-card-body {
+  padding: 22px;
+}
+
+.dash-kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  color: var(--text-4);
+  margin-bottom: 8px;
+}
+
+.dash-card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+.dash-card p {
+  font-size: 13px;
+  color: var(--text-3);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.ac-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.metric-val {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.metric-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--text-4);
+  margin-top: 2px;
+}
+
+.th-action {
+  text-align: right;
+}
+
+.td-action {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.empty-inline {
+  padding: 24px;
+  text-align: center;
+}
+
+:host ::ng-deep .repz-table tr.row-muted > td {
+  opacity: 0.55;
+}

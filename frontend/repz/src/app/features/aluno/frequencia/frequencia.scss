@@ -1,0 +1,21 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.page-title { font-size: 1.4rem; font-weight: 600; }
+.page-subtitle { color: var(--text-color-secondary); font-size: 0.9rem; }
+
+.placeholder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+
+  h2 { margin: 0; }
+  p { max-width: 460px; }
+}

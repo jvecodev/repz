@@ -3,7 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { AuthService, AvaliacaoFisicaService, DadoGrafico, ThemeService } from '@core/services';
+import {
+  AuthService,
+  AvaliacaoFisicaService,
+  DadoGrafico,
+  FrequenciaService,
+  PersonalService,
+  ThemeService,
+} from '@core/services';
 import { AppShell } from '@shared/layout';
 import type { ChartData, ChartOptions, TooltipItem } from 'chart.js';
 import { ButtonModule } from 'primeng/button';
@@ -12,7 +19,6 @@ import { ChartModule } from 'primeng/chart';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TableModule } from 'primeng/table';
 import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao-fisica.mapper';
 
 @Component({
@@ -28,14 +34,15 @@ import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao
     InputNumberModule,
     MessageModule,
     ProgressSpinnerModule,
-    TableModule,
   ],
   templateUrl: './avaliacao-fisica.html',
   styleUrl: './avaliacao-fisica.scss',
 })
 export class AvaliacaoFisica implements OnInit {
   private readonly service = inject(AvaliacaoFisicaService);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
+  protected readonly personalService = inject(PersonalService);
+  protected readonly freq = inject(FrequenciaService);
   private readonly route = inject(ActivatedRoute);
   private readonly themeService = inject(ThemeService);
 
@@ -56,11 +63,59 @@ export class AvaliacaoFisica implements OnInit {
     { label: '% Gordura', value: 'gordura' satisfies Metrica },
   ];
 
-  /** Apenas PERSONAL registra; demais perfis acessam em modo leitura. */
   readonly podeRegistrar = computed(() => this.auth.getUserRole() === 'PERSONAL');
 
-  /** Avaliação mais recente (histórico já está em ordem decrescente). */
+  readonly nomeSidebar = computed(() =>
+    this.auth.getUserRole() === 'PERSONAL'
+      ? this.personalService.nomePersonal()
+      : this.alunoNome(),
+  );
+
+  readonly ativoNav = computed(() =>
+    this.auth.getUserRole() === 'PERSONAL' ? 'alunos' : 'evolucao',
+  );
+
+  readonly crumbs = computed<string[]>(() =>
+    this.auth.getUserRole() === 'PERSONAL'
+      ? ['Personal', 'Meus alunos', 'Avaliações']
+      : ['Aluno', 'Evolução'],
+  );
+
+  readonly mostrarCheckin = computed(
+    () => this.auth.getUserRole() === 'ALUNO' && !this.freq.jaFezCheckinHoje(),
+  );
+
   readonly ultimaAvaliacao = computed(() => this.historico()[0] ?? null);
+
+  private readonly primeiraAvaliacao = computed(() => {
+    const h = this.historico();
+    return h.length > 1 ? h[h.length - 1] : null;
+  });
+
+  readonly kpis = computed(() => {
+    const atual = this.ultimaAvaliacao();
+    if (!atual) return null;
+    const antiga = this.primeiraAvaliacao();
+
+    const massaMagra = (av: AvaliacaoVM | null): number | null =>
+      av?.peso != null && av?.gordura != null
+        ? Number((av.peso * (1 - av.gordura / 100)).toFixed(1))
+        : null;
+    const delta = (cur?: number | null, prev?: number | null): number | null =>
+      cur != null && prev != null ? Number((cur - prev).toFixed(1)) : null;
+
+    const mmAtual = massaMagra(atual);
+    return {
+      peso: atual.peso ?? null,
+      pesoDelta: delta(atual.peso, antiga?.peso),
+      gordura: atual.gordura ?? null,
+      gorduraDelta: delta(atual.gordura, antiga?.gordura),
+      massaMagra: mmAtual,
+      massaMagraDelta: delta(mmAtual, massaMagra(antiga)),
+      cintura: atual.cintura ?? null,
+      cinturaDelta: delta(atual.cintura, antiga?.cintura),
+    };
+  });
 
   readonly form = {
     pesoKg: null as number | null,
@@ -72,7 +127,6 @@ export class AvaliacaoFisica implements OnInit {
     coxaCm: null as number | null,
   };
 
-  /** IMC calculado localmente para orientar o preenchimento antes de salvar. */
   readonly imcPreview = computed(() => {
     const p = this.form.pesoKg;
     const a = this.form.alturaCm;
@@ -163,6 +217,14 @@ export class AvaliacaoFisica implements OnInit {
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     this.alunoId = idParam ? Number(idParam) : (this.auth.sessao()?.id ?? null);
+
+    if (this.auth.getUserRole() === 'PERSONAL' && !this.personalService.nomePersonal()) {
+      this.personalService.meuPerfil().subscribe({ error: () => {} });
+    }
+
+    if (this.auth.getUserRole() === 'ALUNO') {
+      this.freq.carregarStatusHoje();
+    }
 
     if (!this.alunoId) {
       this.carregando.set(false);

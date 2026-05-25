@@ -1,0 +1,285 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.aviso {
+  margin-bottom: 16px;
+}
+
+:host ::ng-deep .academia-card .p-card-body {
+  padding: 22px;
+}
+
+.academia-card {
+  margin-bottom: 16px;
+}
+
+.ac-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ac-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ac-nome {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ac-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ac-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ac-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-4);
+  font-weight: 600;
+}
+
+.ac-value {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+:host ::ng-deep .stat-card .p-card-body {
+  padding: 20px;
+}
+
+.stat-kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  color: var(--text-4);
+}
+
+.stat-value {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+  margin: 8px 0 4px;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+:host ::ng-deep .dash-card .p-card-body {
+  padding: 22px;
+}
+
+.dash-kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  color: var(--text-4);
+  margin-bottom: 8px;
+}
+
+.dash-card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+.dash-card p {
+  font-size: 13px;
+  color: var(--text-3);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.aviso-global {
+  margin-bottom: 16px;
+}
+
+.kpi-icon.kpi-icon-warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.cell-aluno {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-md {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #b1846b 0%, #6b3e2f 100%);
+  color: #fefefe;
+  font-weight: 700;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+}
+
+.cell-strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cell-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.empty-inline {
+  text-align: center;
+  padding: 24px 0;
+  font-size: 13px;
+}
+
+:host ::ng-deep .cadastro-card .p-card-body {
+  padding: 22px;
+}
+
+.cad-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 16px 0 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cad-tab {
+  background: transparent;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: var(--text-2);
+  }
+
+  &.active {
+    color: var(--mint);
+    border-bottom-color: var(--mint);
+    font-weight: 600;
+  }
+}
+
+.cad-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 14px;
+  appearance: auto;
+
+  &:focus {
+    outline: 2px solid var(--mint);
+    outline-offset: -1px;
+  }
+}

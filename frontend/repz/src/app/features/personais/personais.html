@@ -1,0 +1,192 @@
+<app-shell
+  ativo="personais"
+  [crumbs]="isAdmin() ? ['Admin', 'Personais'] : ['Academia', 'Personais']"
+  [nome]="isAdmin() ? 'Administrador' : 'Academia'"
+  subtitulo="Gestão de personais"
+  [mostrarCta]="false"
+>
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Personais</div>
+      <div class="page-subtitle">
+        {{ isAdmin() ? 'Selecione uma academia para gerenciar seus personais.' : 'Personais vinculados à sua academia.' }}
+      </div>
+    </div>
+    <div class="header-actions">
+      <p-select
+        *ngIf="isAdmin()"
+        [options]="academias()"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="academiaSelecionada"
+        (onChange)="trocarAcademia()"
+        placeholder="Selecione academia"
+        [style]="{ 'min-width': '240px' }"
+      />
+      <p-button
+        label="Novo personal"
+        icon="pi pi-plus"
+        styleClass="repz-primary"
+        (onClick)="novo()"
+        [disabled]="isAdmin() && !academiaSelecionada()"
+      />
+    </div>
+  </div>
+
+  <p-card styleClass="repz-card state-card" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
+    <span>Carregando personais…</span>
+  </p-card>
+
+  <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ erro() }}</span>
+    <p-button label="Tentar novamente" icon="pi pi-refresh" (onClick)="carregar()" />
+  </p-card>
+
+  <p-card styleClass="repz-card" *ngIf="!carregando() && !erro()">
+    <div class="hist-head">
+      <div class="font-semibold">Personais cadastrados</div>
+      <div class="text-3 text-sm">{{ lista().length }} registro(s)</div>
+    </div>
+
+    <div class="empty-message text-3 text-sm" *ngIf="lista().length === 0">
+      Nenhum personal cadastrado.
+    </div>
+
+    <p-table
+      *ngIf="lista().length > 0"
+      [value]="lista()"
+      styleClass="repz-table"
+      [tableStyle]="{ 'min-width': '760px' }"
+      [paginator]="lista().length > 10"
+      [rows]="10"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Especialidade</th>
+          <th *ngIf="isAdmin()">Academia</th>
+          <th>Status</th>
+          <th style="width: 160px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-p>
+        <tr>
+          <td><strong>{{ p.userName }}</strong></td>
+          <td>{{ p.email }}</td>
+          <td>{{ p.especialidade || '—' }}</td>
+          <td *ngIf="isAdmin()">{{ p.academiaNome || '—' }}</td>
+          <td>
+            <p-tag
+              [value]="p.ativo ? 'Ativo' : 'Inativo'"
+              [severity]="p.ativo ? 'success' : 'danger'"
+            />
+          </td>
+          <td class="actions-cell">
+            <p-button icon="pi pi-pencil" text rounded severity="secondary" (onClick)="editar(p)" />
+            <p-button
+              [icon]="p.ativo ? 'pi pi-ban' : 'pi pi-check'"
+              text
+              rounded
+              [severity]="p.ativo ? 'danger' : 'success'"
+              (onClick)="confirmarToggleAtivo(p)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <p-dialog
+    [(visible)]="dialogAberto"
+    [modal]="true"
+    [closable]="!salvando()"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '560px' }"
+    [header]="modo() === 'editar' ? 'Editar personal' : 'Novo personal'"
+    (onHide)="fecharDialog()"
+  >
+    <form #f="ngForm" (ngSubmit)="salvar(f)" class="form-personal">
+      <ng-container *ngIf="modo() === 'criar'">
+        <label class="field">
+          <span>Nome *</span>
+          <input pInputText name="name" [(ngModel)]="form().name" required maxlength="120" />
+        </label>
+        <div class="grid2">
+          <label class="field">
+            <span>E-mail *</span>
+            <input
+              pInputText
+              type="email"
+              name="email"
+              [(ngModel)]="form().email"
+              required
+              email
+            />
+          </label>
+          <label class="field">
+            <span>Senha *</span>
+            <input
+              pInputText
+              type="password"
+              name="password"
+              [(ngModel)]="form().password"
+              required
+              minlength="5"
+            />
+          </label>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="modo() === 'editar'">
+        <div class="readonly-block">
+          <div><strong>{{ form().name }}</strong></div>
+          <div class="text-3 text-sm">{{ form().email }}</div>
+        </div>
+      </ng-container>
+
+      <label class="field">
+        <span>Especialidade {{ modo() === 'criar' ? '' : '*' }}</span>
+        <input
+          pInputText
+          name="especialidade"
+          [(ngModel)]="form().especialidade"
+          [required]="modo() === 'editar'"
+          maxlength="80"
+        />
+      </label>
+
+      <p-message
+        *ngIf="erroForm()"
+        severity="error"
+        styleClass="aviso"
+        [text]="erroForm() ?? ''"
+      />
+
+      <div class="form-actions">
+        <p-button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          text
+          [disabled]="salvando()"
+          (onClick)="fecharDialog()"
+        />
+        <p-button
+          type="submit"
+          [label]="modo() === 'editar' ? 'Salvar' : 'Criar'"
+          icon="pi pi-save"
+          [loading]="salvando()"
+          [disabled]="salvando()"
+          styleClass="repz-primary"
+        />
+      </div>
+    </form>
+  </p-dialog>
+</app-shell>

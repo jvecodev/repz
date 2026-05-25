@@ -1,0 +1,111 @@
+<app-shell
+  ativo="perfil"
+  [crumbs]="['Academia', 'Perfil']"
+  [nome]="userService.nomeUsuario() || 'Gerente'"
+  subtitulo="Gestão da academia"
+  [mostrarCta]="false"
+>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Meu perfil</div>
+      <div class="page-subtitle">Edite seus dados de acesso.</div>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
+
+  <div class="perfil-grid" *ngIf="!carregando() && !erro() && perfil()">
+    <p-card styleClass="repz-card">
+      <div class="card-title">Editar informações</div>
+
+      <div class="form-group">
+        <label class="form-label" for="nome">Nome</label>
+        <input id="nome" pInputText [(ngModel)]="nome" class="w-full" placeholder="Seu nome" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">E-mail</label>
+        <input
+          id="email"
+          pInputText
+          type="email"
+          [(ngModel)]="email"
+          class="w-full"
+          placeholder="voce@email.com"
+        />
+      </div>
+
+      <div class="form-divider"></div>
+      <div class="form-section-label">Alterar senha (opcional)</div>
+
+      <div class="form-group">
+        <label class="form-label" for="senha">Nova senha</label>
+        <input
+          id="senha"
+          pInputText
+          type="password"
+          [(ngModel)]="novaSenha"
+          class="w-full"
+          placeholder="Deixe em branco para manter"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmar">Confirmar nova senha</label>
+        <input
+          id="confirmar"
+          pInputText
+          type="password"
+          [(ngModel)]="confirmarSenha"
+          class="w-full"
+          placeholder="Repita a nova senha"
+        />
+      </div>
+
+      <p-message
+        *ngIf="aviso()"
+        [severity]="avisoSeverity()"
+        styleClass="w-full mt-3"
+        [text]="aviso()!"
+      />
+
+      <div class="form-actions">
+        <p-button
+          label="Salvar"
+          icon="pi pi-check"
+          styleClass="repz-primary"
+          [loading]="salvando()"
+          (onClick)="salvar()"
+        />
+      </div>
+    </p-card>
+
+    <p-card styleClass="repz-card info-card">
+      <div class="avatar avatar-xl">
+        {{ (perfil()?.name ?? 'G').charAt(0).toUpperCase() }}
+      </div>
+      <div class="avatar-name">{{ perfil()?.name }}</div>
+      <p-tag styleClass="repz-tag-success" value="Gerente" />
+
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">E-mail</span>
+          <span class="info-value">{{ perfil()?.email }}</span>
+        </div>
+        <div class="info-row" *ngIf="perfil()?.lastLogin">
+          <span class="info-label">Último login</span>
+          <span class="info-value">{{ perfil()?.lastLogin }}</span>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</app-shell>

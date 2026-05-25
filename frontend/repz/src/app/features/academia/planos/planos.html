@@ -1,0 +1,157 @@
+<app-shell
+  ativo="planos"
+  [crumbs]="['Academia', 'Planos']"
+  nome="Academia"
+  subtitulo="Gestão de planos"
+  [mostrarCta]="false"
+>
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Planos</div>
+      <div class="page-subtitle">Cadastre, edite e inative os planos da academia.</div>
+    </div>
+    <p-button label="Novo plano" icon="pi pi-plus" styleClass="repz-primary" (onClick)="novo()" />
+  </div>
+
+  <p-card styleClass="repz-card state-card" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
+    <span>Carregando planos…</span>
+  </p-card>
+
+  <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ erro() }}</span>
+    <p-button label="Tentar novamente" icon="pi pi-refresh" (onClick)="carregar()" />
+  </p-card>
+
+  <p-card styleClass="repz-card" *ngIf="!carregando() && !erro()">
+    <div class="hist-head">
+      <div class="font-semibold">Planos cadastrados</div>
+      <div class="text-3 text-sm">{{ lista().length }} registro(s)</div>
+    </div>
+
+    <div class="empty-message text-3 text-sm" *ngIf="lista().length === 0">
+      Nenhum plano cadastrado ainda.
+    </div>
+
+    <p-table
+      *ngIf="lista().length > 0"
+      [value]="lista()"
+      styleClass="repz-table"
+      [tableStyle]="{ 'min-width': '640px' }"
+      [paginator]="lista().length > 10"
+      [rows]="10"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nome</th>
+          <th>Duração</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th style="width: 160px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-p>
+        <tr>
+          <td><strong>{{ p.nome }}</strong></td>
+          <td>{{ p.duracaoDias }} dias</td>
+          <td>R$ {{ p.valor | number: '1.2-2' }}</td>
+          <td>
+            <p-tag
+              [value]="p.ativo ? 'Ativo' : 'Inativo'"
+              [severity]="p.ativo ? 'success' : 'danger'"
+            />
+          </td>
+          <td class="actions-cell">
+            <p-button
+              icon="pi pi-pencil"
+              text
+              rounded
+              severity="secondary"
+              (onClick)="editar(p)"
+            />
+            <p-button
+              [icon]="p.ativo ? 'pi pi-ban' : 'pi pi-check'"
+              text
+              rounded
+              [severity]="p.ativo ? 'danger' : 'success'"
+              (onClick)="confirmarToggleAtivo(p)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <p-dialog
+    [(visible)]="dialogAberto"
+    [modal]="true"
+    [closable]="!salvando()"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '480px' }"
+    [header]="editando() ? 'Editar plano' : 'Novo plano'"
+    (onHide)="fecharDialog()"
+  >
+    <form #f="ngForm" (ngSubmit)="salvar(f)" class="form-plano">
+      <label class="field">
+        <span>Nome *</span>
+        <input pInputText name="nome" [(ngModel)]="form().nome" required maxlength="80" />
+      </label>
+
+      <div class="grid2">
+        <label class="field">
+          <span>Duração (dias) *</span>
+          <p-inputNumber
+            inputId="duracao"
+            name="duracaoDias"
+            [(ngModel)]="form().duracaoDias"
+            [min]="1"
+            [useGrouping]="false"
+          />
+        </label>
+        <label class="field">
+          <span>Valor (R$) *</span>
+          <p-inputNumber
+            inputId="valor"
+            name="valor"
+            [(ngModel)]="form().valor"
+            mode="currency"
+            currency="BRL"
+            locale="pt-BR"
+            [minFractionDigits]="2"
+          />
+        </label>
+      </div>
+
+      <p-message
+        *ngIf="erroForm()"
+        severity="error"
+        styleClass="aviso"
+        [text]="erroForm() ?? ''"
+      />
+
+      <div class="form-actions">
+        <p-button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          text
+          [disabled]="salvando()"
+          (onClick)="fecharDialog()"
+        />
+        <p-button
+          type="submit"
+          [label]="editando() ? 'Salvar' : 'Criar'"
+          icon="pi pi-save"
+          [loading]="salvando()"
+          [disabled]="salvando()"
+          styleClass="repz-primary"
+        />
+      </div>
+    </form>
+  </p-dialog>
+</app-shell>
