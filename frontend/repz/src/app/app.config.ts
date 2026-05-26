@@ -1,6 +1,5 @@
 import {
   ApplicationConfig,
-  importProvidersFrom,
   provideBrowserGlobalErrorListeners
 } from '@angular/core';
 
@@ -17,26 +16,13 @@ import Lara from '@primeng/themes/lara';
 
 import {
   provideHttpClient,
-  HttpClient,
   withInterceptors
 } from '@angular/common/http';
 
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 
-import {
-  TranslateLoader,
-  TranslateModule
-} from '@ngx-translate/core';
-
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-
-export function httpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(
-    http,
-    './assets/i18n/',
-    '.json'
-  );
-}
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -58,15 +44,13 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        defaultLanguage: 'pt-BR',
-        loader: {
-          provide: TranslateLoader,
-          useFactory: httpLoaderFactory,
-          deps: [HttpClient],
-        },
-      })
-    ),
+
+    provideTranslateService({
+      defaultLanguage: 'pt-BR',
+    }),
+    provideTranslateHttpLoader({
+      prefix: './assets/i18n/',
+      suffix: '.json',
+    }),
   ],
 };
