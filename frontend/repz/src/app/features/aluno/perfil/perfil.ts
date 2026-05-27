@@ -63,6 +63,7 @@ export class Perfil implements OnInit {
     this.alunoService.meuPerfil().subscribe({
       next: (a) => {
         this.aluno.set(a);
+        this.userService.setFotoUrl(a.fotoUrl ?? null);
         this.nome = a.nome ?? '';
         this.telefone = a.telefone ?? '';
         this.carregando.set(false);

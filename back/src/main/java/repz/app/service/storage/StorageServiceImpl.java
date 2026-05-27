@@ -3,6 +3,7 @@ package repz.app.service.storage;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import repz.app.persistence.entity.Arquivo;
 import repz.app.persistence.entity.User;
 import repz.app.persistence.repository.ArquivoRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class StorageServiceImpl implements StorageService {
 
-    private static final long MAX_FOTO_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
     private static final java.util.Set<String> ALLOWED_CONTENT_TYPES =
             java.util.Set.of("image/jpeg", "image/png");
 
@@ -33,16 +34,28 @@ public class StorageServiceImpl implements StorageService {
     @Value("${minio.bucket}")
     private String bucket;
 
-    @Value("${minio.url-expiry-hours:1}")
-    private int urlExpiryHours;
-
     @Value("${minio.external-url}")
     private String externalUrl;
+
+    @Value("${minio.url-expiry-hours}")
+    private int urlExpiryHours;
 
     @Override
     public String upload(MultipartFile file, User user) {
         String extension = extractExtension(file.getOriginalFilename());
         String objectKey = "users/" + user.getId() + "/" + UUID.randomUUID() + extension;
+
+        Optional<Arquivo> arquivoExistente = arquivoRepository.findByUserId(user.getId());
+        arquivoExistente.ifPresent(a -> {
+            if (a.getFileName() != null) {
+                try {
+                    minioClient.removeObject(RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(a.getFileName())
+                            .build());
+                } catch (Exception ignored) {}
+            }
+        });
 
         try {
             minioClient.putObject(PutObjectArgs.builder()
@@ -56,7 +69,7 @@ public class StorageServiceImpl implements StorageService {
                     mensagens.get("arquivo.erro.upload"));
         }
 
-        String url = generatePresignedUrl(objectKey);
+        String url = buildPublicUrl(objectKey);
 
         Arquivo arquivo = arquivoRepository.findByUserId(user.getId()).orElse(new Arquivo());
         arquivo.setUser(user);
@@ -69,11 +82,11 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public String getPreviewUrl(String fileName) {
-        return generatePresignedUrl(fileName);
+        return buildPublicUrl(fileName);
     }
 
     @Override
-    public String getMyPhotoUrl(User user) {
+    public String getMyPhotoUrlString(User user) {
         return arquivoRepository.findByUserId(user.getId())
                 .map(arquivo -> generatePresignedUrl(arquivo.getFileName()))
                 .orElse(null);
@@ -95,6 +108,10 @@ public class StorageServiceImpl implements StorageService {
         }
     }
 
+    private String buildPublicUrl(String objectKey) {
+        return externalUrl + "/" + bucket + "/" + objectKey;
+    }
+
     private String extractExtension(String filename) {
         if (filename != null && filename.contains(".")) {
             return filename.substring(filename.lastIndexOf('.'));
@@ -107,10 +124,6 @@ public class StorageServiceImpl implements StorageService {
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     mensagens.get("foto.arquivo.obrigatorio"));
-        }
-        if (file.getSize() > MAX_FOTO_SIZE_BYTES) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    mensagens.get("foto.tamanho.maximo", "5"));
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {

@@ -138,7 +138,7 @@ public interface UserController {
             @Parameter(description = "ID do usuário", example = "1")
             @PathVariable Integer id);
 
-    @PatchMapping(value = "/me/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/me/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "Atualizar foto de perfil",
             description = "Faz upload de uma imagem (JPG ou PNG, máx. 5 MB) e a vincula ao perfil do usuário autenticado. Disponível para qualquer perfil."
