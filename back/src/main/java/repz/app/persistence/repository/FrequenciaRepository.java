@@ -18,6 +18,9 @@ public interface FrequenciaRepository extends JpaRepository<Frequencia, Long> {
 
     List<Frequencia> findByAluno_IdOrderByDataHoraDesc(Long alunoId);
 
+    @Query("SELECT COUNT(f) > 0 FROM Frequencia f WHERE f.aluno.id = :alunoId AND f.dataHora >= :inicioDia AND f.dataHora < :fimDia")
+    boolean existsCheckinNoDia(@Param("alunoId") Long alunoId, @Param("inicioDia") LocalDateTime inicioDia, @Param("fimDia") LocalDateTime fimDia);
+
     @Query(value = "SELECT f.* FROM checkin f WHERE f.id_academia = :academiaId ORDER BY f.data_hora DESC LIMIT 1 OFFSET 0", nativeQuery = true)
     Frequencia findLatestByAcademia(@Param("academiaId") Long academiaId);
 
