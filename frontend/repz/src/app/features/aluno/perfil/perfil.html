@@ -3,69 +3,160 @@
   [crumbs]="['Aluno', 'Perfil']"
   [nome]="aluno()?.nome ?? 'Aluno'"
   subtitulo="Meu perfil"
+  [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
       <div class="page-title">Meu perfil</div>
-      <div class="page-subtitle">Dados da sua matrícula e contato.</div>
+      <div class="page-subtitle">Visualize e edite suas informações pessoais.</div>
     </div>
   </div>
 
-  <p-card styleClass="repz-card state-card" *ngIf="carregando()">
-    <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
-    <span>Carregando perfil…</span>
-  </p-card>
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
 
-  <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
-    <i class="pi pi-exclamation-triangle"></i>
-    <span>{{ erro() }}</span>
-  </p-card>
+  <p-message
+    *ngIf="!carregando() && erro()"
+    severity="error"
+    styleClass="w-full"
+    [text]="erro()!"
+  />
 
-  <p-card styleClass="repz-card" *ngIf="!carregando() && !erro() && aluno() as a">
-    <div class="perfil-grid">
-      <div class="info-row">
-        <span class="info-label">Nome</span>
-        <span class="info-value">{{ a.nome }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">E-mail</span>
-        <span class="info-value">{{ a.email || emailSessao() }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Telefone</span>
-        <span class="info-value">{{ a.telefone || '—' }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Academia</span>
-        <span class="info-value">{{ a.academiaNome || '—' }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Plano</span>
-        <span class="info-value">{{ a.planoNome || '—' }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Personal</span>
-        <span class="info-value">{{ a.personalNome || 'Sem personal' }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Objetivo</span>
-        <span class="info-value">{{ a.objetivo || '—' }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Status</span>
-        <span class="info-value">
-          <p-tag
-            [value]="a.ativo ? 'Ativo' : 'Inativo'"
-            [severity]="a.ativo ? 'success' : 'danger'"
+  <div class="perfil-grid" *ngIf="!carregando() && !erro() && aluno()">
+
+    <!-- Coluna esquerda: formulário -->
+    <div class="perfil-form-col">
+      <p-card styleClass="repz-card">
+        <div class="card-title">Editar informações</div>
+
+        <div class="form-group">
+          <label class="form-label" for="nome">Nome</label>
+          <input
+            id="nome"
+            pInputText
+            [(ngModel)]="formNome"
+            [disabled]="!editando()"
+            placeholder="Seu nome completo"
+            class="w-full"
           />
-        </span>
-      </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="telefone">Telefone</label>
+          <input
+            id="telefone"
+            pInputText
+            [(ngModel)]="formTelefone"
+            [disabled]="!editando()"
+            placeholder="(00) 00000-0000"
+            class="w-full"
+          />
+        </div>
+
+        <ng-container *ngIf="editando()">
+          <div class="form-divider"></div>
+          <div class="form-section-label">Alterar senha (opcional)</div>
+
+          <div class="form-group">
+            <label class="form-label" for="senha">Nova senha</label>
+            <input
+              id="senha"
+              pInputText
+              type="password"
+              [(ngModel)]="novaSenha"
+              placeholder="Deixe em branco para manter"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirmar">Confirmar nova senha</label>
+            <input
+              id="confirmar"
+              pInputText
+              type="password"
+              [(ngModel)]="confirmarSenha"
+              placeholder="Repita a nova senha"
+              class="w-full"
+            />
+          </div>
+        </ng-container>
+
+        <p-message
+          *ngIf="aviso()"
+          [severity]="avisoSeverity()"
+          styleClass="w-full mt-3"
+          [text]="aviso()!"
+        />
+
+        <div class="form-actions">
+          <ng-container *ngIf="!editando()">
+            <p-button
+              label="Editar"
+              icon="pi pi-pencil"
+              styleClass="repz-primary"
+              (onClick)="abrirEdicao()"
+            />
+          </ng-container>
+          <ng-container *ngIf="editando()">
+            <p-button
+              label="Cancelar"
+              styleClass="repz-ghost"
+              (onClick)="cancelarEdicao()"
+              [disabled]="salvando()"
+            />
+            <p-button
+              label="Salvar"
+              icon="pi pi-check"
+              styleClass="repz-primary"
+              [loading]="salvando()"
+              (onClick)="salvar()"
+            />
+          </ng-container>
+        </div>
+      </p-card>
     </div>
 
-    <p-message
-      severity="info"
-      styleClass="placeholder-msg"
-      text="Edição de dados pessoais (nome, telefone, foto, senha) será disponibilizada em breve."
-    />
-  </p-card>
+    <!-- Coluna direita: avatar + dados de matrícula -->
+    <div class="perfil-info-col">
+      <p-card styleClass="repz-card avatar-card">
+        <div class="avatar avatar-xl">{{ inicial() }}</div>
+        <div class="avatar-name">{{ aluno()?.nome }}</div>
+        <p-tag
+          [styleClass]="aluno()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
+          [value]="aluno()?.ativo ? 'Ativo' : 'Inativo'"
+        />
+      </p-card>
+
+      <p-card styleClass="repz-card">
+        <div class="card-title">Informações</div>
+
+        <div class="info-row">
+          <span class="info-label">E-mail</span>
+          <span class="info-value">{{ aluno()?.email || emailSessao() }}</span>
+        </div>
+        <div class="info-row" *ngIf="aluno()?.academiaNome">
+          <span class="info-label">Academia</span>
+          <span class="info-value">{{ aluno()?.academiaNome }}</span>
+        </div>
+        <div class="info-row" *ngIf="aluno()?.planoNome">
+          <span class="info-label">Plano</span>
+          <span class="info-value">{{ aluno()?.planoNome }}</span>
+        </div>
+        <div class="info-row" *ngIf="aluno()?.personalNome">
+          <span class="info-label">Personal</span>
+          <span class="info-value">{{ aluno()?.personalNome }}</span>
+        </div>
+        <div class="info-row" *ngIf="aluno()?.objetivo">
+          <span class="info-label">Objetivo</span>
+          <span class="info-value">{{ aluno()?.objetivo }}</span>
+        </div>
+        <div class="info-row" *ngIf="aluno()?.telefone">
+          <span class="info-label">Telefone</span>
+          <span class="info-value">{{ aluno()?.telefone }}</span>
+        </div>
+      </p-card>
+    </div>
+  </div>
 </app-shell>
