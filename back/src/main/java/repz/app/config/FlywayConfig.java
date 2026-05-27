@@ -17,6 +17,8 @@ public class FlywayConfig {
      */
     @Value("${app.seed.enabled:true}")
     private boolean seedEnabled;
+    @Value("${app.flyway.locations:classpath:db/migration,classpath:db/seed}")
+    private String[] flywayLocations;
 
     @Bean(initMethod = "migrate")
     public Flyway flyway(DataSource dataSource) {
@@ -27,6 +29,7 @@ public class FlywayConfig {
         return Flyway.configure()
                 .dataSource(dataSource)
                 .locations(locations)
+                .locations(flywayLocations)
                 .baselineOnMigrate(true)
                 .baselineVersion("0")
                 .outOfOrder(true)
