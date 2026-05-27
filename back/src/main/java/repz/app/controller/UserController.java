@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
@@ -134,4 +137,20 @@ public interface UserController {
     ResponseEntity<Void> desativar(
             @Parameter(description = "ID do usuário", example = "1")
             @PathVariable Integer id);
+
+    @PatchMapping(value = "/me/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Atualizar foto de perfil",
+            description = "Faz upload de uma imagem (JPG ou PNG, máx. 5 MB) e a vincula ao perfil do usuário autenticado. Disponível para qualquer perfil."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Foto atualizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Arquivo inválido (formato, tamanho ou ausente)"),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    ResponseEntity<UserGetResponse> atualizarFotoPerfil(
+            @Parameter(description = "Imagem de perfil (JPG ou PNG, máx. 5 MB)")
+            @RequestParam("foto") MultipartFile foto,
+            @Parameter(hidden = true) Authentication authentication);
 }

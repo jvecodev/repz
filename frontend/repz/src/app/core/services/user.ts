@@ -35,6 +35,7 @@ export interface UserGetResponse {
   lastLogin?: string;
   role: UserRole;
   active: boolean;
+  fotoUrl?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -78,6 +79,14 @@ export class UserService {
   atualizarMeuPerfil(req: UserSelfUpdateRequest): Observable<UserGetResponse> {
     return this.http.put<UserGetResponse>(`${this.base}/me`, req).pipe(
       tap((u) => this._nomeUsuario.set(u?.name ?? req.name)),
+    );
+  }
+
+  uploadFoto(file: File): Observable<UserGetResponse> {
+    const form = new FormData();
+    form.append('foto', file);
+    return this.http.patch<UserGetResponse>(`${this.base}/me/foto`, form).pipe(
+      tap((u) => this._nomeUsuario.set(u?.name ?? '')),
     );
   }
 

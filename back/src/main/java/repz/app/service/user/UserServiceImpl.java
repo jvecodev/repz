@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import repz.app.dto.request.AdminCreateRequest;
@@ -18,6 +19,7 @@ import repz.app.message.Mensagens;
 import repz.app.persistence.entity.*;
 import repz.app.persistence.mapper.UserMapper;
 import repz.app.persistence.repository.*;
+import repz.app.service.storage.StorageService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final Mensagens mensagens;
+    private final StorageService storageService;
 
     @Override
     public List<UserGetResponse> findAll() {
@@ -203,6 +206,34 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     mensagens.get("usuario.email.ja.cadastrado"));
         });
+    }
+
+    @Override
+    @Transactional
+    public UserGetResponse atualizarFotoPerfil(MultipartFile foto, Authentication auth) {
+        if (auth == null || auth.getName() == null) {
+            throw new AccessDeniedException(mensagens.get("auth.usuario.nao.autenticado"));
+        }
+
+        storageService.validateProfilePhoto(foto);
+
+        User user = userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        mensagens.get("usuario.nao.encontrado")));
+
+        String url = storageService.upload(foto, user);
+        user.setFotoUrl(url);
+        user = userRepository.save(user);
+
+        if (user.getRole() == UserRole.ALUNO) {
+            User finalUser = user;
+            alunoRepository.findByUsuarioId(user.getId()).ifPresent(aluno -> {
+                aluno.setFotoUrl(url);
+                alunoRepository.save(aluno);
+            });
+        }
+
+        return userMapper.toResponse(user);
     }
 
     @Override

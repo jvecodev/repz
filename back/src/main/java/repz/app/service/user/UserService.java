@@ -1,6 +1,7 @@
 package repz.app.service.user;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.web.multipart.MultipartFile;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
 import repz.app.dto.request.UserPutRequest;
@@ -29,4 +30,6 @@ public interface UserService {
     void desativar(Integer id);
 
     void ativar(Integer id);
+
+    UserGetResponse atualizarFotoPerfil(MultipartFile foto, Authentication auth);
 }

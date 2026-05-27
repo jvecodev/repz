@@ -60,6 +60,9 @@ public class User extends AuditoriaBase implements UserDetails {
     @Column(name = "data_delecao")
     private LocalDateTime deletedAt;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     @NonNull
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

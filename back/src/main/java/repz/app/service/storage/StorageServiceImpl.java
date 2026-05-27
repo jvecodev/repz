@@ -22,6 +22,10 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class StorageServiceImpl implements StorageService {
 
+    private static final long MAX_FOTO_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
+    private static final java.util.Set<String> ALLOWED_CONTENT_TYPES =
+            java.util.Set.of("image/jpeg", "image/png");
+
     private final MinioClient minioClient;
     private final ArquivoRepository arquivoRepository;
     private final Mensagens mensagens;
@@ -96,5 +100,22 @@ public class StorageServiceImpl implements StorageService {
             return filename.substring(filename.lastIndexOf('.'));
         }
         return "";
+    }
+
+    @Override
+    public void validateProfilePhoto(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    mensagens.get("foto.arquivo.obrigatorio"));
+        }
+        if (file.getSize() > MAX_FOTO_SIZE_BYTES) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    mensagens.get("foto.tamanho.maximo", "5"));
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    mensagens.get("foto.formato.invalido"));
+        }
     }
 }

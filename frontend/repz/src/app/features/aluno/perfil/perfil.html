@@ -23,7 +23,42 @@
     [text]="erro()!"
   />
 
-  <div class="perfil-grid" *ngIf="!carregando() && !erro() && aluno()">
+  <div class="perfil-grid" *ngIf="!carregando() && !erro()">
+    <!-- Avatar card -->
+    <p-card styleClass="repz-card avatar-card">
+      <div class="avatar-wrap">
+        <div class="avatar avatar-xl" *ngIf="!aluno()?.fotoUrl">
+          {{ (aluno()?.nome ?? 'A').charAt(0).toUpperCase() }}
+        </div>
+        <img
+          *ngIf="aluno()?.fotoUrl"
+          [src]="aluno()!.fotoUrl!"
+          class="avatar avatar-xl avatar-img"
+          alt="Foto de perfil"
+        />
+        <button
+          class="avatar-edit-btn"
+          type="button"
+          (click)="fotoInput.click()"
+          [disabled]="uploadandoFoto()"
+          title="Alterar foto"
+        >
+          <i class="pi" [ngClass]="uploadandoFoto() ? 'pi-spin pi-spinner' : 'pi-camera'"></i>
+        </button>
+        <input
+          #fotoInput
+          type="file"
+          accept="image/jpeg,image/png"
+          class="hidden-input"
+          (change)="onFotoSelecionada($event)"
+        />
+      </div>
+      <div class="avatar-name">{{ aluno()?.nome }}</div>
+      <p-tag
+        [styleClass]="aluno()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
+        [value]="aluno()?.ativo ? 'Ativo' : 'Inativo'"
+      />
+    </p-card>
 
     <!-- Coluna esquerda: formulário -->
     <div class="perfil-form-col">
@@ -34,6 +69,7 @@
           <label class="form-label" for="nome">{{ 'PROFILE.NAME' | translate }}</label>
           <input
             id="nome"
+            type="text"
             pInputText
             [(ngModel)]="formNome"
             [disabled]="!editando()"
@@ -46,10 +82,11 @@
           <label class="form-label" for="telefone">{{ 'PROFILE.PHONE' | translate }}</label>
           <input
             id="telefone"
+            type="text"
             pInputText
-            [(ngModel)]="formTelefone"
-            [disabled]="!editando()"
-            placeholder="(00) 00000-0000"
+            [(ngModel)]="telefone"
+            name="telefone"
+            placeholder="(11) 99999-9999"
             class="w-full"
           />
         </div>
@@ -89,6 +126,7 @@
           styleClass="w-full mt-3"
           [text]="aviso()!"
         />
+    </p-card>
 
         <div class="form-actions">
           <ng-container *ngIf="!editando()">
@@ -115,13 +153,15 @@
             />
           </ng-container>
         </div>
-      </p-card>
     </div>
 
     <!-- Coluna direita: avatar + dados de matrícula -->
     <div class="perfil-info-col">
       <p-card styleClass="repz-card avatar-card">
-        <app-avatar-upload [iniciais]="inicial()" tamanho="xl" />
+        <app-avatar-upload
+          [iniciais]="(aluno()?.nome ?? 'A').charAt(0).toUpperCase()"
+          tamanho="xl"
+        />
         <div class="avatar-name">{{ aluno()?.nome }}</div>
         <p-tag
           [styleClass]="aluno()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"

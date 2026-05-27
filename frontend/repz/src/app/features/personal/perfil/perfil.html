@@ -108,6 +108,33 @@
 
       <p-card styleClass="repz-card avatar-card">
         <app-avatar-upload [iniciais]="(perfil()?.userName ?? 'P').charAt(0).toUpperCase()" tamanho="xl" />
+        <div class="avatar-wrap">
+          <div class="avatar avatar-xl" *ngIf="!fotoUrl()">
+            {{ (perfil()?.userName ?? 'P').charAt(0).toUpperCase() }}
+          </div>
+          <img
+            *ngIf="fotoUrl()"
+            [src]="fotoUrl()!"
+            class="avatar avatar-xl avatar-img"
+            alt="Foto de perfil"
+          />
+          <button
+            class="avatar-edit-btn"
+            type="button"
+            (click)="fotoInput.click()"
+            [disabled]="uploadandoFoto()"
+            title="Alterar foto"
+          >
+            <i class="pi" [ngClass]="uploadandoFoto() ? 'pi-spin pi-spinner' : 'pi-camera'"></i>
+          </button>
+          <input
+            #fotoInput
+            type="file"
+            accept="image/jpeg,image/png"
+            class="hidden-input"
+            (change)="onFotoSelecionada($event)"
+          />
+        </div>
         <div class="avatar-name">{{ perfil()?.userName }}</div>
         <p-tag
           [styleClass]="perfil()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"

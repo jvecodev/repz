@@ -48,10 +48,17 @@ export class PersonalPerfil implements OnInit {
   novaSenha = '';
   confirmarSenha = '';
 
+  readonly fotoUrl = signal<string | undefined>(undefined);
+  readonly uploadandoFoto = signal(false);
+
   ngOnInit(): void {
-    this.personalService.meuPerfil().subscribe({
-      next: (p) => {
+    forkJoin([
+      this.personalService.meuPerfil(),
+      this.userService.meuPerfil(),
+    ]).subscribe({
+      next: ([p, u]) => {
         this.perfil.set(p);
+        this.fotoUrl.set(u.fotoUrl);
         this.nome = p.userName;
         this.email = p.email;
         this.especialidade = p.especialidade ?? '';
@@ -109,6 +116,26 @@ export class PersonalPerfil implements OnInit {
         this.salvando.set(false);
         this.avisoSeverity.set('error');
         this.aviso.set(err?.error?.message ?? 'Erro ao salvar perfil.');
+      },
+    });
+  }
+
+  onFotoSelecionada(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    input.value = '';
+
+    this.uploadandoFoto.set(true);
+    this.userService.uploadFoto(file).subscribe({
+      next: (u) => {
+        this.fotoUrl.set(u.fotoUrl);
+        this.uploadandoFoto.set(false);
+      },
+      error: (err) => {
+        this.uploadandoFoto.set(false);
+        this.avisoSeverity.set('error');
+        this.aviso.set(err?.error?.message ?? 'Erro ao enviar a foto.');
       },
     });
   }
