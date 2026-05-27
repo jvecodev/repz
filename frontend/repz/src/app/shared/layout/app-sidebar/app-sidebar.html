@@ -8,6 +8,9 @@
   <div class="pb-info">
     <div class="pb-role">{{ subtitulo() }}</div>
     <div class="pb-name">{{ nome() }}</div>
+    @if (academiaNome()) {
+      <div class="pb-academia">{{ academiaNome() }}</div>
+    }
   </div>
 </div>
 

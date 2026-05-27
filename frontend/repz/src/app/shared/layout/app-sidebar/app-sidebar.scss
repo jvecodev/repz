@@ -76,6 +76,16 @@ svg {
     text-overflow: ellipsis;
     margin-top: 2px;
   }
+
+  .pb-academia {
+    font-size: 11px;
+    color: var(--accent, #34d399);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+    font-weight: 500;
+  }
 }
 
 .nav-section {

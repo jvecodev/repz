@@ -1,7 +1,11 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { catchError, of } from 'rxjs';
+import { AcademiaService } from '@core/services/academia';
+import { AlunoService } from '@core/services/aluno';
 import { AuthService } from '@core/services/auth';
 import { LayoutService } from '@core/services/layout';
+import { PersonalService } from '@core/services/personal';
 import { ButtonModule } from 'primeng/button';
 
 export interface NavItem {
@@ -51,14 +55,21 @@ const NAV_GERENTE: NavItem[] = [
   styleUrl: './app-sidebar.scss',
   host: { '[class.is-collapsed]': 'layout.colapsada()' },
 })
-export class AppSidebar {
+export class AppSidebar implements OnInit {
   protected readonly layout = inject(LayoutService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly academiaService = inject(AcademiaService);
+  private readonly personalService = inject(PersonalService);
+  private readonly alunoService = inject(AlunoService);
+
+  readonly _academiaNomeCarregado = signal<string>('');
 
   readonly nome = input<string>('Usuário');
 
   readonly subtitulo = input<string>('');
+
+  readonly academiaNome = computed(() => this._academiaNomeCarregado());
 
   readonly ativo = input<string>('');
 
@@ -78,6 +89,32 @@ export class AppSidebar {
   });
 
   readonly inicial = computed(() => (this.nome().trim()[0] ?? 'U').toUpperCase());
+
+  ngOnInit(): void {
+    const role = this.auth.getUserRole();
+    if (role === 'GERENTE') {
+      this.academiaService
+        .minhaAcademia()
+        .pipe(catchError(() => of(null)))
+        .subscribe((a) => {
+          if (a?.name) this._academiaNomeCarregado.set(a.name);
+        });
+    } else if (role === 'PERSONAL') {
+      this.personalService
+        .meuPerfil()
+        .pipe(catchError(() => of(null)))
+        .subscribe((p) => {
+          if (p?.academiaNome) this._academiaNomeCarregado.set(p.academiaNome);
+        });
+    } else if (role === 'ALUNO') {
+      this.alunoService
+        .meuPerfil()
+        .pipe(catchError(() => of(null)))
+        .subscribe((a) => {
+          if (a?.academiaNome) this._academiaNomeCarregado.set(a.academiaNome);
+        });
+    }
+  }
 
   logout(): void {
     this.auth.logout();

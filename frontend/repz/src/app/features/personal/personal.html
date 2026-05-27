@@ -160,24 +160,26 @@
             />
           </td>
           <td class="td-action">
-            <p-button
-              icon="pi pi-eye"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              styleClass="repz-icon-button"
-              title="Ver perfil completo"
-              (onClick)="verDetalhes(r)"
-            />
-            <p-button
-              icon="pi pi-pencil"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              styleClass="repz-icon-button"
-              title="Criar/editar ficha de treino"
-              (onClick)="verFicha(r)"
-            />
+            <div class="action-btns">
+              <p-button
+                icon="pi pi-eye"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                styleClass="repz-icon-button"
+                title="Ver perfil completo"
+                (onClick)="verDetalhes(r)"
+              />
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                styleClass="repz-icon-button"
+                title="Criar/editar ficha de treino"
+                (onClick)="verFicha(r)"
+              />
+            </div>
           </td>
         </tr>
       </ng-template>
