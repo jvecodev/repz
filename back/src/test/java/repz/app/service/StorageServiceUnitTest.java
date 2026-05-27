@@ -127,4 +127,68 @@ class StorageServiceUnitTest {
         assertThatThrownBy(() -> storageService.getPreviewUrl("users/1/photo.jpg"))
                 .isInstanceOf(ResponseStatusException.class);
     }
+
+
+    @Test
+    void validateProfilePhotoAceitaJpeg() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getSize()).thenReturn(1024L);
+        when(file.getContentType()).thenReturn("image/jpeg");
+
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(
+                () -> storageService.validateProfilePhoto(file));
+    }
+
+    @Test
+    void validateProfilePhotoAceitaPng() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getSize()).thenReturn(2048L);
+        when(file.getContentType()).thenReturn("image/png");
+
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(
+                () -> storageService.validateProfilePhoto(file));
+    }
+
+    @Test
+    void validateProfilePhotoRejeitaArquivoNulo() {
+        when(mensagens.get("foto.arquivo.obrigatorio")).thenReturn("Foto obrigatória.");
+
+        assertThatThrownBy(() -> storageService.validateProfilePhoto(null))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    void validateProfilePhotoRejeitaArquivoVazio() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(true);
+        when(mensagens.get("foto.arquivo.obrigatorio")).thenReturn("Foto obrigatória.");
+
+        assertThatThrownBy(() -> storageService.validateProfilePhoto(file))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    void validateProfilePhotoRejeitaTamanhoExcedido() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getSize()).thenReturn(6L * 1024 * 1024); // 6 MB
+        when(mensagens.get("foto.tamanho.maximo", "5")).thenReturn("Arquivo muito grande.");
+
+        assertThatThrownBy(() -> storageService.validateProfilePhoto(file))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    void validateProfilePhotoRejeitaFormatoInvalido() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getSize()).thenReturn(1024L);
+        when(file.getContentType()).thenReturn("image/gif");
+        when(mensagens.get("foto.formato.invalido")).thenReturn("Formato inválido.");
+
+        assertThatThrownBy(() -> storageService.validateProfilePhoto(file))
+                .isInstanceOf(ResponseStatusException.class);
+    }
 }

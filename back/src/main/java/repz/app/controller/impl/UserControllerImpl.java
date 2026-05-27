@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import repz.app.controller.UserController;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
@@ -71,5 +72,10 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<Void> desativar(Integer id) {
         userService.desativar(id);
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<UserGetResponse> atualizarFotoPerfil(MultipartFile foto, Authentication authentication) {
+        return ResponseEntity.ok(userService.atualizarFotoPerfil(foto, authentication));
     }
 }

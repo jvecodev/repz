@@ -25,5 +25,8 @@ public record UserGetResponse(
         UserRole role,
 
         @Schema(description = "Status ativo do usuário", example = "true")
-        Boolean active
+        Boolean active,
+
+        @Schema(description = "URL da foto de perfil")
+        String fotoUrl
 ) {}

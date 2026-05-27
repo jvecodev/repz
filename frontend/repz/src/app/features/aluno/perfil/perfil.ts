@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AlunoDetalheResponse, AlunoMeUpdateRequest, AlunoService, AuthService } from '@core/services';
+import { AlunoDetalheResponse, AlunoService, AuthService, UserService } from '@core/services';
+import type { AlunoMeUpdateRequest } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { AvatarUpload } from '@shared/avatar-upload';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -33,11 +34,13 @@ import { TagModule } from 'primeng/tag';
 })
 export class Perfil implements OnInit {
   private readonly auth = inject(AuthService);
-  private readonly service = inject(AlunoService);
+  private readonly alunoService = inject(AlunoService);
+  private readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
 
   readonly carregando = signal(true);
   readonly salvando = signal(false);
+  readonly uploadandoFoto = signal(false);
   readonly erro = signal<string | null>(null);
   readonly aviso = signal<string | null>(null);
   readonly avisoSeverity = signal<'success' | 'error'>('success');
@@ -46,22 +49,21 @@ export class Perfil implements OnInit {
 
   formNome = '';
   formTelefone = '';
-  novaSenha = '';
-  confirmarSenha = '';
+
 
   readonly emailSessao = computed(() => this.auth.sessao()?.email ?? '—');
 
-  readonly inicial = computed(() => {
-    const nome = this.aluno()?.nome ?? this.emailSessao();
-    return (nome.trim()[0] ?? 'A').toUpperCase();
-  });
+  nome = '';
+  telefone = '';
+  novaSenha = '';
+  confirmarSenha = '';
 
   ngOnInit(): void {
-    this.service.meuPerfil().subscribe({
+    this.alunoService.meuPerfil().subscribe({
       next: (a) => {
         this.aluno.set(a);
-        this.formNome = a.nome ?? '';
-        this.formTelefone = a.telefone ?? '';
+        this.nome = a.nome ?? '';
+        this.telefone = a.telefone ?? '';
         this.carregando.set(false);
       },
       error: () => {
@@ -115,7 +117,7 @@ export class Perfil implements OnInit {
       senha: this.novaSenha.trim() || undefined,
     };
 
-    this.service.atualizarMeuPerfil(req).subscribe({
+    this.alunoService.atualizarMeuPerfil(req).subscribe({
       next: (a) => {
         this.aluno.set(a);
         this.formNome = a.nome ?? '';
@@ -132,6 +134,27 @@ export class Perfil implements OnInit {
         this.salvando.set(false);
         this.avisoSeverity.set('error');
         this.aviso.set(err?.error?.message ?? this.i18n.instant('PROFILE.SAVE_ERROR'));
+        this.aviso.set(err?.error?.message ?? 'Não foi possível atualizar o perfil.');
+      },
+    });
+  }
+
+  onFotoSelecionada(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    input.value = '';
+
+    this.uploadandoFoto.set(true);
+    this.userService.uploadFoto(file).subscribe({
+      next: (u) => {
+        this.aluno.update((a) => (a ? { ...a, fotoUrl: u.fotoUrl } : a));
+        this.uploadandoFoto.set(false);
+      },
+      error: (err) => {
+        this.uploadandoFoto.set(false);
+        this.avisoSeverity.set('error');
+        this.aviso.set(err?.error?.message ?? 'Não foi possível enviar a foto.');
       },
     });
   }
