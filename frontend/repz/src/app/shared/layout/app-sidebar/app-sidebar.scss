@@ -22,7 +22,8 @@ svg {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 0 8px 22px;
+  width: 100%;
+  padding: 0 0 22px;
   overflow: hidden;
 }
 
@@ -45,46 +46,69 @@ svg {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 15px 12px;
-  margin-bottom: 8px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  padding: 4px 0 0;
+  margin-top: 8px;
   overflow: hidden;
-  transition:
-    background 0.15s,
-    padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-link {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
 
   .pb-info {
     min-width: 0;
   }
+}
 
-  .pb-role {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-3);
-    font-weight: 600;
-  }
+.pb-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
 
-  .pb-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 2px;
-  }
+.pb-academia {
+  font-size: 11px;
+  color: var(--accent, #34d399);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+  font-weight: 500;
+}
 
-  .pb-academia {
-    font-size: 11px;
-    color: var(--accent, #34d399);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 2px;
-    font-weight: 500;
+.profile-logout {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  flex: 0 0 38px;
+  padding: 10px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--red, #ef4444);
   }
 }
 
@@ -179,37 +203,6 @@ svg {
   border-radius: var(--r-md);
 }
 
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 11px 12px;
-  margin-top: 8px;
-  border: none;
-  border-radius: var(--r-sm);
-  background: transparent;
-  color: var(--text-3);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: left;
-  transition:
-    background 0.15s,
-    color 0.15s;
-
-  .icon {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 18px;
-  }
-
-  &:hover {
-    background: var(--surface-hover);
-    color: var(--red, #ef4444);
-  }
-}
-
 :host(.is-collapsed) {
   .logo {
     justify-content: center;
@@ -230,10 +223,22 @@ svg {
 
   .profile-block {
     justify-content: center;
-    padding: 12px 0;
+    flex-direction: column;
+    padding: 4px 0 0;
+  }
+
+  .profile-link {
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 8px 0;
     .pb-info {
       display: none;
     }
+  }
+
+  .profile-logout {
+    margin: 0 auto;
   }
 
   .nav-section {
@@ -263,13 +268,6 @@ svg {
     display: inline-flex;
   }
 
-  .logout-btn {
-    justify-content: center;
-    padding: 11px 0;
-    .label {
-      display: none;
-    }
-  }
 }
 
 @include mobile {
@@ -287,17 +285,12 @@ svg {
     transform: translateX(-100%);
     box-shadow: none;
 
-    .profile-block .pb-info,
+    .profile-link .pb-info,
     .nav-item .label,
-    .logout-btn .label,
     .cta-card {
       display: revert;
     }
 
-    .logout-btn {
-      justify-content: flex-start;
-      padding: 11px 12px;
-    }
     ::ng-deep .cta-mini {
       display: none;
     }
@@ -307,7 +300,13 @@ svg {
     }
     .profile-block {
       justify-content: flex-start;
-      padding: 14px 10px;
+      flex-direction: row;
+      padding: 4px 0 0;
+    }
+    .profile-link {
+      justify-content: flex-start;
+      flex: 1;
+      padding: 8px 10px;
     }
     .logo {
       justify-content: flex-start;

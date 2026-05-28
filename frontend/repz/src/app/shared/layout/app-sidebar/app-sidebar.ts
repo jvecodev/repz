@@ -20,7 +20,6 @@ const NAV_ALUNO: NavItem[] = [
   { key: 'treino', label: 'Meu treino', link: '/aluno/ficha-treino' },
   { key: 'frequencia', label: 'Frequência', link: '/aluno/frequencia' },
   { key: 'evolucao', label: 'Evolução', link: '/aluno/evolucao' },
-  { key: 'perfil', label: 'Perfil', link: '/aluno/perfil' },
 ];
 
 const NAV_PERSONAL: NavItem[] = [
@@ -28,14 +27,12 @@ const NAV_PERSONAL: NavItem[] = [
   { key: 'alunos', label: 'Meus alunos', link: '/personal/alunos' },
   { key: 'fichas', label: 'Fichas', link: '/personal/alunos', queryParams: { foco: 'ficha' } },
   { key: 'avaliacoes', label: 'Avaliações', link: '/personal/alunos', queryParams: { foco: 'avaliacao' } },
-  { key: 'perfil', label: 'Perfil', link: '/personal/perfil' },
 ];
 
 const NAV_ADMIN: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', link: '/admin' },
   { key: 'academias', label: 'Academias', link: '/admin/academias' },
   { key: 'usuarios', label: 'Usuários', link: '/admin/usuarios' },
-  { key: 'perfil', label: 'Perfil', link: '/admin/perfil' },
 ];
 
 const NAV_GERENTE: NavItem[] = [
@@ -44,8 +41,14 @@ const NAV_GERENTE: NavItem[] = [
   { key: 'personais', label: 'Personais', link: '/academia/personais' },
   { key: 'planos', label: 'Planos', link: '/academia/planos' },
   { key: 'relatorios', label: 'Relatórios', link: '/academia/relatorios' },
-  { key: 'perfil', label: 'Perfil', link: '/academia/perfil' },
 ];
+
+const PERFIL_LINK_BY_ROLE: Record<string, string> = {
+  ALUNO: '/aluno/perfil',
+  PERSONAL: '/personal/perfil',
+  ADMIN: '/admin/perfil',
+  GERENTE: '/academia/perfil',
+};
 
 @Component({
   selector: 'app-sidebar',
@@ -86,6 +89,11 @@ export class AppSidebar implements OnInit {
     if (role === 'ADMIN') return NAV_ADMIN;
     if (role === 'GERENTE') return NAV_GERENTE;
     return NAV_ALUNO;
+  });
+
+  readonly perfilLink = computed<string>(() => {
+    const role = this.auth.getUserRole() ?? 'ALUNO';
+    return PERFIL_LINK_BY_ROLE[role] ?? '/aluno/perfil';
   });
 
   readonly inicial = computed(() => (this.nome().trim()[0] ?? 'U').toUpperCase());

@@ -1,16 +1,23 @@
 @use 'mixins' as *;
 
 :host {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 32px;
+  display: block;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 20;
   transition: var(--transition-tema);
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 14px 32px;
 }
 
 .topbar-actions {
@@ -61,7 +68,7 @@
 }
 
 @include small {
-  :host {
+  .topbar-inner {
     padding: 12px 14px;
   }
 }
