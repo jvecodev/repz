@@ -1,19 +1,168 @@
 <app-shell
   ativo="frequencia"
   [crumbs]="['Aluno', 'Frequência']"
-  nome="Aluno"
-  subtitulo="Frequência"
+  [nome]="nomeAluno()"
+  subtitulo="Área do aluno"
+  [mostrarCta]="!freqService.jaFezCheckinHoje()"
+  (ctaClick)="fazerCheckin()"
 >
   <div class="page-header">
     <div>
       <div class="page-title">Frequência</div>
-      <div class="page-subtitle">Acompanhe seus check-ins e a sequência atual.</div>
+      <div class="page-subtitle">Histórico de check-ins, sequência e calendário mensal.</div>
     </div>
+    <p-button
+      *ngIf="!freqService.jaFezCheckinHoje()"
+      label="Fazer check-in"
+      icon="pi pi-bolt"
+      styleClass="repz-primary"
+      [loading]="fazendoCheckin()"
+      (onClick)="fazerCheckin()"
+    />
+    <p-button
+      *ngIf="freqService.jaFezCheckinHoje()"
+      label="Check-in já registrado"
+      icon="pi pi-check"
+      styleClass="repz-ghost"
+      [disabled]="true"
+    />
   </div>
 
-  <p-card styleClass="repz-card placeholder-card">
-    <i class="pi pi-calendar" style="font-size: 2rem"></i>
-    <h2>Em construção</h2>
-    <p class="text-3">Esta tela receberá o histórico de check-ins, sequência de dias, calendário do mês e indicadores semanais.</p>
-  </p-card>
+  <p-message
+    *ngIf="avisoCheckin()"
+    [severity]="avisoCheckinSeverity()"
+    styleClass="w-full aviso-checkin"
+    [text]="avisoCheckin()!"
+  />
+
+  <div class="loading-wrap" *ngIf="carregando()">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <p-message *ngIf="!carregando() && erro()" severity="error" styleClass="w-full" [text]="erro()!" />
+
+  <ng-container *ngIf="!carregando() && !erro()">
+
+    <!-- KPIs + Calendário lado a lado -->
+    <div class="freq-top">
+
+      <!-- KPIs 2x2 -->
+      <div class="kpi-grid">
+        <p-card styleClass="repz-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Check-ins totais</span>
+            <span class="kpi-icon"><i class="pi pi-bolt"></i></span>
+          </div>
+          <div class="kpi-value">{{ totalCheckins() }}</div>
+          <div class="kpi-sub">desde o início</div>
+        </p-card>
+
+        <p-card styleClass="repz-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Este mês</span>
+            <span class="kpi-icon"><i class="pi pi-calendar"></i></span>
+          </div>
+          <div class="kpi-value">{{ checkinsMes() }}</div>
+          <div class="kpi-sub">presenças em {{ mesLabel() }}</div>
+        </p-card>
+
+        <p-card styleClass="repz-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Sequência atual</span>
+            <span class="kpi-icon"><i class="pi pi-star"></i></span>
+          </div>
+          <div class="kpi-value">{{ sequenciaAtual() }}d</div>
+          <div class="kpi-sub">dias consecutivos</div>
+        </p-card>
+
+        <p-card styleClass="repz-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Último check-in</span>
+            <span class="kpi-icon"><i class="pi pi-clock"></i></span>
+          </div>
+          <div class="kpi-value kpi-value-sm">
+            {{ ultimoCheckin() ? formatarData(ultimoCheckin()!) : '—' }}
+          </div>
+          <div class="kpi-sub">
+            @if (diasDesdeUltimo() !== null) {
+              {{ diasDesdeUltimo() === 0 ? 'hoje' : 'há ' + diasDesdeUltimo() + ' dia(s)' }}
+            } @else {
+              sem registros
+            }
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Calendário compacto -->
+      <p-card styleClass="repz-card cal-card">
+        <div class="cal-header">
+          <p-button
+            icon="pi pi-chevron-left"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            styleClass="repz-icon-button"
+            (onClick)="mesAnterior()"
+          />
+          <span class="cal-mes-label">{{ mesLabel() | titlecase }}</span>
+          <p-button
+            icon="pi pi-chevron-right"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            styleClass="repz-icon-button"
+            [disabled]="!podeProximoMes()"
+            (onClick)="proximoMes()"
+          />
+        </div>
+
+        <div class="cal-grid">
+          <div class="cal-dia-semana" *ngFor="let d of diasSemana">{{ d }}</div>
+          <div
+            *ngFor="let dia of calendarioDias()"
+            class="cal-dia"
+            [class.fora]="dia.foraDoMes"
+            [class.checkin]="dia.temCheckin"
+            [class.hoje]="dia.hoje"
+          >
+            {{ dia.dia }}
+          </div>
+        </div>
+
+        <div class="cal-legenda">
+          <span class="leg-item"><span class="leg-dot leg-checkin"></span> Check-in</span>
+          <span class="leg-item"><span class="leg-dot leg-hoje"></span> Hoje</span>
+        </div>
+      </p-card>
+
+    </div>
+
+    <!-- Histórico recente -->
+    <p-card styleClass="repz-card" *ngIf="ultimosCheckins().length > 0">
+      <div class="section-head">
+        <div class="section-title">Histórico recente</div>
+        <div class="section-sub">últimas {{ ultimosCheckins().length }} presenças</div>
+      </div>
+
+      <div class="historico-lista">
+        <div *ngFor="let c of ultimosCheckins()" class="hist-item">
+          <div class="hist-icon">
+            <i class="pi pi-check"></i>
+          </div>
+          <div class="hist-info">
+            <div class="hist-data">{{ formatarData(parseBR(c.dataHora)) }}</div>
+            <div class="hist-hora">{{ formatarHora(c.dataHora) }}<span *ngIf="c.academiaNome"> · {{ c.academiaNome }}</span></div>
+          </div>
+          <div class="hist-dia-semana">{{ diaSemanaCheckin(c.dataHora) }}</div>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="repz-card empty-hist" *ngIf="totalCheckins() === 0">
+      <i class="pi pi-calendar empty-icon"></i>
+      <div class="empty-title">Nenhum check-in registrado</div>
+      <div class="empty-sub">Faça seu primeiro check-in no painel principal.</div>
+    </p-card>
+
+  </ng-container>
 </app-shell>

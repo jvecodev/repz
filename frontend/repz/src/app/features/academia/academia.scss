@@ -188,8 +188,9 @@
 }
 
 .kpi-icon.kpi-icon-warn {
-  background: var(--warn-soft);
-  color: var(--warn);
+  background: var(--bg-elev);
+  border-color: var(--border);
+  color: var(--text-3);
 }
 
 .cell-aluno {

@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import {
   AuthService,
@@ -44,6 +44,7 @@ export class AvaliacaoFisica implements OnInit {
   protected readonly personalService = inject(PersonalService);
   protected readonly freq = inject(FrequenciaService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly themeService = inject(ThemeService);
 
   private alunoId: number | null = null;
@@ -316,6 +317,10 @@ export class AvaliacaoFisica implements OnInit {
         );
       },
     });
+  }
+
+  irParaCheckin(): void {
+    this.router.navigate(['/aluno/frequencia']);
   }
 
   private resetForm(): void {

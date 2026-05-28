@@ -101,34 +101,14 @@
       </p-card>
     </div>
 
-    <div class="dash-split">
-      <p-card styleClass="repz-card">
-        <div class="section-head">
-          <div class="section-title">Check-ins por mês</div>
-        </div>
-        <div class="chart-box">
-          <p-chart type="line" [data]="mesData()" [options]="mesOptions" />
-        </div>
-      </p-card>
-
-      <p-card styleClass="repz-card placeholder-card">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Relatórios financeiros</div>
-            <div class="section-sub">receita acumulada · ticket médio · renovações</div>
-          </div>
-        </div>
-        <div class="placeholder-content">
-          <i class="pi pi-lock"></i>
-          <strong>Em breve</strong>
-          <p>
-            Indicadores financeiros (receita, ticket médio e retenção) virão com a próxima
-            integração de pagamentos. Hoje o backend não armazena cobranças, então não há
-            como calcular esses números de forma confiável.
-          </p>
-        </div>
-      </p-card>
-    </div>
+    <p-card styleClass="repz-card">
+      <div class="section-head">
+        <div class="section-title">Check-ins por mês</div>
+      </div>
+      <div class="chart-box">
+        <p-chart type="line" [data]="mesData()" [options]="mesOptions" />
+      </div>
+    </p-card>
 
     <p-card styleClass="repz-card">
       <div class="section-head">

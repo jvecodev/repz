@@ -21,8 +21,9 @@
 }
 
 .kpi-icon.kpi-icon-warn {
-  background: var(--warn-soft);
-  color: var(--warn);
+  background: var(--bg-elev);
+  border-color: var(--border);
+  color: var(--text-3);
 }
 
 .section-head {
@@ -88,9 +89,12 @@
 .td-action {
   text-align: right;
   white-space: nowrap;
-  display: flex;
-  gap: 4px;
-  justify-content: flex-end;
+
+  .action-btns {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+  }
 }
 
 .freq-cell {

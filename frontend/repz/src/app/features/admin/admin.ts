@@ -75,6 +75,12 @@ export class Admin implements OnInit {
   readonly totalAcademias = computed(() => this.rows().length);
   readonly ativas = computed(() => this.rows().filter((r) => r.active).length);
   readonly inativas = computed(() => this.rows().filter((r) => !r.active).length);
+  readonly totalAlunosComputado = computed(() =>
+    this.rows().reduce((acc, r) => acc + r.alunosAtivos, 0),
+  );
+  readonly totalPersonaisComputado = computed(() =>
+    this.rows().reduce((acc, r) => acc + r.personaisAtivos, 0),
+  );
 
   ngOnInit(): void {
     this.userService.carregarNomeLogado();

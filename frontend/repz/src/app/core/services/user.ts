@@ -19,6 +19,7 @@ export interface UserPutRequest {
   email: string;
   role?: UserRole;
   active?: boolean;
+  academiaId?: number;
 }
 
 export interface UserSelfUpdateRequest {

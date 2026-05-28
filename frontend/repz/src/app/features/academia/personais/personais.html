@@ -91,23 +91,19 @@
                 [value]="p.ativo ? 'Ativo' : 'Inativo'"
               />
             </td>
-            <td class="td-action">
-              <p-button
-                icon="pi pi-pencil"
-                label="Editar"
-                size="small"
-                styleClass="repz-ghost"
-                (onClick)="abrirEdicao(p)"
-              />
-              <p-button
-                [label]="p.ativo ? 'Desativar' : 'Ativar'"
-                [icon]="p.ativo ? 'pi pi-ban' : 'pi pi-check'"
-                size="small"
-                [styleClass]="p.ativo ? 'repz-ghost' : 'repz-primary'"
-                [loading]="alterandoId() === p.id"
-                [disabled]="alterandoId() !== null && alterandoId() !== p.id"
-                (onClick)="alternarStatus(p)"
-              />
+            <td>
+              <div class="actions-cell">
+                <p-button icon="pi pi-pencil" text rounded severity="secondary" (onClick)="abrirEdicao(p)" />
+                <p-button
+                  [icon]="p.ativo ? 'pi pi-ban' : 'pi pi-check'"
+                  text
+                  rounded
+                  [severity]="p.ativo ? 'danger' : 'success'"
+                  [loading]="alterandoId() === p.id"
+                  [disabled]="alterandoId() !== null && alterandoId() !== p.id"
+                  (onClick)="alternarStatus(p)"
+                />
+              </div>
             </td>
           </tr>
         </ng-template>
@@ -130,13 +126,28 @@
     [style]="{ width: '420px' }"
     styleClass="repz-dialog"
   >
-    <div class="edit-form" *ngIf="editando() as p">
-      <div class="form-readonly">
-        <span class="form-label">Personal</span>
-        <span class="form-readonly-value">{{ p.userName }} · {{ p.email }}</span>
+    <div class="edit-form" *ngIf="editando()">
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input
+          pInputText
+          [(ngModel)]="formNome"
+          class="w-full"
+          placeholder="Nome completo"
+        />
       </div>
       <div class="form-group">
-        <label class="form-label">Especialidade *</label>
+        <label class="form-label">E-mail *</label>
+        <input
+          pInputText
+          type="email"
+          [(ngModel)]="formEmail"
+          class="w-full"
+          placeholder="email@exemplo.com"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Especialidade</label>
         <input
           pInputText
           [(ngModel)]="formEspecialidade"

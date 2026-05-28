@@ -1,8 +1,10 @@
 package repz.app.service.frequencia;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import repz.app.dto.request.FrequenciaCreateRequest;
 import repz.app.dto.response.AlunoInativoResponse;
 import repz.app.dto.response.FrequenciaRelatorioResponse;
@@ -20,6 +22,7 @@ import repz.app.persistence.repository.UserRepository;
 import repz.app.service.academia.AcademiaContextService;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +62,18 @@ public class FrequenciaServiceImpl implements FrequenciaService {
                     .orElseThrow(() -> new RuntimeException(mensagens.get("personal.nao.encontrado")));
         }
 
+        LocalDateTime dataHora = request.getDataHora() != null ? request.getDataHora() : LocalDateTime.now();
+        LocalDateTime inicioDia = LocalDate.from(dataHora).atStartOfDay();
+        LocalDateTime fimDia = inicioDia.plusDays(1);
+        if (frequenciaRepository.existsCheckinNoDia(aluno.getId(), inicioDia, fimDia)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, mensagens.get("frequencia.ja.registrada.hoje"));
+        }
+
         Frequencia frequencia = new Frequencia();
         frequencia.setAluno(aluno);
         frequencia.setAcademia(academia);
         frequencia.setRegistradoPor(registradoPor);
-        frequencia.setDataHora(request.getDataHora() != null ? request.getDataHora() : LocalDateTime.now());
+        frequencia.setDataHora(dataHora);
 
         Frequencia saved = frequenciaRepository.save(frequencia);
         return toDTO(saved);
@@ -78,7 +88,7 @@ public class FrequenciaServiceImpl implements FrequenciaService {
         Long resolvedAcademiaId = academiaContextService.resolveOptional(auth, academiaId);
         List<Frequencia> frequencias = frequenciaRepository.findByAlunoIdAndPeriodo(alunoId, inicio, fim);
         return frequencias.stream()
-                .filter(f -> resolvedAcademiaId == null || f.getAcademia().getId().equals(resolvedAcademiaId))
+                .filter(f -> resolvedAcademiaId == null || (f.getAcademia() != null && f.getAcademia().getId().equals(resolvedAcademiaId)))
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -182,10 +192,10 @@ public class FrequenciaServiceImpl implements FrequenciaService {
         return new FrequenciaResponse(
                 frequencia.getId(),
                 frequencia.getDataHora(),
-                frequencia.getAluno().getId(),
-                frequencia.getAluno().getName(),
-                frequencia.getAcademia().getId(),
-                frequencia.getAcademia().getName(),
+                frequencia.getAluno() != null ? frequencia.getAluno().getId() : null,
+                frequencia.getAluno() != null ? frequencia.getAluno().getName() : null,
+                frequencia.getAcademia() != null ? frequencia.getAcademia().getId() : null,
+                frequencia.getAcademia() != null ? frequencia.getAcademia().getName() : null,
                 frequencia.getRegistradoPor() != null ? frequencia.getRegistradoPor().getUser().getId() : null,
                 frequencia.getRegistradoPor() != null ? frequencia.getRegistradoPor().getUser().getName() : null
         );

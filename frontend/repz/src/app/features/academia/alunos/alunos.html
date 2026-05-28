@@ -95,24 +95,20 @@
                 [value]="a.ativo ? 'Ativo' : 'Inativo'"
               />
             </td>
-            <td class="td-action">
-              <p-button
-                icon="pi pi-pencil"
-                label="Editar"
-                size="small"
-                styleClass="repz-ghost"
-                (onClick)="abrirEdicao(a)"
-              />
-              <p-button
-                *ngIf="a.ativo"
-                label="Inativar"
-                icon="pi pi-ban"
-                size="small"
-                styleClass="repz-ghost"
-                [loading]="alterandoId() === a.id"
-                [disabled]="alterandoId() !== null && alterandoId() !== a.id"
-                (onClick)="inativar(a)"
-              />
+            <td>
+              <div class="actions-cell">
+                <p-button icon="pi pi-pencil" text rounded severity="secondary" (onClick)="abrirEdicao(a)" />
+                <p-button
+                  *ngIf="a.ativo"
+                  icon="pi pi-ban"
+                  text
+                  rounded
+                  severity="danger"
+                  [loading]="alterandoId() === a.id"
+                  [disabled]="alterandoId() !== null && alterandoId() !== a.id"
+                  (onClick)="inativar(a)"
+                />
+              </div>
             </td>
           </tr>
         </ng-template>
@@ -135,10 +131,16 @@
     [style]="{ width: '460px' }"
     styleClass="repz-dialog"
   >
-    <div class="edit-form" *ngIf="editando() as a">
-      <div class="form-readonly">
-        <span class="form-label">Aluno</span>
-        <span class="form-readonly-value">{{ a.nome }} · {{ a.email }}</span>
+    <div class="edit-form" *ngIf="editando()">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input pInputText [(ngModel)]="formNome" class="w-full" placeholder="Nome completo" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail *</label>
+          <input pInputText type="email" [(ngModel)]="formEmail" class="w-full" placeholder="email@exemplo.com" />
+        </div>
       </div>
 
       <div class="form-group">

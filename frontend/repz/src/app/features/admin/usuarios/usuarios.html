@@ -105,28 +105,28 @@
                 [value]="u.active ? 'Ativo' : 'Inativo'"
               />
             </td>
-            <td class="td-action">
-              <p-button
-                icon="pi pi-pencil"
-                label="Editar"
-                size="small"
-                styleClass="repz-ghost"
-                [disabled]="!podeEditar(u)"
-                [title]="!podeEditar(u) ? 'Você não pode editar outro admin' : ''"
-                (onClick)="abrirEdicao(u)"
-              />
-              <p-button
-                [label]="u.active ? 'Desativar' : 'Ativar'"
-                [icon]="u.active ? 'pi pi-ban' : 'pi pi-check'"
-                size="small"
-                [styleClass]="u.active ? 'repz-ghost' : 'repz-primary'"
-                [loading]="alterandoId() === u.id"
-                [disabled]="
-                  ehProprioUsuario(u) || (alterandoId() !== null && alterandoId() !== u.id)
-                "
-                [title]="ehProprioUsuario(u) ? 'Você não pode desativar a si mesmo' : ''"
-                (onClick)="alternarStatus(u)"
-              />
+            <td>
+              <div class="actions-cell">
+                <p-button
+                  icon="pi pi-pencil"
+                  text
+                  rounded
+                  severity="secondary"
+                  [disabled]="!podeEditar(u)"
+                  [title]="!podeEditar(u) ? 'Você não pode editar outro admin' : ''"
+                  (onClick)="abrirEdicao(u)"
+                />
+                <p-button
+                  [icon]="u.active ? 'pi pi-ban' : 'pi pi-check'"
+                  text
+                  rounded
+                  [severity]="u.active ? 'danger' : 'success'"
+                  [loading]="alterandoId() === u.id"
+                  [disabled]="ehProprioUsuario(u) || (alterandoId() !== null && alterandoId() !== u.id)"
+                  [title]="ehProprioUsuario(u) ? 'Você não pode desativar a si mesmo' : ''"
+                  (onClick)="alternarStatus(u)"
+                />
+              </div>
             </td>
           </tr>
         </ng-template>
@@ -171,6 +171,16 @@
         </select>
         <div class="form-hint" *ngIf="editandoProprioPerfil()">
           Você não pode alterar o próprio perfil.
+        </div>
+      </div>
+      <div class="form-group" *ngIf="precisaAcademia()">
+        <label class="form-label">Academia</label>
+        <select class="form-select" [(ngModel)]="formAcademiaId">
+          <option [ngValue]="null">Sem academia</option>
+          <option *ngFor="let a of academias()" [ngValue]="a.id">{{ a.name }}</option>
+        </select>
+        <div class="form-hint">
+          Vincula o usuário a uma academia específica.
         </div>
       </div>
     </div>

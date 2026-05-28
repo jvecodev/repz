@@ -13,6 +13,7 @@ import type { AvaliacaoFisicaResponse, TreinoResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 
@@ -38,6 +39,7 @@ function parseBR(s: string): Date {
     AppShell,
     ButtonModule,
     CardModule,
+    MessageModule,
     ProgressSpinnerModule,
     TagModule,
   ],
@@ -52,6 +54,9 @@ export class Aluno implements OnInit {
   protected readonly freq = inject(FrequenciaService);
 
   readonly carregando = signal(true);
+  readonly fazendoCheckin = signal(false);
+  readonly avisoCheckin = signal<string | null>(null);
+  readonly avisoCheckinSeverity = signal<'success' | 'error'>('success');
   readonly nome = signal('Aluno');
   readonly planoNome = signal('—');
   readonly personalNome = signal('—');
@@ -64,6 +69,9 @@ export class Aluno implements OnInit {
   readonly divisoes = signal<TreinoResponse[]>([]);
   readonly semana = signal<DiaSemana[]>([]);
   readonly ultimoCheckin = signal<Date | null>(null);
+
+  private alunoId = 0;
+  private academiaId = 0;
 
   readonly primeiroNome = computed(() => this.nome().trim().split(' ')[0]);
 
@@ -109,6 +117,8 @@ export class Aluno implements OnInit {
         this.planoNome.set(perfil.planoNome ?? '—');
         this.personalNome.set(perfil.personalNome ?? '—');
         this.objetivo.set(perfil.objetivo ?? '');
+        this.alunoId = perfil.userId;
+        this.academiaId = perfil.academiaId;
       }
       this.processarFrequencia(historico);
       this.divisoes.set(
@@ -116,6 +126,30 @@ export class Aluno implements OnInit {
       );
       this.processarAvaliacoes(avaliacoes);
       this.carregando.set(false);
+    });
+  }
+
+  fazerCheckin(): void {
+    if (this.fazendoCheckin() || this.freq.jaFezCheckinHoje()) return;
+    if (!this.alunoId || !this.academiaId) return;
+    this.fazendoCheckin.set(true);
+    this.avisoCheckin.set(null);
+    this.freq.registrar({ alunoId: this.alunoId, academiaId: this.academiaId }).subscribe({
+      next: () => {
+        this.fazendoCheckin.set(false);
+        this.avisoCheckinSeverity.set('success');
+        this.avisoCheckin.set('Check-in registrado com sucesso!');
+        this.totalMes.update((v) => v + 1);
+        this.totalGeral.update((v) => v + 1);
+        this.ultimoCheckin.set(new Date());
+        setTimeout(() => this.avisoCheckin.set(null), 3000);
+      },
+      error: (err) => {
+        this.fazendoCheckin.set(false);
+        this.avisoCheckinSeverity.set('error');
+        this.avisoCheckin.set(err?.error?.message ?? 'Não foi possível registrar o check-in.');
+        setTimeout(() => this.avisoCheckin.set(null), 4000);
+      },
     });
   }
 

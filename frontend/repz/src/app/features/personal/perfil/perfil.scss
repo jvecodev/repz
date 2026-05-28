@@ -86,17 +86,21 @@
 }
 
 :host ::ng-deep .avatar-card .p-card-body {
+  padding: 28px 20px;
+}
+
+:host ::ng-deep .avatar-card .p-card-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   text-align: center;
-  padding: 28px 20px;
 }
 
 .avatar-xl {
   width: 72px;
   height: 72px;
+  flex: none;
   border-radius: 50%;
   background: var(--mint-soft);
   color: var(--mint);
