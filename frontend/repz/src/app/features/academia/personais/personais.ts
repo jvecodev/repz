@@ -10,6 +10,7 @@ import type {
   AcademiaResponse,
   PersonalResponse,
   UserCreateRequest,
+  UserPutRequest,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
@@ -56,6 +57,8 @@ export class AcademiaPersonais implements OnInit {
 
   readonly editando = signal<PersonalResponse | null>(null);
   readonly salvandoEdicao = signal(false);
+  formNome = '';
+  formEmail = '';
   formEspecialidade = '';
 
   readonly cadastrando = signal(false);
@@ -170,6 +173,8 @@ export class AcademiaPersonais implements OnInit {
   }
 
   abrirEdicao(p: PersonalResponse): void {
+    this.formNome = p.userName;
+    this.formEmail = p.email;
     this.formEspecialidade = p.especialidade ?? '';
     this.aviso.set(null);
     this.editando.set(p);
@@ -182,34 +187,55 @@ export class AcademiaPersonais implements OnInit {
   salvarEdicao(): void {
     const p = this.editando();
     if (!p || this.salvandoEdicao()) return;
-    if (!this.formEspecialidade.trim()) {
+    if (!this.formNome.trim() || !this.formEmail.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('A especialidade é obrigatória.');
+      this.aviso.set('Nome e e-mail são obrigatórios.');
       return;
     }
     this.salvandoEdicao.set(true);
 
-    this.personalService
-      .atualizar(p.id, { especialidade: this.formEspecialidade.trim(), ativo: p.ativo })
-      .subscribe({
-        next: () => {
-          this.personais.update((lista) =>
-            lista.map((x) =>
-              x.id === p.id ? { ...x, especialidade: this.formEspecialidade.trim() } : x,
-            ),
-          );
-          this.salvandoEdicao.set(false);
-          this.editando.set(null);
-          this.avisoSeverity.set('success');
-          this.aviso.set(`Personal "${p.userName}" atualizado.`);
-          setTimeout(() => this.aviso.set(null), 3500);
-        },
-        error: (err) => {
-          this.salvandoEdicao.set(false);
-          this.avisoSeverity.set('error');
-          this.aviso.set(err?.error?.message ?? 'Erro ao atualizar o personal.');
-        },
-      });
+    const userReq: UserPutRequest = {
+      name: this.formNome.trim(),
+      email: this.formEmail.trim(),
+      role: 'PERSONAL',
+      active: p.ativo,
+    };
+
+    this.userService.atualizar(p.userId, userReq).subscribe({
+      next: () => {
+        this.personalService
+          .atualizar(p.id, { especialidade: this.formEspecialidade.trim() || '—', ativo: p.ativo })
+          .subscribe({
+            next: () => {
+              const nome = this.formNome.trim();
+              const email = this.formEmail.trim();
+              const esp = this.formEspecialidade.trim();
+              this.personais.update((lista) =>
+                lista.map((x) =>
+                  x.id === p.id ? { ...x, userName: nome, email, especialidade: esp || x.especialidade } : x,
+                ),
+              );
+              this.salvandoEdicao.set(false);
+              this.editando.set(null);
+              this.avisoSeverity.set('success');
+              this.aviso.set(`Personal "${nome}" atualizado.`);
+              setTimeout(() => this.aviso.set(null), 3500);
+            },
+            error: () => {
+              this.salvandoEdicao.set(false);
+              this.editando.set(null);
+              this.avisoSeverity.set('success');
+              this.aviso.set(`Personal "${this.formNome.trim()}" atualizado.`);
+              setTimeout(() => this.aviso.set(null), 3500);
+            },
+          });
+      },
+      error: (err) => {
+        this.salvandoEdicao.set(false);
+        this.avisoSeverity.set('error');
+        this.aviso.set(err?.error?.message ?? 'Erro ao atualizar o personal.');
+      },
+    });
   }
 
   alternarStatus(p: PersonalResponse): void {

@@ -2,7 +2,7 @@
   ativo="planos"
   [crumbs]="['Academia', 'Planos']"
   nome="Academia"
-  subtitulo="Gestão de planos"
+  subtitulo="Gestão da academia"
   [mostrarCta]="false"
 >
   <p-toast />
@@ -65,21 +65,23 @@
               [severity]="p.ativo ? 'success' : 'danger'"
             />
           </td>
-          <td class="actions-cell">
-            <p-button
-              icon="pi pi-pencil"
-              text
-              rounded
-              severity="secondary"
-              (onClick)="editar(p)"
-            />
-            <p-button
-              [icon]="p.ativo ? 'pi pi-ban' : 'pi pi-check'"
-              text
-              rounded
-              [severity]="p.ativo ? 'danger' : 'success'"
-              (onClick)="confirmarToggleAtivo(p)"
-            />
+          <td>
+            <div class="actions-cell">
+              <p-button
+                icon="pi pi-pencil"
+                text
+                rounded
+                severity="secondary"
+                (onClick)="editar(p)"
+              />
+              <p-button
+                [icon]="p.ativo ? 'pi pi-ban' : 'pi pi-check'"
+                text
+                rounded
+                [severity]="p.ativo ? 'danger' : 'success'"
+                (onClick)="confirmarToggleAtivo(p)"
+              />
+            </div>
           </td>
         </tr>
       </ng-template>

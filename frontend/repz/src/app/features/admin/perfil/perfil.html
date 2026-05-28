@@ -90,14 +90,17 @@
       </div>
     </p-card>
 
-    <p-card styleClass="repz-card info-card">
-      <div class="avatar avatar-xl">
-        {{ (perfil()?.name ?? 'A').charAt(0).toUpperCase() }}
-      </div>
-      <div class="avatar-name">{{ perfil()?.name }}</div>
-      <p-tag styleClass="repz-tag-success" value="Administrador" />
+    <div class="perfil-info-col">
+      <p-card styleClass="repz-card avatar-card">
+        <div class="avatar avatar-xl">
+          {{ (perfil()?.name ?? 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="avatar-name">{{ perfil()?.name }}</div>
+        <p-tag styleClass="repz-tag-success" value="Administrador" />
+      </p-card>
 
-      <div class="info-rows">
+      <p-card styleClass="repz-card">
+        <div class="card-title">Informações</div>
         <div class="info-row">
           <span class="info-label">E-mail</span>
           <span class="info-value">{{ perfil()?.email }}</span>
@@ -106,7 +109,7 @@
           <span class="info-label">Último login</span>
           <span class="info-value">{{ perfil()?.lastLogin }}</span>
         </div>
-      </div>
-    </p-card>
+      </p-card>
+    </div>
   </div>
 </app-shell>

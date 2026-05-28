@@ -2,7 +2,7 @@
   ativo="alunos"
   [crumbs]="isAdmin() ? ['Admin', 'Alunos'] : ['Academia', 'Alunos']"
   [nome]="isAdmin() ? 'Administrador' : 'Academia'"
-  subtitulo="Gestão de alunos"
+  [subtitulo]="isAdmin() ? 'Administração' : 'Gestão da academia'"
   [mostrarCta]="false"
 >
   <p-toast />
@@ -92,24 +92,26 @@
               [severity]="a.ativo ? 'success' : 'danger'"
             />
           </td>
-          <td class="actions-cell">
-            <p-button icon="pi pi-pencil" text rounded severity="secondary" (onClick)="editar(a)" />
-            <p-button
-              *ngIf="a.ativo"
-              icon="pi pi-ban"
-              text
-              rounded
-              severity="danger"
-              (onClick)="confirmarInativar(a)"
-            />
-            <p-button
-              *ngIf="!a.ativo"
-              icon="pi pi-check"
-              text
-              rounded
-              severity="success"
-              (onClick)="confirmarReativar(a)"
-            />
+          <td>
+            <div class="actions-cell">
+              <p-button icon="pi pi-pencil" text rounded severity="secondary" (onClick)="editar(a)" />
+              <p-button
+                *ngIf="a.ativo"
+                icon="pi pi-ban"
+                text
+                rounded
+                severity="danger"
+                (onClick)="confirmarInativar(a)"
+              />
+              <p-button
+                *ngIf="!a.ativo"
+                icon="pi pi-check"
+                text
+                rounded
+                severity="success"
+                (onClick)="confirmarReativar(a)"
+              />
+            </div>
           </td>
         </tr>
       </ng-template>

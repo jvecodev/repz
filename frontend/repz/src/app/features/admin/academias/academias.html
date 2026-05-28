@@ -2,7 +2,7 @@
   ativo="academias"
   [crumbs]="['Admin', 'Academias']"
   nome="Administrador"
-  subtitulo="Gestão de academias"
+  subtitulo="Administração"
   [mostrarCta]="false"
 >
   <p-toast />
@@ -11,7 +11,7 @@
   <div class="page-header">
     <div>
       <div class="page-title">Academias</div>
-      <div class="page-subtitle">CRUD completo de academias cadastradas no sistema.</div>
+      <div class="page-subtitle">Gerencie as academias cadastradas na plataforma.</div>
     </div>
     <p-button
       label="Nova academia"
@@ -80,21 +80,23 @@
               [severity]="a.active ? 'success' : 'danger'"
             />
           </td>
-          <td class="actions-cell">
-            <p-button
-              icon="pi pi-pencil"
-              text
-              rounded
-              severity="secondary"
-              (onClick)="editar(a)"
-            />
-            <p-button
-              [icon]="a.active ? 'pi pi-ban' : 'pi pi-check'"
-              text
-              rounded
-              [severity]="a.active ? 'danger' : 'success'"
-              (onClick)="confirmarToggleAtivo(a)"
-            />
+          <td>
+            <div class="actions-cell">
+              <p-button
+                icon="pi pi-pencil"
+                text
+                rounded
+                severity="secondary"
+                (onClick)="editar(a)"
+              />
+              <p-button
+                [icon]="a.active ? 'pi pi-ban' : 'pi pi-check'"
+                text
+                rounded
+                [severity]="a.active ? 'danger' : 'success'"
+                (onClick)="confirmarToggleAtivo(a)"
+              />
+            </div>
           </td>
         </tr>
       </ng-template>

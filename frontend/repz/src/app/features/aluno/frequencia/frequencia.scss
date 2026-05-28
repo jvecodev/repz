@@ -1,21 +1,260 @@
 .page-header {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.page-title { font-size: 22px; font-weight: 700; color: var(--text); }
+.page-subtitle { font-size: 14px; color: var(--text-3); margin-top: 4px; }
+
+.aviso-checkin {
+  margin-bottom: 20px;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+// ─── Layout topo: KPIs (2×2) + Calendário lado a lado ───────────────────────
+.freq-top {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  align-items: stretch;   // ambas colunas mesma altura
+  margin-bottom: 20px;
+}
+
+// KPIs em grade 2×2 que ocupa exatamente a mesma altura do calendário
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  height: 100%;
+}
+
+// ─── KPI cards ───────────────────────────────────────────────────────────────
+.kpi-card {
+  .kpi-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-3);
+  }
+  .kpi-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border-radius: 6px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    color: var(--text-3);
+    font-size: 12px;
+  }
+  .kpi-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+    &.kpi-value-sm { font-size: 18px; }
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+}
+
+// ─── Calendário compacto ─────────────────────────────────────────────────────
+.cal-card {
+  // o card ocupa a largura fixa da coluna direita (300px)
+}
+
+.cal-header {
+  display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+
+.cal-mes-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+  text-align: center;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-bottom: 10px;
+}
+
+.cal-dia-semana {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  padding: 4px 0 8px;
+}
+
+.cal-dia {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  transition: background 0.12s;
+
+  &.fora { color: var(--text-4); }
+  &.hoje { border: 2px solid var(--accent, #34d399); color: var(--accent, #34d399); font-weight: 700; }
+  &.checkin { background: var(--accent, #34d399); color: #0d1117; font-weight: 700; }
+  &.checkin.hoje { border-color: rgba(255,255,255,.6); }
+}
+
+.cal-legenda {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.leg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  &.leg-checkin { background: var(--accent, #34d399); }
+  &.leg-hoje { border: 2px solid var(--accent, #34d399); background: transparent; }
+}
+
+// ─── Histórico ───────────────────────────────────────────────────────────────
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
-.page-title { font-size: 1.4rem; font-weight: 600; }
-.page-subtitle { color: var(--text-color-secondary); font-size: 0.9rem; }
+.section-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.section-sub { font-size: 12px; color: var(--text-3); }
 
-.placeholder-card {
+.historico-lista {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 48px 24px;
-  text-align: center;
+  gap: 4px;
+}
 
-  h2 { margin: 0; }
-  p { max-width: 460px; }
+.hist-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: var(--card-2);
+    border-color: var(--border);
+  }
+}
+
+.hist-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--accent, #34d399);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.hist-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.hist-data {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.hist-hora {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.hist-dia-semana {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ─── Vazio ───────────────────────────────────────────────────────────────────
+.empty-hist {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 0 !important;
+  text-align: center;
+}
+
+.empty-icon { font-size: 2.5rem; color: var(--text-4); }
+.empty-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.empty-sub { font-size: 14px; color: var(--text-3); }
+
+// ─── Responsivo ──────────────────────────────────────────────────────────────
+@media (max-width: 860px) {
+  .freq-top {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }

@@ -1,8 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService, UserService } from '@core/services';
-import type { UserGetResponse, UserPutRequest, UserRole } from '@core/services';
+import { AcademiaService, AuthService, UserService } from '@core/services';
+import type { AcademiaResponse, UserGetResponse, UserPutRequest, UserRole } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -37,6 +37,9 @@ type FiltroRole = 'TODOS' | UserRole;
 export class AdminUsuarios implements OnInit {
   protected readonly userService = inject(UserService);
   private readonly auth = inject(AuthService);
+  private readonly academiaService = inject(AcademiaService);
+
+  readonly academias = signal<AcademiaResponse[]>([]);
 
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
@@ -67,6 +70,7 @@ export class AdminUsuarios implements OnInit {
   formNome = '';
   formEmail = '';
   formRole: UserRole = 'ALUNO';
+  formAcademiaId: number | null = null;
 
   private readonly meuId = computed(() => this.auth.sessao()?.id ?? null);
 
@@ -84,6 +88,10 @@ export class AdminUsuarios implements OnInit {
   ngOnInit(): void {
     this.userService.carregarNomeLogado();
     this.carregar();
+    this.academiaService.listar().subscribe({
+      next: (lista) => this.academias.set(lista),
+      error: () => {},
+    });
   }
 
   private carregar(): void {
@@ -138,8 +146,13 @@ export class AdminUsuarios implements OnInit {
     this.formNome = u.name;
     this.formEmail = u.email;
     this.formRole = u.role;
+    this.formAcademiaId = (u as any).academiaId ?? null;
     this.aviso.set(null);
     this.editando.set(u);
+  }
+
+  precisaAcademia(): boolean {
+    return this.formRole === 'GERENTE' || this.formRole === 'PERSONAL' || this.formRole === 'ALUNO';
   }
 
   fecharEdicao(): void {
@@ -161,6 +174,7 @@ export class AdminUsuarios implements OnInit {
       email: this.formEmail.trim(),
       role: this.editandoProprioPerfil() ? u.role : this.formRole,
       active: u.active,
+      academiaId: this.precisaAcademia() ? (this.formAcademiaId ?? undefined) : undefined,
     };
 
     this.userService.atualizar(u.id, req).subscribe({

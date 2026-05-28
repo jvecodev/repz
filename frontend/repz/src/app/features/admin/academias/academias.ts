@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AcademiaRequest, AcademiaResponse, AcademiaService } from '@core/services';
+import { validarCNPJ } from '@core/validators/cpf-cnpj';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -119,15 +120,16 @@ export class AdminAcademias implements OnInit {
       return;
     }
     const f = this.form();
-    if (!/^\d{14}$/.test(f.cnpj)) {
-      this.erroForm.set('CNPJ deve conter 14 dígitos.');
+    const cnpjLimpo = f.cnpj.replace(/\D/g, '');
+    if (!validarCNPJ(cnpjLimpo)) {
+      this.erroForm.set('CNPJ inválido. Verifique o número informado.');
       return;
     }
     this.erroForm.set(null);
     this.salvando.set(true);
 
     const payload: AcademiaRequest = {
-      cnpj: f.cnpj,
+      cnpj: cnpjLimpo,
       name: f.name,
       address: f.address,
       responsible: f.responsible,

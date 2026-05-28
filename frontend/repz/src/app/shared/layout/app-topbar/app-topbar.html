@@ -1,32 +1,23 @@
-<p-button
-  icon="pi pi-bars"
-  severity="secondary"
-  [text]="true"
-  [rounded]="true"
-  styleClass="menu-btn repz-icon-button"
-  (onClick)="layout.toggleSidebar()"
-  [title]="layout.colapsada() ? 'Expandir menu' : 'Recolher menu'"
-  [ariaLabel]="layout.colapsada() ? 'Expandir menu' : 'Recolher menu'"
-/>
-
-<div class="crumbs">
-  @for (c of crumbs(); track $index; let last = $last) {
-    <span [class.here]="last">{{ c }}</span>
-    @if (!last) {
-      <span class="sep">/</span>
+<div class="topbar-inner">
+  <div class="crumbs">
+    @for (c of crumbs(); track $index; let last = $last) {
+      <span [class.here]="last">{{ c }}</span>
+      @if (!last) {
+        <span class="sep">/</span>
+      }
     }
-  }
-</div>
+  </div>
 
-<div class="topbar-actions">
-  <p-button
-    [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
-    severity="secondary"
-    [text]="true"
-    [rounded]="true"
-    styleClass="theme-btn repz-icon-button"
-    (onClick)="theme.toggleTema()"
-    [title]="theme.tema() === 'dark' ? 'Modo claro' : 'Modo escuro'"
-    [ariaLabel]="theme.tema() === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
-  />
+  <div class="topbar-actions">
+    <p-button
+      [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
+      severity="secondary"
+      [text]="true"
+      [rounded]="true"
+      styleClass="theme-btn repz-icon-button"
+      (onClick)="theme.toggleTema()"
+      [title]="theme.tema() === 'dark' ? 'Modo claro' : 'Modo escuro'"
+      [ariaLabel]="theme.tema() === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
+    />
+  </div>
 </div>

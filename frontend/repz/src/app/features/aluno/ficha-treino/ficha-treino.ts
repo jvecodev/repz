@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import {
   AuthService,
@@ -51,6 +51,7 @@ export class FichaTreino implements OnInit {
   private readonly solicitacaoService = inject(SolicitacaoFichaService);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   protected readonly freq = inject(FrequenciaService);
 
   readonly ficha = signal<FichaVM | null>(null);
@@ -158,5 +159,9 @@ export class FichaTreino implements OnInit {
           this.avisoSolicitacao.set(msg);
         },
       });
+  }
+
+  irParaCheckin(): void {
+    this.router.navigate(['/aluno/frequencia']);
   }
 }

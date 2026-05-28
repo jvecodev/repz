@@ -3,14 +3,6 @@
   <img class="brand-wordmark" src="/assets/repz-wordmark.png" alt="REPZ" />
 </div>
 
-<div class="profile-block">
-  <div class="avatar avatar-lg">{{ inicial() }}</div>
-  <div class="pb-info">
-    <div class="pb-role">{{ subtitulo() }}</div>
-    <div class="pb-name">{{ nome() }}</div>
-  </div>
-</div>
-
 <div class="nav-section">Geral</div>
 <nav class="nav">
   @for (item of navItems(); track item.key) {
@@ -234,8 +226,20 @@
   </div>
 }
 
-<button class="logout-btn" (click)="logout()" title="Sair" aria-label="Sair">
-  <span class="icon">
+<div class="profile-block">
+  <a class="profile-link" [routerLink]="perfilLink()" title="Perfil" aria-label="Perfil">
+    <div class="avatar avatar-lg">{{ inicial() }}</div>
+    <div class="pb-info">
+      <div class="pb-name">{{ nome() }}</div>
+      @if (academiaNome()) {
+        <div class="pb-academia">{{ academiaNome() }}</div>
+      } @else {
+        <div class="pb-academia">{{ subtitulo() }}</div>
+      }
+    </div>
+  </a>
+
+  <button class="profile-logout" (click)="logout()" title="Sair" aria-label="Sair">
     <svg
       viewBox="0 0 24 24"
       fill="none"
@@ -248,6 +252,5 @@
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
-  </span>
-  <span class="label">Sair</span>
-</button>
+  </button>
+</div>

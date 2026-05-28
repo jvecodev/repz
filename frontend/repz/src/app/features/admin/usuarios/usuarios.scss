@@ -139,11 +139,9 @@
   padding: 1px 6px;
 }
 
-.td-action {
-  text-align: right;
-  white-space: nowrap;
+.actions-cell {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   justify-content: flex-end;
 }
 

@@ -10,9 +10,6 @@
       <div class="page-title">Painel do Personal</div>
       <div class="page-subtitle">
         Bem-vindo de volta, {{ nomePersonal() }}.
-        @if (!carregando()) {
-          Você tem {{ ativos() }} aluno(s) ativo(s) hoje.
-        }
       </div>
     </div>
     <div class="header-actions">
@@ -160,24 +157,26 @@
             />
           </td>
           <td class="td-action">
-            <p-button
-              icon="pi pi-eye"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              styleClass="repz-icon-button"
-              title="Ver perfil completo"
-              (onClick)="verDetalhes(r)"
-            />
-            <p-button
-              icon="pi pi-pencil"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              styleClass="repz-icon-button"
-              title="Criar/editar ficha de treino"
-              (onClick)="verFicha(r)"
-            />
+            <div class="action-btns">
+              <p-button
+                icon="pi pi-eye"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                styleClass="repz-icon-button"
+                title="Ver perfil completo"
+                (onClick)="verDetalhes(r)"
+              />
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                styleClass="repz-icon-button"
+                title="Criar/editar ficha de treino"
+                (onClick)="verFicha(r)"
+              />
+            </div>
           </td>
         </tr>
       </ng-template>

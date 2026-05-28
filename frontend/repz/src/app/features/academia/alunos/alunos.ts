@@ -16,6 +16,7 @@ import type {
   PersonalResponse,
   PlanoResponse,
   UserCreateRequest,
+  UserPutRequest,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
@@ -66,6 +67,8 @@ export class AcademiaAlunos implements OnInit {
 
   readonly editando = signal<AlunoDetalheResponse | null>(null);
   readonly salvandoEdicao = signal(false);
+  formNome = '';
+  formEmail = '';
   formPlanoId: number | null = null;
   formPersonalId: number | null = null;
   formObjetivo = '';
@@ -170,6 +173,8 @@ export class AcademiaAlunos implements OnInit {
   }
 
   abrirEdicao(a: AlunoDetalheResponse): void {
+    this.formNome = a.nome;
+    this.formEmail = a.email;
     this.formPlanoId = a.planoId ?? null;
     this.formPersonalId = a.personalId ?? null;
     this.formObjetivo = a.objetivo ?? '';
@@ -192,40 +197,65 @@ export class AcademiaAlunos implements OnInit {
   salvarEdicao(): void {
     const a = this.editando();
     if (!a || this.salvandoEdicao()) return;
+    if (!this.formNome.trim() || !this.formEmail.trim()) {
+      this.avisoSeverity.set('error');
+      this.aviso.set('Nome e e-mail são obrigatórios.');
+      return;
+    }
     this.salvandoEdicao.set(true);
 
-    const req: AlunoUpdateRequest = {
+    const userReq: UserPutRequest = {
+      name: this.formNome.trim(),
+      email: this.formEmail.trim(),
+      role: 'ALUNO',
+      active: a.ativo,
+    };
+
+    const alunoReq: AlunoUpdateRequest = {
       planoId: this.formPlanoId ?? undefined,
       personalId: this.formPersonalId ?? undefined,
       objetivo: this.formObjetivo.trim() || undefined,
     };
 
-    this.alunoService.atualizar(a.id, req).subscribe({
+    this.userService.atualizar(a.userId, userReq).subscribe({
       next: () => {
-        this.alunos.update((lista) =>
-          lista.map((x) =>
-            x.id === a.id
-              ? {
-                  ...x,
-                  planoId: this.formPlanoId ?? undefined,
-                  planoNome: this.nomePlano(this.formPlanoId),
-                  personalId: this.formPersonalId ?? undefined,
-                  personalNome: this.nomePersonal(this.formPersonalId),
-                  objetivo: this.formObjetivo.trim() || undefined,
-                }
-              : x,
-          ),
-        );
-        this.salvandoEdicao.set(false);
-        this.editando.set(null);
-        this.avisoSeverity.set('success');
-        this.aviso.set(`Matrícula de "${a.nome}" atualizada.`);
-        setTimeout(() => this.aviso.set(null), 3500);
+        this.alunoService.atualizar(a.id, alunoReq).subscribe({
+          next: () => {
+            const nome = this.formNome.trim();
+            const email = this.formEmail.trim();
+            this.alunos.update((lista) =>
+              lista.map((x) =>
+                x.id === a.id
+                  ? {
+                      ...x,
+                      nome,
+                      email,
+                      planoId: this.formPlanoId ?? undefined,
+                      planoNome: this.nomePlano(this.formPlanoId),
+                      personalId: this.formPersonalId ?? undefined,
+                      personalNome: this.nomePersonal(this.formPersonalId),
+                      objetivo: this.formObjetivo.trim() || undefined,
+                    }
+                  : x,
+              ),
+            );
+            this.salvandoEdicao.set(false);
+            this.editando.set(null);
+            this.avisoSeverity.set('success');
+            this.aviso.set(`Dados de "${nome}" atualizados.`);
+            setTimeout(() => this.aviso.set(null), 3500);
+          },
+          error: (err) => {
+            this.salvandoEdicao.set(false);
+            this.avisoSeverity.set('error');
+            this.aviso.set(err?.error?.message ?? 'Erro ao atualizar a matrícula.');
+          },
+        });
       },
       error: (err) => {
         this.salvandoEdicao.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao atualizar a matrícula.');
+        this.aviso.set(err?.error?.message ?? 'Erro ao atualizar os dados do aluno.');
       },
     });
   }

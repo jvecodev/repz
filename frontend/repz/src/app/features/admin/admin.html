@@ -58,7 +58,7 @@
           <span class="kpi-label">Alunos</span>
           <span class="kpi-icon"><i class="pi pi-users"></i></span>
         </div>
-        <div class="kpi-value">{{ d.totalStudents }}</div>
+        <div class="kpi-value">{{ (d.totalStudents || totalAlunosComputado()) }}</div>
         <div class="kpi-sub">total na plataforma</div>
       </p-card>
 
@@ -67,7 +67,7 @@
           <span class="kpi-label">Personais</span>
           <span class="kpi-icon"><i class="pi pi-id-card"></i></span>
         </div>
-        <div class="kpi-value">{{ d.totalInstructors }}</div>
+        <div class="kpi-value">{{ (d.totalInstructors || totalPersonaisComputado()) }}</div>
         <div class="kpi-sub">instrutores ativos</div>
       </p-card>
 
