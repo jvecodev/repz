@@ -44,6 +44,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     margin-bottom: 10px;
   }
   .kpi-label {
@@ -54,14 +55,16 @@
     color: var(--text-3);
   }
   .kpi-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    background: var(--card-2);
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border-radius: 6px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
     display: grid;
     place-items: center;
-    color: var(--accent, #34d399);
-    font-size: 13px;
+    color: var(--text-3);
+    font-size: 12px;
   }
   .kpi-value {
     font-size: 32px;

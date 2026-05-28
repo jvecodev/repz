@@ -1,14 +1,14 @@
 <app-shell
   ativo="dashboard"
   [crumbs]="['Aluno', 'Dashboard']"
-  nome="Aluno"
+  [nome]="nome()"
   subtitulo="Área do aluno"
   [mostrarCta]="!freq.jaFezCheckinHoje()"
   (ctaClick)="fazerCheckin()"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Olá, {{ primeiroNome() }} 👋</div>
+      <div class="page-title">Olá, {{ primeiroNome() }} </div>
       <div class="page-subtitle">Bom te ver de volta. Continue firme no treino.</div>
       <div class="ultimo-checkin">
         <i class="pi pi-clock"></i>
