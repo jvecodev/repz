@@ -1,14 +1,17 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, interval, Subscription } from 'rxjs';
+import { switchMap, takeWhile } from 'rxjs/operators';
 import {
   AuthService,
   AvaliacaoFisicaService,
   DadoGrafico,
   FrequenciaService,
   PersonalService,
+  RelatorioIAResponse,
+  RelatorioIAService,
   ThemeService,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
@@ -38,11 +41,12 @@ import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao
   templateUrl: './avaliacao-fisica.html',
   styleUrl: './avaliacao-fisica.scss',
 })
-export class AvaliacaoFisica implements OnInit {
+export class AvaliacaoFisica implements OnInit, OnDestroy {
   private readonly service = inject(AvaliacaoFisicaService);
   protected readonly auth = inject(AuthService);
   protected readonly personalService = inject(PersonalService);
   protected readonly freq = inject(FrequenciaService);
+  private readonly relatorioService = inject(RelatorioIAService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly themeService = inject(ThemeService);
@@ -53,6 +57,11 @@ export class AvaliacaoFisica implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly salvando = signal(false);
   readonly aviso = signal<string | null>(null);
+
+  // --- Relatório IA ---
+  readonly relatorio = signal<RelatorioIAResponse | null>(null);
+  readonly gerandoRelatorio = signal(false);
+  private pollSub: Subscription | null = null;
 
   readonly historico = signal<AvaliacaoVM[]>([]);
   readonly dados = signal<DadoGrafico[]>([]);
@@ -331,5 +340,64 @@ export class AvaliacaoFisica implements OnInit {
     this.form.quadrilCm = null;
     this.form.bracoCm = null;
     this.form.coxaCm = null;
+  }
+
+  gerarRelatorio(): void {
+    if (!this.alunoId || this.gerandoRelatorio()) return;
+    this.gerandoRelatorio.set(true);
+    this.relatorio.set(null);
+
+    this.relatorioService.iniciar(this.alunoId).subscribe({
+      next: (r) => {
+        this.relatorio.set(r);
+        this.iniciarPolling(r.id);
+      },
+      error: () => {
+        this.gerandoRelatorio.set(false);
+      },
+    });
+  }
+
+  cancelarRelatorio(): void {
+    const r = this.relatorio();
+    if (!r || r.status !== 'PENDENTE') return;
+    this.relatorioService.cancelar(r.id).subscribe({
+      next: () => {
+        this.pararPolling();
+        this.gerandoRelatorio.set(false);
+        this.relatorio.set({ ...r, status: 'CANCELADO' });
+      },
+    });
+  }
+
+  private iniciarPolling(id: number): void {
+    this.pararPolling();
+    this.pollSub = interval(3000)
+      .pipe(
+        switchMap(() => this.relatorioService.buscar(id)),
+        takeWhile((r) => r.status === 'PENDENTE', true),
+      )
+      .subscribe({
+        next: (r) => {
+          this.relatorio.set(r);
+          if (r.status !== 'PENDENTE') {
+            this.gerandoRelatorio.set(false);
+            this.pararPolling();
+          }
+        },
+        error: () => {
+          this.gerandoRelatorio.set(false);
+          this.pararPolling();
+        },
+      });
+  }
+
+  private pararPolling(): void {
+    this.pollSub?.unsubscribe();
+    this.pollSub = null;
+  }
+
+  ngOnDestroy(): void {
+    this.pararPolling();
   }
 }

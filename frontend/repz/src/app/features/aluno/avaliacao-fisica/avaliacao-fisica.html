@@ -211,6 +211,62 @@
             </div>
           </div>
         </p-card>
+
+        <!-- Relatório IA -->
+        <p-card styleClass="repz-card relatorio-card" *ngIf="historico().length > 0">
+          <div class="relatorio-head">
+            <div>
+              <div class="font-semibold">Relatório de evolução</div>
+              <div class="text-3 text-sm">Análise gerada por inteligência artificial</div>
+            </div>
+            <div class="relatorio-actions">
+              <p-button
+                *ngIf="relatorio()?.status === 'PENDENTE'"
+                label="Cancelar"
+                icon="pi pi-times"
+                styleClass="repz-ghost"
+                (onClick)="cancelarRelatorio()"
+              />
+              <p-button
+                label="Gerar relatório"
+                icon="pi pi-sparkles"
+                styleClass="repz-primary"
+                [loading]="gerandoRelatorio()"
+                [disabled]="gerandoRelatorio()"
+                (onClick)="gerarRelatorio()"
+              />
+            </div>
+          </div>
+
+          <!-- Pendente -->
+          <div class="relatorio-pending" *ngIf="relatorio()?.status === 'PENDENTE'">
+            <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="rel-spinner" />
+            <span class="text-3">Analisando seus dados… isso pode levar alguns segundos.</span>
+          </div>
+
+          <!-- Erro -->
+          <div class="relatorio-status-msg relatorio-erro" *ngIf="relatorio()?.status === 'ERRO'">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>Não foi possível gerar o relatório. Tente novamente.</span>
+          </div>
+
+          <!-- Cancelado -->
+          <div class="relatorio-status-msg relatorio-cancelado" *ngIf="relatorio()?.status === 'CANCELADO'">
+            <span class="badge-cancelado">Cancelado</span>
+            <span class="text-3 text-sm">A geração do relatório foi cancelada.</span>
+          </div>
+
+          <!-- Concluído -->
+          <div class="relatorio-conteudo" *ngIf="relatorio()?.status === 'CONCLUIDO'">
+            <pre class="relatorio-texto">{{ relatorio()!.conteudo }}</pre>
+          </div>
+
+          <!-- Estado inicial -->
+          <div class="relatorio-vazio text-3 text-sm" *ngIf="!relatorio()">
+            Clique em <strong>Gerar relatório</strong> para receber uma análise personalizada da sua evolução.
+          </div>
+        </p-card>
+
       </div>
 
       <div class="col-side" *ngIf="podeRegistrar()">

@@ -443,3 +443,86 @@
     grid-template-columns: 1fr;
   }
 }
+
+// ---------- Relatório IA ----------
+
+:host ::ng-deep .relatorio-card .p-card-body,
+:host ::ng-deep .relatorio-card .p-card-content {
+  padding: 18px 22px;
+}
+
+.relatorio-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+}
+
+.relatorio-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.relatorio-pending {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0 4px;
+}
+
+:host ::ng-deep .rel-spinner {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.relatorio-status-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+
+  &.relatorio-erro {
+    background: rgba(239, 68, 68, 0.08);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  &.relatorio-cancelado {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    gap: 10px;
+  }
+}
+
+.badge-cancelado {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(107, 114, 128, 0.15);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+.relatorio-vazio {
+  padding: 6px 0 2px;
+}
+
+.relatorio-conteudo {
+  padding-top: 4px;
+}
+
+.relatorio-texto {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
