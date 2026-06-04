@@ -9,6 +9,8 @@ import type {
   AvaliacaoFisicaResponse,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { LanguageService } from '@core/services/language.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,8 +25,8 @@ function parseBR(s: string): Date {
   return new Date(ano, (mes ?? 1) - 1, dia ?? 1, h ?? 0, mi ?? 0, se ?? 0);
 }
 
-function hojeBR(): string {
-  return new Date().toLocaleDateString('pt-BR', {
+function hojeBR(locale: string): string {
+  return new Date().toLocaleDateString(locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -38,6 +40,7 @@ function hojeBR(): string {
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     InputTextModule,
@@ -54,6 +57,8 @@ export class PersonalAvaliacaoNova implements OnInit {
   private readonly avaliacaoService = inject(AvaliacaoFisicaService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly i18n = inject(TranslateService);
+  private readonly language = inject(LanguageService);
 
   private userId!: number;
 
@@ -64,7 +69,9 @@ export class PersonalAvaliacaoNova implements OnInit {
   readonly avisoSeverity = signal<'success' | 'error'>('success');
   readonly alunoNome = signal('Aluno');
   readonly ultima = signal<AvaliacaoFisicaResponse | null>(null);
-  readonly dataHoje = hojeBR();
+  get dataHoje(): string {
+    return hojeBR(this.language.idioma());
+  }
 
   readonly fPeso = signal<number | null>(null);
   readonly fGordura = signal<number | null>(null);
@@ -144,7 +151,7 @@ export class PersonalAvaliacaoNova implements OnInit {
     if (this.salvando()) return;
     if (this.fPeso() == null || this.fAltura() == null) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Peso e altura são obrigatórios.');
+      this.aviso.set(this.i18n.instant('ALUNO.AVAL.WEIGHT_HEIGHT_REQUIRED'));
       return;
     }
 
@@ -170,7 +177,7 @@ export class PersonalAvaliacaoNova implements OnInit {
         error: (err) => {
           this.salvando.set(false);
           this.avisoSeverity.set('error');
-          this.aviso.set(err?.error?.message ?? 'Erro ao registrar avaliação.');
+          this.aviso.set(err?.error?.message ?? this.i18n.instant('PERSONAL.NEWEVAL.SAVE_ERROR'));
         },
       });
   }

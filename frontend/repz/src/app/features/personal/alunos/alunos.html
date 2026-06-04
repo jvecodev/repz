@@ -1,8 +1,8 @@
 <app-shell
   [ativo]="ativoSidebar()"
-  [crumbs]="['Personal Trainer', tituloPagina()]"
+  [crumbs]="[('PERSONAL.AREA' | translate), tituloPagina()]"
   [nome]="personalService.nomePersonal()"
-  subtitulo="Personal Trainer"
+  [subtitulo]="'PERSONAL.AREA' | translate"
   [mostrarCta]="false"
 >
   <div class="page-header">
@@ -10,7 +10,7 @@
       <div class="page-title">{{ tituloPagina() }}</div>
       <div class="page-subtitle">
         @if (!carregando()) {
-          {{ rows().length }} aluno(s) vinculado(s) à sua conta.
+          {{ 'PERSONAL.STUDENTS.N_LINKED' | translate: { n: rows().length } }}
         }
       </div>
     </div>
@@ -31,9 +31,9 @@
     <p-card styleClass="repz-card" *ngIf="rows().length === 0">
       <div class="empty-state">
         <i class="pi pi-users empty-icon"></i>
-        <div class="empty-title">Nenhum aluno vinculado</div>
+        <div class="empty-title">{{ 'PERSONAL.STUDENTS.NONE_LINKED' | translate }}</div>
         <div class="empty-desc">
-          Quando a academia vincular alunos ao seu perfil eles aparecerão aqui.
+          {{ 'PERSONAL.STUDENTS.NONE_DESC' | translate }}
         </div>
       </div>
     </p-card>
@@ -45,7 +45,7 @@
           <input
             pInputText
             type="text"
-            placeholder="Buscar por nome ou e-mail…"
+            [placeholder]="'PERSONAL.STUDENTS.SEARCH_NAME_EMAIL' | translate"
             [ngModel]="busca()"
             (ngModelChange)="busca.set($event)"
             class="search-input"
@@ -62,11 +62,11 @@
       >
         <ng-template pTemplate="header">
           <tr>
-            <th>Aluno</th>
-            <th style="width: 160px">Plano</th>
-            <th style="width: 180px">Frequência (mês)</th>
-            <th style="width: 150px">Último check-in</th>
-            <th style="width: 100px">Status</th>
+            <th>{{ 'PERSONAL.DASH.COL_STUDENT' | translate }}</th>
+            <th style="width: 160px">{{ 'PERSONAL.DASH.COL_PLAN' | translate }}</th>
+            <th style="width: 180px">{{ 'PERSONAL.DASH.COL_FREQ' | translate }}</th>
+            <th style="width: 150px">{{ 'PERSONAL.DASH.COL_LAST_CHECKIN' | translate }}</th>
+            <th style="width: 100px">{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
             <th style="width: 90px"></th>
           </tr>
         </ng-template>
@@ -94,7 +94,7 @@
             <td>
               <p-tag
                 [styleClass]="r.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
-                [value]="r.ativo ? 'Ativo' : 'Inativo'"
+                [value]="(r.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
               />
             </td>
             <td>
@@ -104,7 +104,7 @@
                   text
                   rounded
                   severity="secondary"
-                  title="Ver detalhes"
+                  [title]="'PERSONAL.STUDENTS.VIEW_DETAILS' | translate"
                   (onClick)="verDetalhes(r)"
                 />
                 <p-button
@@ -112,7 +112,7 @@
                   text
                   rounded
                   severity="secondary"
-                  title="Editar ficha"
+                  [title]="'PERSONAL.FICHA.EDIT_SHEET' | translate"
                   (onClick)="verFicha(r)"
                 />
               </div>
@@ -121,7 +121,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="6" class="empty-row">Nenhum aluno corresponde à busca.</td>
+            <td colspan="6" class="empty-row">{{ 'PERSONAL.STUDENTS.NO_MATCH' | translate }}</td>
           </tr>
         </ng-template>
       </p-table>
