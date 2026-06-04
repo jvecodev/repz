@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
 import { AcademiaService, AlunoService, FrequenciaService, UserService } from '@core/services';
-import type { AcademiaResponse, AlunoDetalheResponse, FrequenciaResponse } from '@core/services';
+import type {
+  AcademiaResponse,
+  AlunoDetalheResponse,
+  FrequenciaRelatorioResponse,
+} from '@core/services';
 import { AppShell } from '@shared/layout';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -21,13 +25,6 @@ function parseInputDate(s: string, endOfDay = false): Date {
   return endOfDay
     ? new Date(y, (m ?? 1) - 1, d ?? 1, 23, 59, 59)
     : new Date(y, (m ?? 1) - 1, d ?? 1, 0, 0, 0);
-}
-
-function parseBR(s: string): Date {
-  const [d, t = '00:00:00'] = (s ?? '').split(' ');
-  const [dia, mes, ano] = d.split('/').map(Number);
-  const [h, mi, se] = t.split(':').map(Number);
-  return new Date(ano, (mes ?? 1) - 1, dia ?? 1, h ?? 0, mi ?? 0, se ?? 0);
 }
 
 @Component({
@@ -54,7 +51,7 @@ export class AcademiaRelatorios implements OnInit {
 
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
-  readonly checkins = signal<FrequenciaResponse[]>([]);
+  readonly relatorio = signal<FrequenciaRelatorioResponse | null>(null);
   readonly totalAlunos = signal(0);
   readonly academia = signal<AcademiaResponse | null>(null);
 
@@ -62,7 +59,7 @@ export class AcademiaRelatorios implements OnInit {
   dataFim = '';
   readonly periodoAplicado = signal<{ inicio: Date; fim: Date } | null>(null);
 
-  readonly checkinsMes = computed(() => this.checkins().length);
+  readonly checkinsMes = computed(() => this.relatorio()?.totalFrequencias ?? 0);
 
   readonly mediaPorAluno = computed(() => {
     const t = this.totalAlunos();
@@ -93,9 +90,10 @@ export class AcademiaRelatorios implements OnInit {
 
   private readonly ocupacaoBuckets = computed(() => {
     const buckets = new Array(24).fill(0);
-    for (const c of this.checkins()) {
-      const d = parseBR(c.dataHora);
-      buckets[d.getHours()] = (buckets[d.getHours()] ?? 0) + 1;
+    const porHora = this.relatorio()?.ocupacaoPorHora ?? {};
+    for (const [hora, count] of Object.entries(porHora)) {
+      const h = Number(hora);
+      if (Number.isInteger(h) && h >= 0 && h < 24) buckets[h] = count;
     }
     return buckets;
   });
@@ -140,17 +138,13 @@ export class AcademiaRelatorios implements OnInit {
     const labels: string[] = [];
     const values: number[] = [];
     if (!p) return { labels, datasets: [] };
+    const porMes = this.relatorio()?.frequenciaPorMes ?? {};
     const cursor = new Date(p.inicio.getFullYear(), p.inicio.getMonth(), 1);
     const limite = new Date(p.fim.getFullYear(), p.fim.getMonth(), 1);
     while (cursor.getTime() <= limite.getTime()) {
       labels.push(cursor.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
-      const ano = cursor.getFullYear();
-      const mes = cursor.getMonth();
-      const count = this.checkins().filter((c) => {
-        const d = parseBR(c.dataHora);
-        return d.getMonth() === mes && d.getFullYear() === ano;
-      }).length;
-      values.push(count);
+      const chave = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
+      values.push(porMes[chave] ?? 0);
       cursor.setMonth(cursor.getMonth() + 1);
     }
     return {
@@ -234,12 +228,12 @@ export class AcademiaRelatorios implements OnInit {
 
     forkJoin({
       alunos: this.alunoService.listar().pipe(catchError(() => of([] as AlunoDetalheResponse[]))),
-      checkins: this.freqService
-        .listarPeriodo(inicio, fim, academiaId)
-        .pipe(catchError(() => of([] as FrequenciaResponse[]))),
-    }).subscribe(({ alunos, checkins }) => {
+      relatorio: this.freqService
+        .relatorio(inicio, fim, academiaId)
+        .pipe(catchError(() => of(null))),
+    }).subscribe(({ alunos, relatorio }) => {
       this.totalAlunos.set(alunos.filter((a) => a.ativo).length);
-      this.checkins.set(checkins);
+      this.relatorio.set(relatorio);
       this.periodoAplicado.set({ inicio, fim });
       this.carregando.set(false);
     });

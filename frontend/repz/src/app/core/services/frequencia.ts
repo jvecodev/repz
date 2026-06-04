@@ -30,6 +30,17 @@ export interface AlunoInativoResponse {
   ativo: boolean;
 }
 
+export interface FrequenciaRelatorioResponse {
+  academiaId: number;
+  periodo: { inicio: string; fim: string };
+  totalFrequencias: number;
+  frequenciaPorAluno: Record<string, number>;
+  /** Chave: hora do dia ("0"–"23"). */
+  ocupacaoPorHora: Record<string, number>;
+  /** Chave: mês em ordem cronológica ("yyyy-MM"). */
+  frequenciaPorMes: Record<string, number>;
+}
+
 function isoLocal(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   return (
@@ -129,6 +140,16 @@ export class FrequenciaService {
 
   alunosInativos(): Observable<AlunoInativoResponse[]> {
     return this.http.get<AlunoInativoResponse[]>(`${this.base}/alunos/inativos`);
+  }
+
+  /** Relatório agregado de check-ins (total, por hora e por mês) calculado no backend. */
+  relatorio(inicio: Date, fim: Date, academiaId?: number): Observable<FrequenciaRelatorioResponse> {
+    const params: Record<string, string | number> = {
+      inicio: isoLocal(inicio),
+      fim: isoLocal(fim),
+    };
+    if (academiaId != null) params['academia'] = academiaId;
+    return this.http.get<FrequenciaRelatorioResponse>(`${this.base}/relatorio`, { params });
   }
 
   carregarStatusHoje(): void {
