@@ -15,6 +15,7 @@ import repz.app.message.Mensagens;
 import repz.app.persistence.entity.User;
 import repz.app.persistence.repository.UserRepository;
 import repz.app.service.security.PasswordResetService;
+import repz.app.service.security.TokenBlacklistService;
 import repz.app.service.security.TokenService;
 import repz.app.service.user.UserService;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,6 +31,7 @@ public class AuthControllerImpl implements AuthController {
     private final TokenService tokenService;
     private final UserRepository userRepository;
     private final PasswordResetService passwordResetService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final Mensagens mensagens;
 
     @Override
@@ -47,6 +49,9 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<Void> logout(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            tokenBlacklistService.revoke(authHeader.substring(7));
+        }
         return ResponseEntity.noContent().build();
     }
 

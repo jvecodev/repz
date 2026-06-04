@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 
 interface LoginResponse {
@@ -35,16 +35,37 @@ export class AuthService {
       .pipe(tap((res) => this.salvarSessao(res.token, res.refreshToken)));
   }
 
+  /**
+   * Renova o par de tokens a partir do refresh token salvo.
+   * O backend espera o refresh token como corpo de texto puro.
+   */
+  refresh(): Observable<LoginResponse> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('Refresh token ausente'));
+    }
+    return this.http
+      .post<LoginResponse>(`${this.base}/refresh`, refreshToken, {
+        headers: { 'Content-Type': 'text/plain' },
+      })
+      .pipe(tap((res) => this.salvarSessao(res.token, res.refreshToken)));
+  }
+
   logout(): void {
     if (!this.isBrowser()) return;
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_KEY);
-    localStorage.removeItem(ROLE_KEY);
-    this.sessao.set(null);
+    // Avisa o backend (best-effort) enquanto o token ainda está disponível.
+    if (this.getToken()) {
+      this.http.post<void>(`${this.base}/logout`, {}).subscribe({ error: () => {} });
+    }
+    this.limparSessao();
   }
 
   getToken(): string | null {
     return this.isBrowser() ? localStorage.getItem(TOKEN_KEY) : null;
+  }
+
+  getRefreshToken(): string | null {
+    return this.isBrowser() ? localStorage.getItem(REFRESH_KEY) : null;
   }
 
   forgotPassword(email: string): Observable<void> {
@@ -60,6 +81,13 @@ export class AuthService {
   }
 
   // ----------------------------------------------------------------
+  private limparSessao(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(ROLE_KEY);
+    this.sessao.set(null);
+  }
+
   private salvarSessao(token: string, refreshToken: string): void {
     if (!this.isBrowser()) return;
     localStorage.setItem(TOKEN_KEY, token);
