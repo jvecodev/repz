@@ -107,7 +107,7 @@
     <div class="perfil-info-col">
 
       <p-card styleClass="repz-card avatar-card">
-        <div class="avatar avatar-xl">{{ (perfil()?.userName ?? 'P').charAt(0).toUpperCase() }}</div>
+        <app-avatar-upload [iniciais]="(perfil()?.userName ?? 'P').charAt(0).toUpperCase()" tamanho="xl" />
         <div class="avatar-name">{{ perfil()?.userName }}</div>
         <p-tag
           [styleClass]="perfil()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"

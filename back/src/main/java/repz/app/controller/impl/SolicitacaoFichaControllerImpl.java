@@ -29,11 +29,6 @@ public class SolicitacaoFichaControllerImpl implements SolicitacaoFichaControlle
     }
 
     @Override
-    public List<SolicitacaoFichaResponse> listarMinhas(Authentication auth) {
-        return service.listarMinhas(auth);
-    }
-
-    @Override
     public SolicitacaoFichaResponse pendente(Authentication auth) {
         return service.pendente(auth);
     }

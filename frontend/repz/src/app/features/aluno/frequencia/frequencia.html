@@ -1,19 +1,19 @@
 <app-shell
   ativo="frequencia"
-  [crumbs]="['Aluno', 'Frequência']"
+  [crumbs]="[('ROLES.STUDENT' | translate), ('ALUNO.FREQ.TITLE' | translate)]"
   [nome]="nomeAluno()"
-  subtitulo="Área do aluno"
+  [subtitulo]="'ALUNO.AREA' | translate"
   [mostrarCta]="!freqService.jaFezCheckinHoje()"
   (ctaClick)="fazerCheckin()"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Frequência</div>
-      <div class="page-subtitle">Histórico de check-ins, sequência e calendário mensal.</div>
+      <div class="page-title">{{ 'ALUNO.FREQ.TITLE' | translate }}</div>
+      <div class="page-subtitle">{{ 'ALUNO.FREQ.SUBTITLE' | translate }}</div>
     </div>
     <p-button
       *ngIf="!freqService.jaFezCheckinHoje()"
-      label="Fazer check-in"
+      [label]="'ALUNO.FREQ.CHECKIN' | translate"
       icon="pi pi-bolt"
       styleClass="repz-primary"
       [loading]="fazendoCheckin()"
@@ -21,7 +21,7 @@
     />
     <p-button
       *ngIf="freqService.jaFezCheckinHoje()"
-      label="Check-in já registrado"
+      [label]="'ALUNO.FREQ.CHECKIN_DONE' | translate"
       icon="pi pi-check"
       styleClass="repz-ghost"
       [disabled]="true"
@@ -50,34 +50,34 @@
       <div class="kpi-grid">
         <p-card styleClass="repz-card kpi-card">
           <div class="kpi-head">
-            <span class="kpi-label">Check-ins totais</span>
+            <span class="kpi-label">{{ 'ALUNO.FREQ.TOTAL' | translate }}</span>
             <span class="kpi-icon"><i class="pi pi-bolt"></i></span>
           </div>
           <div class="kpi-value">{{ totalCheckins() }}</div>
-          <div class="kpi-sub">desde o início</div>
+          <div class="kpi-sub">{{ 'ALUNO.FREQ.SINCE_START' | translate }}</div>
         </p-card>
 
         <p-card styleClass="repz-card kpi-card">
           <div class="kpi-head">
-            <span class="kpi-label">Este mês</span>
+            <span class="kpi-label">{{ 'ALUNO.FREQ.THIS_MONTH' | translate }}</span>
             <span class="kpi-icon"><i class="pi pi-calendar"></i></span>
           </div>
           <div class="kpi-value">{{ checkinsMes() }}</div>
-          <div class="kpi-sub">presenças em {{ mesLabel() }}</div>
+          <div class="kpi-sub">{{ 'ALUNO.FREQ.PRESENCES_IN' | translate: { mes: mesLabel() } }}</div>
         </p-card>
 
         <p-card styleClass="repz-card kpi-card">
           <div class="kpi-head">
-            <span class="kpi-label">Sequência atual</span>
+            <span class="kpi-label">{{ 'ALUNO.FREQ.STREAK' | translate }}</span>
             <span class="kpi-icon"><i class="pi pi-star"></i></span>
           </div>
           <div class="kpi-value">{{ sequenciaAtual() }}d</div>
-          <div class="kpi-sub">dias consecutivos</div>
+          <div class="kpi-sub">{{ 'ALUNO.FREQ.CONSECUTIVE_DAYS' | translate }}</div>
         </p-card>
 
         <p-card styleClass="repz-card kpi-card">
           <div class="kpi-head">
-            <span class="kpi-label">Último check-in</span>
+            <span class="kpi-label">{{ 'ALUNO.FREQ.LAST_CHECKIN' | translate }}</span>
             <span class="kpi-icon"><i class="pi pi-clock"></i></span>
           </div>
           <div class="kpi-value kpi-value-sm">
@@ -85,9 +85,11 @@
           </div>
           <div class="kpi-sub">
             @if (diasDesdeUltimo() !== null) {
-              {{ diasDesdeUltimo() === 0 ? 'hoje' : 'há ' + diasDesdeUltimo() + ' dia(s)' }}
+              {{ diasDesdeUltimo() === 0
+                ? ('ALUNO.FREQ.TODAY' | translate)
+                : ('ALUNO.FREQ.DAYS_AGO' | translate: { dias: diasDesdeUltimo() }) }}
             } @else {
-              sem registros
+              {{ 'ALUNO.FREQ.NO_RECORDS' | translate }}
             }
           </div>
         </p-card>
@@ -130,8 +132,8 @@
         </div>
 
         <div class="cal-legenda">
-          <span class="leg-item"><span class="leg-dot leg-checkin"></span> Check-in</span>
-          <span class="leg-item"><span class="leg-dot leg-hoje"></span> Hoje</span>
+          <span class="leg-item"><span class="leg-dot leg-checkin"></span> {{ 'ALUNO.FREQ.LEGEND_CHECKIN' | translate }}</span>
+          <span class="leg-item"><span class="leg-dot leg-hoje"></span> {{ 'ALUNO.FREQ.LEGEND_TODAY' | translate }}</span>
         </div>
       </p-card>
 
@@ -140,8 +142,8 @@
     <!-- Histórico recente -->
     <p-card styleClass="repz-card" *ngIf="ultimosCheckins().length > 0">
       <div class="section-head">
-        <div class="section-title">Histórico recente</div>
-        <div class="section-sub">últimas {{ ultimosCheckins().length }} presenças</div>
+        <div class="section-title">{{ 'ALUNO.FREQ.RECENT' | translate }}</div>
+        <div class="section-sub">{{ 'ALUNO.FREQ.LAST_N' | translate: { n: ultimosCheckins().length } }}</div>
       </div>
 
       <div class="historico-lista">
@@ -160,8 +162,8 @@
 
     <p-card styleClass="repz-card empty-hist" *ngIf="totalCheckins() === 0">
       <i class="pi pi-calendar empty-icon"></i>
-      <div class="empty-title">Nenhum check-in registrado</div>
-      <div class="empty-sub">Faça seu primeiro check-in no painel principal.</div>
+      <div class="empty-title">{{ 'ALUNO.FREQ.EMPTY_TITLE' | translate }}</div>
+      <div class="empty-sub">{{ 'ALUNO.FREQ.EMPTY_SUB' | translate }}</div>
     </p-card>
 
   </ng-container>

@@ -7,13 +7,22 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '@core/services/language.service';
 
 type Etapa = 'login' | 'esqueci' | 'redefinir';
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonModule, CardModule, InputTextModule, MessageModule],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    CardModule,
+    InputTextModule,
+    MessageModule,
+    TranslatePipe,
+  ],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
 })
@@ -21,7 +30,9 @@ export class Auth {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly i18n = inject(TranslateService);
   protected readonly theme = inject(ThemeService);
+  protected readonly language = inject(LanguageService);
 
   readonly etapa = signal<Etapa>('login');
   readonly carregando = signal(false);
@@ -71,11 +82,11 @@ export class Auth {
       error: (err) => {
         this.carregando.set(false);
         if (err?.status === 401 || err?.status === 400) {
-          this.erro.set('E-mail ou senha inválidos.');
+          this.erro.set(this.i18n.instant('AUTH.MESSAGES.INVALID_CREDENTIALS'));
         } else if (err?.status === 403) {
-          this.erro.set('Acesso negado. Verifique suas permissões.');
+          this.erro.set(this.i18n.instant('AUTH.MESSAGES.ACCESS_DENIED'));
         } else {
-          this.erro.set('Não foi possível entrar. Tente novamente.');
+          this.erro.set(this.i18n.instant('AUTH.MESSAGES.LOGIN_ERROR'));
         }
       },
     });
@@ -109,14 +120,14 @@ export class Auth {
     this.authService.resetPassword(token!, newPassword!).subscribe({
       next: () => {
         this.carregando.set(false);
-        this.irParaLogin('Senha redefinida com sucesso! Faça login para continuar.');
+        this.irParaLogin(this.i18n.instant('AUTH.MESSAGES.RESET_SUCCESS'));
       },
       error: (err) => {
         this.carregando.set(false);
         if (err?.status === 400) {
-          this.erro.set('Código inválido ou expirado. Solicite um novo código.');
+          this.erro.set(this.i18n.instant('AUTH.MESSAGES.RESET_INVALID_CODE'));
         } else {
-          this.erro.set('Não foi possível redefinir a senha. Tente novamente.');
+          this.erro.set(this.i18n.instant('AUTH.MESSAGES.RESET_ERROR'));
         }
       },
     });
@@ -140,7 +151,7 @@ export class Auth {
   private irParaRedefinir(email: string): void {
     this.carregando.set(false);
     this.etapa.set('redefinir');
-    this.sucesso.set(`Código enviado para ${email}. Verifique sua caixa de entrada.`);
+    this.sucesso.set(this.i18n.instant('AUTH.MESSAGES.CODE_SENT', { email }));
   }
 
   private redirecionarPorPerfil(role: string | null): void {
@@ -158,7 +169,7 @@ export class Auth {
         this.router.navigate(['/aluno/ficha-treino']);
         break;
       default:
-        this.erro.set('Perfil de usuário desconhecido. Contate o administrador.');
+        this.erro.set(this.i18n.instant('AUTH.MESSAGES.UNKNOWN_ROLE'));
     }
   }
 }
@@ -168,4 +179,3 @@ function senhasIguaisValidator(group: AbstractControl) {
   const confirmar = group.get('confirmarSenha')?.value;
   return nova && confirmar && nova !== confirmar ? { senhasDiferentes: true } : null;
 }
-

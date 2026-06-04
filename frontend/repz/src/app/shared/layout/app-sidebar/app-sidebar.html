@@ -3,7 +3,7 @@
   <img class="brand-wordmark" src="/assets/repz-wordmark.png" alt="REPZ" />
 </div>
 
-<div class="nav-section">Geral</div>
+<div class="nav-section">{{ 'NAV.SECTION_GENERAL' | translate }}</div>
 <nav class="nav">
   @for (item of navItems(); track item.key) {
     <a
@@ -11,7 +11,7 @@
       [class.active]="ativo() === item.key"
       [routerLink]="item.link"
       [queryParams]="item.queryParams"
-      [title]="item.label"
+      [title]="item.labelKey | translate"
     >
       <span class="icon">
         @switch (item.key) {
@@ -199,7 +199,7 @@
           }
         }
       </span>
-      <span class="label">{{ item.label }}</span>
+      <span class="label">{{ item.labelKey | translate }}</span>
     </a>
   }
 </nav>
@@ -207,10 +207,10 @@
 @if (mostrarCta()) {
   <div class="sidebar-cta">
     <div class="cta-card">
-      <div class="cta-title">{{ ctaTitulo() }}</div>
-      <div class="cta-desc">{{ ctaDescricao() }}</div>
+      <div class="cta-title">{{ ctaTitulo() | translate }}</div>
+      <div class="cta-desc">{{ ctaDescricao() | translate }}</div>
       <p-button
-        [label]="ctaLabel()"
+        [label]="ctaLabel() | translate"
         icon="pi pi-bolt"
         styleClass="repz-primary cta-btn"
         (onClick)="ctaClick.emit()"
@@ -219,15 +219,15 @@
     <p-button
       icon="pi pi-bolt"
       styleClass="repz-primary cta-mini"
-      [title]="ctaLabel()"
-      [ariaLabel]="ctaLabel()"
+      [title]="ctaLabel() | translate"
+      [ariaLabel]="ctaLabel() | translate"
       (onClick)="ctaClick.emit()"
     />
   </div>
 }
 
 <div class="profile-block">
-  <a class="profile-link" [routerLink]="perfilLink()" title="Perfil" aria-label="Perfil">
+  <a class="profile-link" [routerLink]="perfilLink()" [title]="'NAV.PROFILE' | translate" [attr.aria-label]="'NAV.PROFILE' | translate">
     <div class="avatar avatar-lg">{{ inicial() }}</div>
     <div class="pb-info">
       <div class="pb-name">{{ nome() }}</div>
@@ -239,7 +239,7 @@
     </div>
   </a>
 
-  <button class="profile-logout" (click)="logout()" title="Sair" aria-label="Sair">
+  <button class="profile-logout" (click)="logout()" [title]="'NAV.LOGOUT' | translate" [attr.aria-label]="'NAV.LOGOUT' | translate">
     <svg
       viewBox="0 0 24 24"
       fill="none"

@@ -10,14 +10,24 @@
 
   <div class="topbar-actions">
     <p-button
+      [label]="language.idioma() === 'pt-BR' ? 'EN' : 'PT'"
+      severity="secondary"
+      [text]="true"
+      [rounded]="true"
+      styleClass="lang-btn repz-icon-button"
+      (onClick)="language.alternar()"
+      [title]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
+      [ariaLabel]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
+    />
+    <p-button
       [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
       severity="secondary"
       [text]="true"
       [rounded]="true"
       styleClass="theme-btn repz-icon-button"
       (onClick)="theme.toggleTema()"
-      [title]="theme.tema() === 'dark' ? 'Modo claro' : 'Modo escuro'"
-      [ariaLabel]="theme.tema() === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
+      [title]="(theme.tema() === 'dark' ? 'THEME.TO_LIGHT' : 'THEME.TO_DARK') | translate"
+      [ariaLabel]="(theme.tema() === 'dark' ? 'THEME.ARIA_TO_LIGHT' : 'THEME.ARIA_TO_DARK') | translate"
     />
   </div>
 </div>

@@ -3,31 +3,285 @@
     "SAVE": "Save",
     "CANCEL": "Cancel",
     "EDIT": "Edit",
-    "DELETE": "Delete"
-  },
-
-  "MENU": {
-    "HOME": "Home",
-    "USERS": "Users",
-    "SETTINGS": "Settings",
-    "LOGOUT": "Logout"
-  },
-
-  "LOGIN": {
-    "TITLE": "Sign in",
-    "EMAIL": "Email",
-    "PASSWORD": "Password",
-    "BUTTON": "Login"
+    "DELETE": "Delete",
+    "BACK": "Back",
+    "LOADING": "Loading...",
+    "CONFIRM": "Confirm",
+    "SEARCH": "Search",
+    "ACTIONS": "Actions",
+    "ACTIVE": "Active",
+    "INACTIVE": "Inactive",
+    "VIEW": "View",
+    "OPTIONAL": "(optional)"
   },
 
   "VALIDATION": {
     "REQUIRED": "Required field",
-    "INVALID_EMAIL": "Invalid email",
-    "MIN_LENGTH": "Invalid minimum length"
+    "EMAIL_REQUIRED": "E-mail is required.",
+    "EMAIL_INVALID": "Invalid e-mail format.",
+    "PASSWORD_REQUIRED": "Password is required.",
+    "PASSWORD_MIN": "Minimum of 5 characters.",
+    "TOKEN_REQUIRED": "Code is required.",
+    "NEW_PASSWORD_REQUIRED": "New password is required.",
+    "CONFIRM_REQUIRED": "Confirmation is required.",
+    "PASSWORD_MISMATCH": "Passwords do not match."
   },
 
-  "MESSAGES": {
-    "SUCCESS": "Operation completed successfully",
-    "ERROR": "Error processing operation"
+  "THEME": {
+    "TO_LIGHT": "Light mode",
+    "TO_DARK": "Dark mode",
+    "ARIA_TO_LIGHT": "Switch to light mode",
+    "ARIA_TO_DARK": "Switch to dark mode"
+  },
+
+  "LANG": {
+    "TO_EN": "Switch to English",
+    "TO_PT": "Mudar para português"
+  },
+
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "Sign in",
+      "SUBTITLE": "Access your account to see your workout plan.",
+      "SUBMIT": "Sign in",
+      "FORGOT": "Forgot my password"
+    },
+    "FORGOT": {
+      "TITLE": "Recover password",
+      "SUBTITLE": "Enter your e-mail and we'll send you a reset code.",
+      "SUBMIT": "Send code",
+      "BACK": "← Back to login"
+    },
+    "RESET": {
+      "TITLE": "New password",
+      "SUBTITLE": "Enter the code received by e-mail and set your new password.",
+      "TOKEN_LABEL": "Verification code",
+      "TOKEN_PLACEHOLDER": "Paste the code here",
+      "NEW_PASSWORD_LABEL": "New password",
+      "CONFIRM_LABEL": "Confirm new password",
+      "SUBMIT": "Reset password",
+      "BACK": "← Back to login"
+    },
+    "FIELDS": {
+      "EMAIL": "E-mail",
+      "EMAIL_PLACEHOLDER": "you@email.com",
+      "PASSWORD": "Password"
+    },
+    "MESSAGES": {
+      "INVALID_CREDENTIALS": "Invalid e-mail or password.",
+      "ACCESS_DENIED": "Access denied. Check your permissions.",
+      "LOGIN_ERROR": "Could not sign in. Please try again.",
+      "UNKNOWN_ROLE": "Unknown user role. Contact the administrator.",
+      "RESET_SUCCESS": "Password reset successfully! Sign in to continue.",
+      "RESET_INVALID_CODE": "Invalid or expired code. Request a new one.",
+      "RESET_ERROR": "Could not reset the password. Please try again.",
+      "CODE_SENT": "Code sent to {{email}}. Check your inbox."
+    }
+  },
+
+  "NAV": {
+    "SECTION_GENERAL": "General",
+    "DASHBOARD": "Dashboard",
+    "PANEL": "Panel",
+    "MY_WORKOUT": "My workout",
+    "ATTENDANCE": "Attendance",
+    "EVOLUTION": "Progress",
+    "MY_STUDENTS": "My students",
+    "STUDENTS": "Students",
+    "WORKOUTS": "Workouts",
+    "ASSESSMENTS": "Assessments",
+    "GYMS": "Gyms",
+    "USERS": "Users",
+    "TRAINERS": "Trainers",
+    "PLANS": "Plans",
+    "REPORTS": "Reports",
+    "PROFILE": "Profile",
+    "LOGOUT": "Log out"
+  },
+
+  "SIDEBAR": {
+    "CTA_TITLE": "Let's train!",
+    "CTA_DESC": "Check in and keep your streak going.",
+    "CTA_LABEL": "Check in"
+  },
+
+  "AVATAR": {
+    "CHANGE": "Change photo",
+    "UPLOADING": "Uploading…",
+    "INVALID_TYPE": "Select an image file.",
+    "TOO_LARGE": "The image must be at most 5 MB.",
+    "UPLOAD_ERROR": "Could not upload the image."
+  },
+
+  "ROLES": {
+    "STUDENT": "Student",
+    "TRAINER": "Trainer",
+    "ADMIN": "Admin",
+    "MANAGER": "Manager"
+  },
+
+  "PROFILE": {
+    "TITLE": "My profile",
+    "SUBTITLE": "View and edit your personal information.",
+    "EDIT_INFO": "Edit information",
+    "NAME": "Name",
+    "NAME_PLACEHOLDER": "Your full name",
+    "PHONE": "Phone",
+    "CHANGE_PASSWORD": "Change password (optional)",
+    "NEW_PASSWORD": "New password",
+    "NEW_PASSWORD_PLACEHOLDER": "Leave blank to keep",
+    "CONFIRM_PASSWORD": "Confirm new password",
+    "CONFIRM_PLACEHOLDER": "Repeat the new password",
+    "INFO": "Information",
+    "EMAIL": "E-mail",
+    "GYM": "Gym",
+    "PLAN": "Plan",
+    "TRAINER": "Trainer",
+    "GOAL": "Goal",
+    "LOAD_ERROR": "Could not load your profile.",
+    "NAME_REQUIRED": "Name is required.",
+    "PASSWORD_MIN": "The new password must be at least 5 characters.",
+    "SAVE_SUCCESS": "Profile updated successfully!",
+    "SAVE_ERROR": "Error saving profile."
+  },
+
+  "ALUNO": {
+    "AREA": "Student area",
+    "DASH": {
+      "GREETING": "Hello, {{nome}}",
+      "WELCOME": "Good to see you back. Keep up the good work.",
+      "LAST_CHECKIN_LABEL": "Last check-in:",
+      "NO_CHECKIN_YET": "No check-ins yet",
+      "AT": "at",
+      "FREQ_MONTH": "Monthly attendance",
+      "DAYS": "days",
+      "DELTA_MONTH": "+{{n}} vs. last month",
+      "PRESENCES_MONTH": "check-ins recorded this month",
+      "TODAY_WORKOUT": "Today's workout",
+      "WORKOUT_DIV": "Workout {{div}}",
+      "NO_SHEET": "No plan",
+      "N_EXERCISES": "{{n}} exercises",
+      "NO_ACTIVE_SHEET": "no active plan",
+      "CURRENT_WEIGHT": "Current weight",
+      "KG_SINCE": "kg since last assessment",
+      "LAST_ASSESSMENT": "last physical assessment",
+      "NO_ASSESSMENT": "no assessment recorded",
+      "ACTIVE_PLAN": "Active plan",
+      "ENROLLMENT_PLAN": "enrollment plan",
+      "YOUR_WORKOUT_TODAY": "Your workout today",
+      "VIEW_FULL": "View full",
+      "SETS": "sets",
+      "REPS": "reps",
+      "MORE_EXERCISES": "+{{n}} exercises in the full plan",
+      "NO_ACTIVE_SHEET_MSG": "You don't have an active workout plan yet.",
+      "WEEK_FREQ": "Weekly attendance",
+      "PRESENCES_THIS_MONTH": "{{n}} check-in(s) this month",
+      "YOUR_TRAINER": "Your trainer:",
+      "WEEKDAYS_MON": "Mon,Tue,Wed,Thu,Fri,Sat,Sun"
+    },
+    "FREQ": {
+      "TITLE": "Attendance",
+      "SUBTITLE": "Check-in history, streak and monthly calendar.",
+      "CHECKIN": "Check in",
+      "CHECKIN_DONE": "Check-in already done",
+      "TOTAL": "Total check-ins",
+      "SINCE_START": "since the start",
+      "THIS_MONTH": "This month",
+      "PRESENCES_IN": "check-ins in {{mes}}",
+      "STREAK": "Current streak",
+      "CONSECUTIVE_DAYS": "consecutive days",
+      "LAST_CHECKIN": "Last check-in",
+      "TODAY": "today",
+      "DAYS_AGO": "{{dias}} day(s) ago",
+      "NO_RECORDS": "no records",
+      "LEGEND_CHECKIN": "Check-in",
+      "LEGEND_TODAY": "Today",
+      "RECENT": "Recent history",
+      "LAST_N": "last {{n}} check-ins",
+      "EMPTY_TITLE": "No check-ins yet",
+      "EMPTY_SUB": "Make your first check-in on the main panel.",
+      "CHECKIN_SUCCESS": "Check-in successful!",
+      "CHECKIN_ERROR": "Could not register the check-in.",
+      "LOAD_ERROR": "Could not load your attendance history.",
+      "WEEKDAYS_SHORT": "Sun,Mon,Tue,Wed,Thu,Fri,Sat"
+    },
+    "FICHA": {
+      "TITLE": "My workout",
+      "CREATED_BY": "Plan created by {{personal}} · updated on {{data}}",
+      "PREVIOUS": "Previous plans",
+      "LOADING": "Loading your workout plan…",
+      "SETS_REPS_REST": "{{series}} sets × {{reps}} reps · rest {{descanso}}",
+      "CURRENT_LOAD": "current load",
+      "SHEET": "Workout plan",
+      "ACTIVE_F": "Active",
+      "WORKOUTS_LABEL": "Workouts",
+      "N_DIVISIONS": "{{n}} splits",
+      "EXERCISES_LABEL": "Exercises",
+      "TRAINER_NOTES": "Trainer notes",
+      "VALIDITY": "Plan validity",
+      "STARTED_AT": "Started on",
+      "EXPIRES_AT": "Expires on",
+      "REQUEST_SENT": "Request sent",
+      "REQUEST_NEW": "Request new plan",
+      "N_CLOSED": "{{n}} closed plan(s)",
+      "CLOSE_HISTORY": "Close history",
+      "NO_PREVIOUS": "No previous plans recorded.",
+      "SHEET_COL": "Plan",
+      "PERIOD": "Period",
+      "REQUEST_INTRO": "Your trainer will be notified and can prepare a new plan for you.",
+      "REQUEST_MSG_LABEL": "Message to the trainer",
+      "REQUEST_MSG_PLACEHOLDER": "E.g.: I'd like to focus on lower-body hypertrophy…",
+      "REQUEST_SEND": "Send request",
+      "NO_ACCESS": "You don't have access to this plan (log in as a student).",
+      "LOAD_ERROR": "Could not load your workout plan.",
+      "REQUEST_ERROR": "Could not send the request.",
+      "DEFAULT_GOAL": "Workout"
+    }
+  },
+
+  "PERSONAL": {
+    "AREA": "Personal Trainer",
+    "FICHA": {
+      "EDIT_SHEET": "Edit plan",
+      "STUDENT_LABEL": "Student:",
+      "SAVE_SHEET": "Save plan",
+      "NEW_DIVISION": "New split",
+      "EXPIRES_TAG": "Expires {{data}}",
+      "REEDIT": "Re-edit",
+      "REMOVE_DIVISION": "Remove split",
+      "NO_EXERCISES": "No exercises in this split.",
+      "REEDIT_DIVISION": "Re-edit split",
+      "NEW_DIVISION_TITLE": "New workout split",
+      "REPLACE_HINT": "(the previous split will be replaced on save)",
+      "DIVISION_LABEL": "Split *",
+      "SELECT": "Select…",
+      "DIVISION_NAME_LABEL": "Split name *",
+      "DIVISION_NAME_PLACEHOLDER": "E.g.: Workout A — Chest & Triceps",
+      "OBJECTIVE_LABEL": "Goal",
+      "OBJECTIVE_PLACEHOLDER": "E.g.: Muscle hypertrophy",
+      "VALID_UNTIL": "Valid until",
+      "GENERAL_NOTES": "General notes",
+      "NOTES_PLACEHOLDER": "E.g.: Warm up 10 min on the treadmill first…",
+      "N_ADDED_DRAG": "{{n}} added · drag to reorder",
+      "DRAG": "Drag",
+      "REMOVE": "Remove",
+      "ADD_EXERCISE": "Add exercise",
+      "EX_NAME_LABEL": "Name *",
+      "EX_NAME_PLACEHOLDER": "E.g.: Bench press",
+      "MUSCLE_GROUP": "Muscle group",
+      "MUSCLE_PLACEHOLDER": "E.g.: Chest",
+      "SETS_LABEL": "Sets",
+      "REPS_LABEL": "Reps",
+      "LOAD_LABEL": "Load (kg)",
+      "REST_LABEL": "Rest (s)",
+      "NOTE_LABEL": "Note",
+      "NOTE_PLACEHOLDER": "E.g.: 3s eccentric phase",
+      "LOAD_ERROR": "Could not load the workout plan.",
+      "DIVISION_REMOVED": "Split removed.",
+      "REMOVE_ERROR": "Error removing split.",
+      "DIVISION_UPDATED": "Split {{div}} updated successfully!",
+      "DIVISION_CREATED": "Split {{div}} — \"{{nome}}\" created successfully!",
+      "SAVE_ERROR": "Error saving split."
+    }
   }
 }

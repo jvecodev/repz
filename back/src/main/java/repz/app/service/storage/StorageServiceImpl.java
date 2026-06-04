@@ -68,6 +68,13 @@ public class StorageServiceImpl implements StorageService {
         return generatePresignedUrl(fileName);
     }
 
+    @Override
+    public String getMyPhotoUrl(User user) {
+        return arquivoRepository.findByUserId(user.getId())
+                .map(arquivo -> generatePresignedUrl(arquivo.getFileName()))
+                .orElse(null);
+    }
+
     private String generatePresignedUrl(String objectKey) {
         try {
             String presigned = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()

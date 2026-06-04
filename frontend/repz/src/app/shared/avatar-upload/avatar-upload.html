@@ -1,0 +1,24 @@
+<div class="avatar-upload">
+  <div class="avatar avatar-{{ tamanho }}">
+    @if (fotoUrl()) {
+      <img [src]="fotoUrl()!" alt="Foto de perfil" />
+    } @else {
+      <span>{{ iniciais }}</span>
+    }
+  </div>
+
+  <label class="avatar-upload__btn" [class.is-disabled]="enviando()">
+    {{ (enviando() ? 'AVATAR.UPLOADING' : 'AVATAR.CHANGE') | translate }}
+    <input
+      type="file"
+      accept="image/*"
+      hidden
+      [disabled]="enviando()"
+      (change)="selecionar($event)"
+    />
+  </label>
+
+  @if (erro()) {
+    <small class="avatar-upload__erro">{{ erro() }}</small>
+  }
+</div>

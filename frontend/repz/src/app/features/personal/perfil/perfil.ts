@@ -5,6 +5,7 @@ import { forkJoin } from 'rxjs';
 import { PersonalService, UserService } from '@core/services';
 import type { PersonalResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { AvatarUpload } from '@shared/avatar-upload';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -19,6 +20,7 @@ import { TagModule } from 'primeng/tag';
     CommonModule,
     FormsModule,
     AppShell,
+    AvatarUpload,
     ButtonModule,
     CardModule,
     InputTextModule,

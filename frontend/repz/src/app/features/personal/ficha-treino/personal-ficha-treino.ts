@@ -6,6 +6,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 import { FichaTreinoService, PersonalService } from '@core/services';
 import type { ExercicioCreateRequest, TreinoCreateRequest, TreinoResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -32,6 +33,7 @@ interface ExercicioDraft {
     FormsModule,
     DragDropModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     InputTextModule,
@@ -48,6 +50,7 @@ export class PersonalFichaTreino implements OnInit {
   protected readonly personalService = inject(PersonalService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly i18n = inject(TranslateService);
 
   readonly LETRAS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
@@ -120,7 +123,7 @@ export class PersonalFichaTreino implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar a ficha de treino.');
+        this.erro.set(this.i18n.instant('PERSONAL.FICHA.LOAD_ERROR'));
       },
     });
   }
@@ -234,7 +237,7 @@ export class PersonalFichaTreino implements OnInit {
         this.divisoes.update((lista) => lista.filter((d) => d.id !== id));
         this.removendo.set(null);
         this.avisoSeverity.set('success');
-        this.aviso.set('Divisão removida.');
+        this.aviso.set(this.i18n.instant('PERSONAL.FICHA.DIVISION_REMOVED'));
         setTimeout(() => this.aviso.set(null), 3000);
         if (this.tabAtiva() === id) {
           this.tabAtiva.set(this.divisoes()[0]?.id ?? 'nova');
@@ -243,7 +246,7 @@ export class PersonalFichaTreino implements OnInit {
       error: (err) => {
         this.removendo.set(null);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao remover divisão.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('PERSONAL.FICHA.REMOVE_ERROR'));
       },
     });
   }
@@ -292,8 +295,8 @@ export class PersonalFichaTreino implements OnInit {
           this.avisoSeverity.set('success');
           this.aviso.set(
             antigaId
-              ? `Divisão ${nova.divisao} atualizada com sucesso!`
-              : `Divisão ${nova.divisao} — "${nova.nome}" criada com sucesso!`,
+              ? this.i18n.instant('PERSONAL.FICHA.DIVISION_UPDATED', { div: nova.divisao })
+              : this.i18n.instant('PERSONAL.FICHA.DIVISION_CREATED', { div: nova.divisao, nome: nova.nome }),
           );
           setTimeout(() => this.aviso.set(null), 4000);
           this.tabAtiva.set(nova.id);
@@ -311,7 +314,7 @@ export class PersonalFichaTreino implements OnInit {
       error: (err) => {
         this.salvando.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao salvar divisão.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('PERSONAL.FICHA.SAVE_ERROR'));
       },
     });
   }

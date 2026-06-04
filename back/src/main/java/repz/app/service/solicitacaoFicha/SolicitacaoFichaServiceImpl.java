@@ -80,14 +80,6 @@ public class SolicitacaoFichaServiceImpl implements SolicitacaoFichaService {
     }
 
     @Override
-    public List<SolicitacaoFichaResponse> listarMinhas(Authentication auth) {
-        User aluno = userRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
-        return repository.findByAluno_IdOrderByCriadaEmDesc(aluno.getId())
-                .stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
-    @Override
     public SolicitacaoFichaResponse pendente(Authentication auth) {
         User aluno = userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));

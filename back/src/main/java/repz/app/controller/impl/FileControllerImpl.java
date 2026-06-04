@@ -28,4 +28,11 @@ public class FileControllerImpl implements FileController {
         String url = storageService.getPreviewUrl(fileName);
         return ResponseEntity.ok(url);
     }
+
+    @Override
+    public ResponseEntity<String> minhaFoto(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        String url = storageService.getMyPhotoUrl(user);
+        return url == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(url);
+    }
 }

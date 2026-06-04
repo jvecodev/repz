@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LanguageService } from '@core/services/language.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,7 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss',
 })
 export class App {
+  // Instancia o serviço de idioma no boot para aplicar o idioma salvo.
+  private readonly language = inject(LanguageService);
   protected readonly title = signal('repz');
 }

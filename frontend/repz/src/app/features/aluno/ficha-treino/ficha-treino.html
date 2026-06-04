@@ -1,6 +1,6 @@
 <app-shell
   ativo="treino"
-  [crumbs]="['Aluno', 'Meu treino']"
+  [crumbs]="[('ROLES.STUDENT' | translate), ('NAV.MY_WORKOUT' | translate)]"
   [nome]="aluno()"
   [subtitulo]="alunoObjetivo()"
   [mostrarCta]="!freq.jaFezCheckinHoje()"
@@ -8,13 +8,13 @@
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Meu treino</div>
+      <div class="page-title">{{ 'ALUNO.FICHA.TITLE' | translate }}</div>
       <div class="page-subtitle" *ngIf="ficha() as f">
-        Ficha criada por {{ f.personal }} · atualizada em {{ f.atualizadaEm }}
+        {{ 'ALUNO.FICHA.CREATED_BY' | translate: { personal: f.personal, data: f.atualizadaEm } }}
       </div>
     </div>
     <p-button
-      label="Fichas anteriores"
+      [label]="'ALUNO.FICHA.PREVIOUS' | translate"
       icon="pi pi-history"
       severity="secondary"
       [outlined]="true"
@@ -25,7 +25,7 @@
 
   <p-card styleClass="repz-card state-card" *ngIf="carregando()">
     <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
-    <span>Carregando sua ficha de treino…</span>
+    <span>{{ 'ALUNO.FICHA.LOADING' | translate }}</span>
   </p-card>
 
   <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
@@ -35,7 +35,7 @@
 
   <p-card styleClass="repz-card state-card" *ngIf="!carregando() && !erro() && !ficha()">
     <i class="pi pi-clipboard"></i>
-    <span>Você ainda não tem uma ficha de treino ativa.</span>
+    <span>{{ 'ALUNO.DASH.NO_ACTIVE_SHEET_MSG' | translate }}</span>
   </p-card>
 
   <ng-container *ngIf="!carregando() && !erro() && ficha() as f">
@@ -58,7 +58,7 @@
           <p-tag
             *ngIf="treinoAtual() as t"
             styleClass="repz-tag-muted"
-            [value]="t.exercicios.length + ' exercícios'"
+            [value]="'ALUNO.DASH.N_EXERCISES' | translate: { n: t.exercicios.length }"
           />
         </div>
 
@@ -75,12 +75,12 @@
                 <div class="name">{{ ex.nome }}</div>
                 <div class="sets">
                   <span class="grupo">{{ ex.grupo }}</span>
-                  · {{ ex.series }} séries × {{ ex.reps }} reps · descanso {{ ex.descanso }}
+                  · {{ 'ALUNO.FICHA.SETS_REPS_REST' | translate: { series: ex.series, reps: ex.reps, descanso: ex.descanso } }}
                 </div>
               </div>
               <div class="carga">
                 <div class="carga-val">{{ ex.carga }}</div>
-                <div class="carga-lbl">carga atual</div>
+                <div class="carga-lbl">{{ 'ALUNO.FICHA.CURRENT_LOAD' | translate }}</div>
               </div>
             </div>
             <div *ngIf="ex.obs" class="ex-note">
@@ -94,37 +94,37 @@
       <div class="side-stack">
         <p-card styleClass="repz-card scard">
           <div class="scard-top">
-            <span class="scard-label">Ficha de treino</span>
-            <p-tag styleClass="repz-tag-success" value="Ativa" *ngIf="f.ativa" />
+            <span class="scard-label">{{ 'ALUNO.FICHA.SHEET' | translate }}</span>
+            <p-tag styleClass="repz-tag-success" [value]="'ALUNO.FICHA.ACTIVE_F' | translate" *ngIf="f.ativa" />
           </div>
           <div class="scard-name">{{ f.nome }}</div>
           <p class="scard-desc" *ngIf="f.objetivo">{{ f.objetivo }}</p>
           <div class="scard-rows">
             <div class="kv">
-              <span class="text-3">Treinos</span><span>{{ letras().length }} divisões</span>
+              <span class="text-3">{{ 'ALUNO.FICHA.WORKOUTS_LABEL' | translate }}</span><span>{{ 'ALUNO.FICHA.N_DIVISIONS' | translate: { n: letras().length } }}</span>
             </div>
             <div class="kv">
-              <span class="text-3">Exercícios</span><span>{{ totalExercicios() }}</span>
+              <span class="text-3">{{ 'ALUNO.FICHA.EXERCISES_LABEL' | translate }}</span><span>{{ totalExercicios() }}</span>
             </div>
             <div class="kv">
-              <span class="text-3">Personal</span><span>{{ f.personal }}</span>
+              <span class="text-3">{{ 'PROFILE.TRAINER' | translate }}</span><span>{{ f.personal }}</span>
             </div>
           </div>
         </p-card>
 
         <p-card styleClass="repz-card scard" *ngIf="f.observacoes">
-          <span class="scard-label">Observações do personal</span>
+          <span class="scard-label">{{ 'ALUNO.FICHA.TRAINER_NOTES' | translate }}</span>
           <p class="scard-obs">{{ f.observacoes }}</p>
         </p-card>
 
         <p-card styleClass="repz-card scard">
-          <span class="scard-label">Validade da ficha</span>
+          <span class="scard-label">{{ 'ALUNO.FICHA.VALIDITY' | translate }}</span>
           <div class="scard-rows mt">
             <div class="kv">
-              <span class="text-3">Iniciada em</span><span>{{ f.criadaEm }}</span>
+              <span class="text-3">{{ 'ALUNO.FICHA.STARTED_AT' | translate }}</span><span>{{ f.criadaEm }}</span>
             </div>
             <div class="kv">
-              <span class="text-3">Vence em</span><span>{{ f.validadeAte }}</span>
+              <span class="text-3">{{ 'ALUNO.FICHA.EXPIRES_AT' | translate }}</span><span>{{ f.validadeAte }}</span>
             </div>
           </div>
 
@@ -133,14 +133,14 @@
             <div class="sol-status" *ngIf="solicitacaoPendente()">
               <i class="pi pi-clock"></i>
               <div>
-                <div class="sol-status-label">Solicitação enviada</div>
+                <div class="sol-status-label">{{ 'ALUNO.FICHA.REQUEST_SENT' | translate }}</div>
                 <div class="sol-status-data">{{ solicitacaoPendente()!.criadaEm }}</div>
               </div>
             </div>
 
             <div class="sol-btn-wrap" *ngIf="!solicitacaoPendente()">
               <p-button
-                label="Solicitar nova ficha"
+                [label]="'ALUNO.FICHA.REQUEST_NEW' | translate"
                 icon="pi pi-envelope"
                 styleClass="repz-ghost w-full"
                 (onClick)="abrirDialogSolicitacao()"
@@ -155,8 +155,8 @@
   <p-card styleClass="repz-card historico" *ngIf="historicoAberto()">
     <div class="hist-head">
       <div>
-        <div class="font-semibold">Fichas anteriores</div>
-        <div class="text-3 text-sm">{{ historico().length }} ficha(s) encerrada(s)</div>
+        <div class="font-semibold">{{ 'ALUNO.FICHA.PREVIOUS' | translate }}</div>
+        <div class="text-3 text-sm">{{ 'ALUNO.FICHA.N_CLOSED' | translate: { n: historico().length } }}</div>
       </div>
       <p-button
         icon="pi pi-times"
@@ -165,11 +165,11 @@
         [rounded]="true"
         styleClass="repz-icon-button"
         (onClick)="toggleHistorico()"
-        ariaLabel="Fechar histórico"
+        [ariaLabel]="'ALUNO.FICHA.CLOSE_HISTORY' | translate"
       />
     </div>
     <div class="empty-message text-3 text-sm" *ngIf="historico().length === 0">
-      Nenhuma ficha anterior registrada.
+      {{ 'ALUNO.FICHA.NO_PREVIOUS' | translate }}
     </div>
     <p-table
       *ngIf="historico().length > 0"
@@ -179,9 +179,9 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Ficha</th>
-          <th>Objetivo</th>
-          <th>Período</th>
+          <th>{{ 'ALUNO.FICHA.SHEET_COL' | translate }}</th>
+          <th>{{ 'PROFILE.GOAL' | translate }}</th>
+          <th>{{ 'ALUNO.FICHA.PERIOD' | translate }}</th>
           <th></th>
         </tr>
       </ng-template>
@@ -194,7 +194,7 @@
           <td class="text-3">{{ h.criadaEm }} — {{ h.encerradaEm }}</td>
           <td class="td-action">
             <p-button
-              label="Ver"
+              [label]="'COMMON.VIEW' | translate"
               icon="pi pi-eye"
               size="small"
               severity="secondary"
@@ -208,7 +208,7 @@
   </p-card>
 
 <p-dialog
-  header="Solicitar nova ficha"
+  [header]="'ALUNO.FICHA.REQUEST_NEW' | translate"
   [visible]="dialogAberto()"
   (visibleChange)="$event ? null : fecharDialog()"
   [modal]="true"
@@ -219,16 +219,16 @@
 >
   <div class="sol-form">
     <p class="sol-intro">
-      Seu personal receberá uma notificação e poderá preparar uma nova ficha para você.
+      {{ 'ALUNO.FICHA.REQUEST_INTRO' | translate }}
     </p>
 
     <label class="sol-field">
-      <span>Mensagem para o personal <em>(opcional)</em></span>
+      <span>{{ 'ALUNO.FICHA.REQUEST_MSG_LABEL' | translate }} <em>{{ 'COMMON.OPTIONAL' | translate }}</em></span>
       <textarea
         pTextarea
         rows="4"
         [autoResize]="false"
-        placeholder="Ex: quero foco em hipertrofia de membros inferiores…"
+        [placeholder]="'ALUNO.FICHA.REQUEST_MSG_PLACEHOLDER' | translate"
         [ngModel]="mensagemSolicitacao()"
         (ngModelChange)="mensagemSolicitacao.set($event)"
         maxlength="500"
@@ -247,14 +247,14 @@
 
   <ng-template pTemplate="footer">
     <p-button
-      label="Cancelar"
+      [label]="'COMMON.CANCEL' | translate"
       severity="secondary"
       styleClass="repz-ghost"
       (onClick)="fecharDialog()"
       [disabled]="enviando()"
     />
     <p-button
-      label="Enviar solicitação"
+      [label]="'ALUNO.FICHA.REQUEST_SEND' | translate"
       icon="pi pi-send"
       styleClass="repz-primary"
       (onClick)="enviarSolicitacao()"

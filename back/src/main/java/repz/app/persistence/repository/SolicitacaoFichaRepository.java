@@ -9,8 +9,6 @@ import java.util.Optional;
 
 public interface SolicitacaoFichaRepository extends JpaRepository<SolicitacaoFicha, Long> {
 
-    List<SolicitacaoFicha> findByAluno_IdOrderByCriadaEmDesc(Long alunoId);
-
     List<SolicitacaoFicha> findByPersonal_IdOrderByCriadaEmDesc(Long personalId);
 
     List<SolicitacaoFicha> findByPersonal_IdAndStatusOrderByCriadaEmDesc(Long personalId, SolicitacaoFichaStatus status);

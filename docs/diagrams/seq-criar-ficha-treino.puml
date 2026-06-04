@@ -1,0 +1,35 @@
+@startuml seq-criar-ficha-treino
+' Diagrama de Sequência — Personal cria e atribui ficha de treino a um aluno
+title REPZ — Sequência: Criar e Atribuir Ficha de Treino
+
+actor Personal
+participant "Frontend\n(FichaTreinoService)" as FE
+participant "TreinoController" as TC
+participant "SecurityFilter" as SF
+participant "TreinoService" as TS
+participant "TreinoRepository" as TR
+database "PostgreSQL" as DB
+
+Personal -> FE : preenche ficha (nome, divisão, exercícios) e aluno
+FE -> TC : POST /api/treinos (Bearer JWT)
+TC -> SF : valida token + perfil (PERSONAL)
+SF -> SF : decodeToken + checa blacklist (jti)
+SF --> TC : autenticado (role=PERSONAL)
+
+TC -> TS : criar(request, auth)
+TS -> TS : valida que o aluno está vinculado ao personal
+alt aluno não pertence ao personal
+    TS --> TC : lança exceção de acesso
+    TC --> FE : 403 Forbidden
+else aluno válido
+    TS -> TR : desativa ficha ativa anterior do aluno (se houver)
+    TR -> DB : UPDATE treino SET ativo=false
+    TS -> TR : save(novoTreino + exercicios)
+    TR -> DB : INSERT treino, exercicio_treino
+    DB --> TR : ids gerados
+    TR --> TS : Treino persistido
+    TS --> TC : TreinoResponse
+    TC --> FE : 201 Created (TreinoResponse)
+    FE --> Personal : ficha criada e marcada como ativa
+end
+@enduml

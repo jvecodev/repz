@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '@core/services';
 import type { UserGetResponse, UserSelfUpdateRequest } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { AvatarUpload } from '@shared/avatar-upload';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -18,6 +19,7 @@ import { TagModule } from 'primeng/tag';
     CommonModule,
     FormsModule,
     AppShell,
+    AvatarUpload,
     ButtonModule,
     CardModule,
     InputTextModule,

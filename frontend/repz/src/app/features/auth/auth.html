@@ -3,14 +3,24 @@
 
     <div class="auth-topbar">
       <p-button
+        [label]="language.idioma() === 'pt-BR' ? 'EN' : 'PT'"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        styleClass="repz-icon-button"
+        (onClick)="language.alternar()"
+        [title]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
+        [ariaLabel]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
+      />
+      <p-button
         [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
         severity="secondary"
         [text]="true"
         [rounded]="true"
         styleClass="repz-icon-button"
         (onClick)="theme.toggleTema()"
-        [title]="theme.tema() === 'dark' ? 'Modo claro' : 'Modo escuro'"
-        [ariaLabel]="theme.tema() === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
+        [title]="(theme.tema() === 'dark' ? 'THEME.TO_LIGHT' : 'THEME.TO_DARK') | translate"
+        [ariaLabel]="(theme.tema() === 'dark' ? 'THEME.ARIA_TO_LIGHT' : 'THEME.ARIA_TO_DARK') | translate"
       />
     </div>
 
@@ -24,30 +34,30 @@
           </div>
 
           <div class="auth-titles">
-            <h1 class="auth-title">Entrar</h1>
-            <p class="auth-sub">Acesse sua conta para ver sua ficha de treino.</p>
+            <h1 class="auth-title">{{ 'AUTH.LOGIN.TITLE' | translate }}</h1>
+            <p class="auth-sub">{{ 'AUTH.LOGIN.SUBTITLE' | translate }}</p>
           </div>
 
           <div class="field" [class.field--invalid]="lEmail.invalid && lEmail.touched">
-            <label class="field__label" for="email">E-mail</label>
+            <label class="field__label" for="email">{{ 'AUTH.FIELDS.EMAIL' | translate }}</label>
             <input
               pInputText
               id="email"
               type="email"
               autocomplete="username"
               formControlName="email"
-              placeholder="voce@email.com"
+              [placeholder]="'AUTH.FIELDS.EMAIL_PLACEHOLDER' | translate"
               [class.p-invalid]="lEmail.invalid && lEmail.touched"
             />
             @if (lEmail.touched && lEmail.errors?.['required']) {
-              <small class="field__error">E-mail obrigatório.</small>
+              <small class="field__error">{{ 'VALIDATION.EMAIL_REQUIRED' | translate }}</small>
             } @else if (lEmail.touched && lEmail.errors?.['email']) {
-              <small class="field__error">Formato de e-mail inválido.</small>
+              <small class="field__error">{{ 'VALIDATION.EMAIL_INVALID' | translate }}</small>
             }
           </div>
 
           <div class="field" [class.field--invalid]="lPassword.invalid && lPassword.touched">
-            <label class="field__label" for="password">Senha</label>
+            <label class="field__label" for="password">{{ 'AUTH.FIELDS.PASSWORD' | translate }}</label>
             <input
               pInputText
               id="password"
@@ -58,9 +68,9 @@
               [class.p-invalid]="lPassword.invalid && lPassword.touched"
             />
             @if (lPassword.touched && lPassword.errors?.['required']) {
-              <small class="field__error">Senha obrigatória.</small>
+              <small class="field__error">{{ 'VALIDATION.PASSWORD_REQUIRED' | translate }}</small>
             } @else if (lPassword.touched && lPassword.errors?.['minlength']) {
-              <small class="field__error">Mínimo de 5 caracteres.</small>
+              <small class="field__error">{{ 'VALIDATION.PASSWORD_MIN' | translate }}</small>
             }
           </div>
 
@@ -74,7 +84,7 @@
 
           <p-button
             type="submit"
-            label="Entrar"
+            [label]="'AUTH.LOGIN.SUBMIT' | translate"
             icon="pi pi-sign-in"
             [loading]="carregando()"
             [disabled]="carregando()"
@@ -82,7 +92,7 @@
           />
 
           <button type="button" class="auth-link" (click)="irParaEsqueci()">
-            Esqueci minha senha
+            {{ 'AUTH.LOGIN.FORGOT' | translate }}
           </button>
         </form>
       }
@@ -95,25 +105,25 @@
           </div>
 
           <div class="auth-titles">
-            <h1 class="auth-title">Recuperar senha</h1>
-            <p class="auth-sub">Informe seu e-mail e enviaremos um código de redefinição.</p>
+            <h1 class="auth-title">{{ 'AUTH.FORGOT.TITLE' | translate }}</h1>
+            <p class="auth-sub">{{ 'AUTH.FORGOT.SUBTITLE' | translate }}</p>
           </div>
 
           <div class="field" [class.field--invalid]="eEmail.invalid && eEmail.touched">
-            <label class="field__label" for="esqueci-email">E-mail</label>
+            <label class="field__label" for="esqueci-email">{{ 'AUTH.FIELDS.EMAIL' | translate }}</label>
             <input
               pInputText
               id="esqueci-email"
               type="email"
               autocomplete="username"
               formControlName="email"
-              placeholder="voce@email.com"
+              [placeholder]="'AUTH.FIELDS.EMAIL_PLACEHOLDER' | translate"
               [class.p-invalid]="eEmail.invalid && eEmail.touched"
             />
             @if (eEmail.touched && eEmail.errors?.['required']) {
-              <small class="field__error">E-mail obrigatório.</small>
+              <small class="field__error">{{ 'VALIDATION.EMAIL_REQUIRED' | translate }}</small>
             } @else if (eEmail.touched && eEmail.errors?.['email']) {
-              <small class="field__error">Formato de e-mail inválido.</small>
+              <small class="field__error">{{ 'VALIDATION.EMAIL_INVALID' | translate }}</small>
             }
           </div>
 
@@ -123,7 +133,7 @@
 
           <p-button
             type="submit"
-            label="Enviar código"
+            [label]="'AUTH.FORGOT.SUBMIT' | translate"
             icon="pi pi-send"
             [loading]="carregando()"
             [disabled]="carregando()"
@@ -131,7 +141,7 @@
           />
 
           <button type="button" class="auth-link" (click)="irParaLogin()">
-            ← Voltar para o login
+            {{ 'AUTH.FORGOT.BACK' | translate }}
           </button>
         </form>
       }
@@ -144,8 +154,8 @@
           </div>
 
           <div class="auth-titles">
-            <h1 class="auth-title">Nova senha</h1>
-            <p class="auth-sub">Insira o código recebido por e-mail e defina sua nova senha.</p>
+            <h1 class="auth-title">{{ 'AUTH.RESET.TITLE' | translate }}</h1>
+            <p class="auth-sub">{{ 'AUTH.RESET.SUBTITLE' | translate }}</p>
           </div>
 
           @if (sucesso()) {
@@ -153,23 +163,23 @@
           }
 
           <div class="field" [class.field--invalid]="rToken.invalid && rToken.touched">
-            <label class="field__label" for="token">Código de verificação</label>
+            <label class="field__label" for="token">{{ 'AUTH.RESET.TOKEN_LABEL' | translate }}</label>
             <input
               pInputText
               id="token"
               type="text"
               autocomplete="one-time-code"
               formControlName="token"
-              placeholder="Cole o código aqui"
+              [placeholder]="'AUTH.RESET.TOKEN_PLACEHOLDER' | translate"
               [class.p-invalid]="rToken.invalid && rToken.touched"
             />
             @if (rToken.touched && rToken.errors?.['required']) {
-              <small class="field__error">Código obrigatório.</small>
+              <small class="field__error">{{ 'VALIDATION.TOKEN_REQUIRED' | translate }}</small>
             }
           </div>
 
           <div class="field" [class.field--invalid]="rNewPassword.invalid && rNewPassword.touched">
-            <label class="field__label" for="new-password">Nova senha</label>
+            <label class="field__label" for="new-password">{{ 'AUTH.RESET.NEW_PASSWORD_LABEL' | translate }}</label>
             <input
               pInputText
               id="new-password"
@@ -180,9 +190,9 @@
               [class.p-invalid]="rNewPassword.invalid && rNewPassword.touched"
             />
             @if (rNewPassword.touched && rNewPassword.errors?.['required']) {
-              <small class="field__error">Nova senha obrigatória.</small>
+              <small class="field__error">{{ 'VALIDATION.NEW_PASSWORD_REQUIRED' | translate }}</small>
             } @else if (rNewPassword.touched && rNewPassword.errors?.['minlength']) {
-              <small class="field__error">Mínimo de 5 caracteres.</small>
+              <small class="field__error">{{ 'VALIDATION.PASSWORD_MIN' | translate }}</small>
             }
           </div>
 
@@ -193,7 +203,7 @@
               (redefinirForm.errors?.['senhasDiferentes'] && rConfirmar.touched)
             "
           >
-            <label class="field__label" for="confirmar-senha">Confirmar nova senha</label>
+            <label class="field__label" for="confirmar-senha">{{ 'AUTH.RESET.CONFIRM_LABEL' | translate }}</label>
             <input
               pInputText
               id="confirmar-senha"
@@ -207,9 +217,9 @@
               "
             />
             @if (rConfirmar.touched && rConfirmar.errors?.['required']) {
-              <small class="field__error">Confirmação obrigatória.</small>
+              <small class="field__error">{{ 'VALIDATION.CONFIRM_REQUIRED' | translate }}</small>
             } @else if (redefinirForm.errors?.['senhasDiferentes'] && rConfirmar.touched) {
-              <small class="field__error">As senhas não coincidem.</small>
+              <small class="field__error">{{ 'VALIDATION.PASSWORD_MISMATCH' | translate }}</small>
             }
           </div>
 
@@ -219,7 +229,7 @@
 
           <p-button
             type="submit"
-            label="Redefinir senha"
+            [label]="'AUTH.RESET.SUBMIT' | translate"
             icon="pi pi-check"
             [loading]="carregando()"
             [disabled]="carregando()"
@@ -227,7 +237,7 @@
           />
 
           <button type="button" class="auth-link" (click)="irParaLogin()">
-            ← Voltar para o login
+            {{ 'AUTH.RESET.BACK' | translate }}
           </button>
         </form>
       }

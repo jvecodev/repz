@@ -1,5 +1,6 @@
 export { AuthService } from './auth';
 export type { SessaoUsuario } from './auth';
+export { FileService } from './file';
 export { LayoutService } from './layout';
 export { ThemeService } from './theme';
 export type { Tema } from './theme';
@@ -29,6 +30,7 @@ export type {
   FrequenciaResponse,
   FrequenciaCreateRequest,
   AlunoInativoResponse,
+  FrequenciaRelatorioResponse,
 } from './frequencia';
 export { AlunoService } from './aluno';
 export type { AlunoDetalheResponse, AlunoMeUpdateRequest, AlunoUpdateRequest } from './aluno';

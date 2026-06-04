@@ -91,9 +91,7 @@
 
     <div class="perfil-info-col">
       <p-card styleClass="repz-card avatar-card">
-        <div class="avatar avatar-xl">
-          {{ (perfil()?.name ?? 'G').charAt(0).toUpperCase() }}
-        </div>
+        <app-avatar-upload [iniciais]="(perfil()?.name ?? 'G').charAt(0).toUpperCase()" tamanho="xl" />
         <div class="avatar-name">{{ perfil()?.name }}</div>
         <p-tag styleClass="repz-tag-success" value="Gerente" />
       </p-card>

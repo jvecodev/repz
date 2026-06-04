@@ -7,40 +7,42 @@ import { AuthService } from '@core/services/auth';
 import { LayoutService } from '@core/services/layout';
 import { PersonalService } from '@core/services/personal';
 import { ButtonModule } from 'primeng/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface NavItem {
   key: string;
-  label: string;
+  /** Chave de tradução do rótulo (ex.: NAV.DASHBOARD). */
+  labelKey: string;
   link: string;
   queryParams?: Record<string, string>;
 }
 
 const NAV_ALUNO: NavItem[] = [
-  { key: 'dashboard', label: 'Dashboard', link: '/aluno' },
-  { key: 'treino', label: 'Meu treino', link: '/aluno/ficha-treino' },
-  { key: 'frequencia', label: 'Frequência', link: '/aluno/frequencia' },
-  { key: 'evolucao', label: 'Evolução', link: '/aluno/evolucao' },
+  { key: 'dashboard', labelKey: 'NAV.DASHBOARD', link: '/aluno' },
+  { key: 'treino', labelKey: 'NAV.MY_WORKOUT', link: '/aluno/ficha-treino' },
+  { key: 'frequencia', labelKey: 'NAV.ATTENDANCE', link: '/aluno/frequencia' },
+  { key: 'evolucao', labelKey: 'NAV.EVOLUTION', link: '/aluno/evolucao' },
 ];
 
 const NAV_PERSONAL: NavItem[] = [
-  { key: 'dashboard', label: 'Painel', link: '/personal' },
-  { key: 'alunos', label: 'Meus alunos', link: '/personal/alunos' },
-  { key: 'fichas', label: 'Fichas', link: '/personal/alunos', queryParams: { foco: 'ficha' } },
-  { key: 'avaliacoes', label: 'Avaliações', link: '/personal/alunos', queryParams: { foco: 'avaliacao' } },
+  { key: 'dashboard', labelKey: 'NAV.PANEL', link: '/personal' },
+  { key: 'alunos', labelKey: 'NAV.MY_STUDENTS', link: '/personal/alunos' },
+  { key: 'fichas', labelKey: 'NAV.WORKOUTS', link: '/personal/alunos', queryParams: { foco: 'ficha' } },
+  { key: 'avaliacoes', labelKey: 'NAV.ASSESSMENTS', link: '/personal/alunos', queryParams: { foco: 'avaliacao' } },
 ];
 
 const NAV_ADMIN: NavItem[] = [
-  { key: 'dashboard', label: 'Dashboard', link: '/admin' },
-  { key: 'academias', label: 'Academias', link: '/admin/academias' },
-  { key: 'usuarios', label: 'Usuários', link: '/admin/usuarios' },
+  { key: 'dashboard', labelKey: 'NAV.DASHBOARD', link: '/admin' },
+  { key: 'academias', labelKey: 'NAV.GYMS', link: '/admin/academias' },
+  { key: 'usuarios', labelKey: 'NAV.USERS', link: '/admin/usuarios' },
 ];
 
 const NAV_GERENTE: NavItem[] = [
-  { key: 'dashboard', label: 'Painel', link: '/academia' },
-  { key: 'alunos', label: 'Alunos', link: '/academia/alunos' },
-  { key: 'personais', label: 'Personais', link: '/academia/personais' },
-  { key: 'planos', label: 'Planos', link: '/academia/planos' },
-  { key: 'relatorios', label: 'Relatórios', link: '/academia/relatorios' },
+  { key: 'dashboard', labelKey: 'NAV.PANEL', link: '/academia' },
+  { key: 'alunos', labelKey: 'NAV.STUDENTS', link: '/academia/alunos' },
+  { key: 'personais', labelKey: 'NAV.TRAINERS', link: '/academia/personais' },
+  { key: 'planos', labelKey: 'NAV.PLANS', link: '/academia/planos' },
+  { key: 'relatorios', labelKey: 'NAV.REPORTS', link: '/academia/relatorios' },
 ];
 
 const PERFIL_LINK_BY_ROLE: Record<string, string> = {
@@ -53,7 +55,7 @@ const PERFIL_LINK_BY_ROLE: Record<string, string> = {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, ButtonModule],
+  imports: [RouterLink, ButtonModule, TranslatePipe],
   templateUrl: './app-sidebar.html',
   styleUrl: './app-sidebar.scss',
   host: { '[class.is-collapsed]': 'layout.colapsada()' },
@@ -76,9 +78,9 @@ export class AppSidebar implements OnInit {
 
   readonly ativo = input<string>('');
 
-  readonly ctaTitulo = input<string>('Bora treinar!');
-  readonly ctaDescricao = input<string>('Registre sua presença e mantenha a sequência.');
-  readonly ctaLabel = input<string>('Fazer check-in');
+  readonly ctaTitulo = input<string>('SIDEBAR.CTA_TITLE');
+  readonly ctaDescricao = input<string>('SIDEBAR.CTA_DESC');
+  readonly ctaLabel = input<string>('SIDEBAR.CTA_LABEL');
   readonly mostrarCta = input<boolean>(true);
 
   readonly ctaClick = output<void>();

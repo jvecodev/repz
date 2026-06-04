@@ -26,9 +26,9 @@ export class AppShell {
   readonly ativo = input<string>('');
   readonly crumbs = input<string[]>([]);
 
-  readonly ctaTitulo = input<string>('Bora treinar!');
-  readonly ctaDescricao = input<string>('Registre sua presença e mantenha a sequência.');
-  readonly ctaLabel = input<string>('Fazer check-in');
+  readonly ctaTitulo = input<string>('SIDEBAR.CTA_TITLE');
+  readonly ctaDescricao = input<string>('SIDEBAR.CTA_DESC');
+  readonly ctaLabel = input<string>('SIDEBAR.CTA_LABEL');
   readonly mostrarCta = input<boolean>(true);
 
   readonly ctaClick = output<void>();

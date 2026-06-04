@@ -23,4 +23,10 @@ public class FrequenciaRelatorioResponse {
     private Long totalFrequencias;
 
     private Map<String, Long> frequenciaPorAluno;
+
+    @Schema(description = "Check-ins por hora do dia (chave: \"0\"–\"23\")")
+    private Map<String, Long> ocupacaoPorHora;
+
+    @Schema(description = "Check-ins por mês em ordem cronológica (chave: \"yyyy-MM\")")
+    private Map<String, Long> frequenciaPorMes;
 }

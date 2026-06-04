@@ -1,14 +1,14 @@
 <app-shell
   ativo="perfil"
-  [crumbs]="['Aluno', 'Perfil']"
+  [crumbs]="[('ROLES.STUDENT' | translate), ('PROFILE.TITLE' | translate)]"
   [nome]="aluno()?.nome ?? 'Aluno'"
-  subtitulo="Área do aluno"
+  [subtitulo]="'ALUNO.AREA' | translate"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Meu perfil</div>
-      <div class="page-subtitle">Visualize e edite suas informações pessoais.</div>
+      <div class="page-title">{{ 'PROFILE.TITLE' | translate }}</div>
+      <div class="page-subtitle">{{ 'PROFILE.SUBTITLE' | translate }}</div>
     </div>
   </div>
 
@@ -28,22 +28,22 @@
     <!-- Coluna esquerda: formulário -->
     <div class="perfil-form-col">
       <p-card styleClass="repz-card">
-        <div class="card-title">Editar informações</div>
+        <div class="card-title">{{ 'PROFILE.EDIT_INFO' | translate }}</div>
 
         <div class="form-group">
-          <label class="form-label" for="nome">Nome</label>
+          <label class="form-label" for="nome">{{ 'PROFILE.NAME' | translate }}</label>
           <input
             id="nome"
             pInputText
             [(ngModel)]="formNome"
             [disabled]="!editando()"
-            placeholder="Seu nome completo"
+            [placeholder]="'PROFILE.NAME_PLACEHOLDER' | translate"
             class="w-full"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="telefone">Telefone</label>
+          <label class="form-label" for="telefone">{{ 'PROFILE.PHONE' | translate }}</label>
           <input
             id="telefone"
             pInputText
@@ -56,28 +56,28 @@
 
         <ng-container *ngIf="editando()">
           <div class="form-divider"></div>
-          <div class="form-section-label">Alterar senha (opcional)</div>
+          <div class="form-section-label">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</div>
 
           <div class="form-group">
-            <label class="form-label" for="senha">Nova senha</label>
+            <label class="form-label" for="senha">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
             <input
               id="senha"
               pInputText
               type="password"
               [(ngModel)]="novaSenha"
-              placeholder="Deixe em branco para manter"
+              [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate"
               class="w-full"
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="confirmar">Confirmar nova senha</label>
+            <label class="form-label" for="confirmar">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
             <input
               id="confirmar"
               pInputText
               type="password"
               [(ngModel)]="confirmarSenha"
-              placeholder="Repita a nova senha"
+              [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate"
               class="w-full"
             />
           </div>
@@ -93,7 +93,7 @@
         <div class="form-actions">
           <ng-container *ngIf="!editando()">
             <p-button
-              label="Editar"
+              [label]="'COMMON.EDIT' | translate"
               icon="pi pi-pencil"
               styleClass="repz-primary"
               (onClick)="abrirEdicao()"
@@ -101,13 +101,13 @@
           </ng-container>
           <ng-container *ngIf="editando()">
             <p-button
-              label="Cancelar"
+              [label]="'COMMON.CANCEL' | translate"
               styleClass="repz-ghost"
               (onClick)="cancelarEdicao()"
               [disabled]="salvando()"
             />
             <p-button
-              label="Salvar"
+              [label]="'COMMON.SAVE' | translate"
               icon="pi pi-check"
               styleClass="repz-primary"
               [loading]="salvando()"
@@ -121,39 +121,39 @@
     <!-- Coluna direita: avatar + dados de matrícula -->
     <div class="perfil-info-col">
       <p-card styleClass="repz-card avatar-card">
-        <div class="avatar avatar-xl">{{ inicial() }}</div>
+        <app-avatar-upload [iniciais]="inicial()" tamanho="xl" />
         <div class="avatar-name">{{ aluno()?.nome }}</div>
         <p-tag
           [styleClass]="aluno()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
-          [value]="aluno()?.ativo ? 'Ativo' : 'Inativo'"
+          [value]="(aluno()?.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
         />
       </p-card>
 
       <p-card styleClass="repz-card">
-        <div class="card-title">Informações</div>
+        <div class="card-title">{{ 'PROFILE.INFO' | translate }}</div>
 
         <div class="info-row">
-          <span class="info-label">E-mail</span>
+          <span class="info-label">{{ 'PROFILE.EMAIL' | translate }}</span>
           <span class="info-value">{{ aluno()?.email || emailSessao() }}</span>
         </div>
         <div class="info-row" *ngIf="aluno()?.academiaNome">
-          <span class="info-label">Academia</span>
+          <span class="info-label">{{ 'PROFILE.GYM' | translate }}</span>
           <span class="info-value">{{ aluno()?.academiaNome }}</span>
         </div>
         <div class="info-row" *ngIf="aluno()?.planoNome">
-          <span class="info-label">Plano</span>
+          <span class="info-label">{{ 'PROFILE.PLAN' | translate }}</span>
           <span class="info-value">{{ aluno()?.planoNome }}</span>
         </div>
         <div class="info-row" *ngIf="aluno()?.personalNome">
-          <span class="info-label">Personal</span>
+          <span class="info-label">{{ 'PROFILE.TRAINER' | translate }}</span>
           <span class="info-value">{{ aluno()?.personalNome }}</span>
         </div>
         <div class="info-row" *ngIf="aluno()?.objetivo">
-          <span class="info-label">Objetivo</span>
+          <span class="info-label">{{ 'PROFILE.GOAL' | translate }}</span>
           <span class="info-value">{{ aluno()?.objetivo }}</span>
         </div>
         <div class="info-row" *ngIf="aluno()?.telefone">
-          <span class="info-label">Telefone</span>
+          <span class="info-label">{{ 'PROFILE.PHONE' | translate }}</span>
           <span class="info-value">{{ aluno()?.telefone }}</span>
         </div>
       </p-card>

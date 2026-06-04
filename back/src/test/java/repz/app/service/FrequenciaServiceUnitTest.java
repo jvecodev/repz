@@ -144,12 +144,17 @@ class FrequenciaServiceUnitTest {
 
         when(userRepository.findByEmail(academiaUser.getEmail())).thenReturn(Optional.of(academiaUser));
         when(academiaContextService.resolveRequired(auth(academiaUser), academia.getId())).thenReturn(academia.getId());
+        // frequenciaPorAluno vem da stored procedure; total/hora/mês vêm dos check-ins do período.
         when(frequenciaRepository.relatorioFrequencia(academia.getId(), inicio, fim))
                 .thenReturn(List.<Object[]>of(new Object[]{aluno.getName(), 1L}));
+        when(frequenciaRepository.findByAcademiaIdAndPeriodo(academia.getId(), inicio, fim))
+                .thenReturn(List.of(frequencia(1L, aluno, academia, null, fim)));
 
         FrequenciaRelatorioResponse response = service.obterRelatorio(academia.getId(), inicio, fim, auth(academiaUser));
 
         assertThat(response.getTotalFrequencias()).isEqualTo(1);
+        assertThat(response.getFrequenciaPorAluno()).containsEntry(aluno.getName(), 1L);
+        assertThat(response.getOcupacaoPorHora()).containsEntry(String.valueOf(fim.getHour()), 1L);
 
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
         assertThrows(RuntimeException.class, () -> service.obterRelatorio(academia.getId(), inicio, fim, auth(aluno)));

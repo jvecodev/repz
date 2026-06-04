@@ -11,6 +11,8 @@ import {
 } from '@core/services';
 import type { AvaliacaoFisicaResponse, TreinoResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { LanguageService } from '@core/services/language.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
@@ -37,6 +39,7 @@ function parseBR(s: string): Date {
     CommonModule,
     RouterLink,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     MessageModule,
@@ -52,6 +55,8 @@ export class Aluno implements OnInit {
   private readonly avaliacaoService = inject(AvaliacaoFisicaService);
   private readonly auth = inject(AuthService);
   protected readonly freq = inject(FrequenciaService);
+  private readonly i18n = inject(TranslateService);
+  private readonly language = inject(LanguageService);
 
   readonly carregando = signal(true);
   readonly fazendoCheckin = signal(false);
@@ -91,10 +96,11 @@ export class Aluno implements OnInit {
 
   readonly ultimoCheckinTexto = computed(() => {
     const d = this.ultimoCheckin();
-    if (!d) return 'Nenhum check-in ainda';
-    const data = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    return `${data} às ${hora}`;
+    if (!d) return this.i18n.instant('ALUNO.DASH.NO_CHECKIN_YET');
+    const locale = this.language.idioma();
+    const data = d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const hora = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+    return `${data} ${this.i18n.instant('ALUNO.DASH.AT')} ${hora}`;
   });
 
   ngOnInit(): void {
@@ -138,7 +144,7 @@ export class Aluno implements OnInit {
       next: () => {
         this.fazendoCheckin.set(false);
         this.avisoCheckinSeverity.set('success');
-        this.avisoCheckin.set('Check-in registrado com sucesso!');
+        this.avisoCheckin.set(this.i18n.instant('ALUNO.FREQ.CHECKIN_SUCCESS'));
         this.totalMes.update((v) => v + 1);
         this.totalGeral.update((v) => v + 1);
         this.ultimoCheckin.set(new Date());
@@ -147,7 +153,7 @@ export class Aluno implements OnInit {
       error: (err) => {
         this.fazendoCheckin.set(false);
         this.avisoCheckinSeverity.set('error');
-        this.avisoCheckin.set(err?.error?.message ?? 'Não foi possível registrar o check-in.');
+        this.avisoCheckin.set(err?.error?.message ?? this.i18n.instant('ALUNO.FREQ.CHECKIN_ERROR'));
         setTimeout(() => this.avisoCheckin.set(null), 4000);
       },
     });
@@ -177,7 +183,7 @@ export class Aluno implements OnInit {
     segunda.setDate(hoje.getDate() - offsetSegunda);
     segunda.setHours(0, 0, 0, 0);
 
-    const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+    const labels = (this.i18n.instant('ALUNO.DASH.WEEKDAYS_MON') as string).split(',');
     const semana: DiaSemana[] = [];
     for (let i = 0; i < 7; i++) {
       const dia = new Date(segunda);

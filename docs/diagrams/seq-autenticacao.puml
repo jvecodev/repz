@@ -1,0 +1,47 @@
+@startuml seq-autenticacao
+' Diagrama de Sequência — Autenticação (login JWT) e renovação de token
+title REPZ — Sequência: Login e Refresh de Token (JWT)
+
+actor Usuário
+participant "Frontend\n(AuthService)" as FE
+participant "AuthController" as AC
+participant "AuthenticationManager" as AM
+participant "TokenService" as TS
+database "PostgreSQL\n(usuario)" as DB
+
+== Login ==
+Usuário -> FE : informa e-mail e senha
+FE -> AC : POST /api/auth/login
+AC -> AM : authenticate(email, senha)
+AM -> DB : findByEmail(email)
+DB --> AM : User (hash bcrypt)
+AM -> AM : valida senha (bcrypt)
+AM --> AC : Authentication (principal=User)
+AC -> TS : generateToken(user) + generateRefreshToken(user)
+TS --> AC : accessToken (60min) + refreshToken (7d)
+AC --> FE : 200 { token, refreshToken }
+FE -> FE : salva tokens (localStorage) e decodifica perfil
+FE --> Usuário : redireciona para o dashboard do perfil
+
+== Requisição autenticada com token expirado ==
+FE -> AC : GET /api/... (Authorization: Bearer accessToken)
+AC --> FE : 401 Unauthorized (token expirado)
+FE -> AC : POST /api/auth/refresh (refreshToken)
+AC -> TS : validateRefreshToken(refreshToken)
+TS --> AC : email (ou null)
+AC -> DB : findByEmail(email)
+DB --> AC : User
+AC -> TS : generateToken + generateRefreshToken
+TS --> AC : novos tokens
+AC --> FE : 200 { token, refreshToken }
+FE -> AC : reenvia a requisição original com o novo token
+AC --> FE : 200 (resposta)
+
+== Logout ==
+Usuário -> FE : clica em sair
+FE -> AC : POST /api/auth/logout (Authorization: Bearer)
+AC -> TS : decodeToken(token) -> jti
+AC -> DB : salva jti em revoked_token (até expirar)
+AC --> FE : 204 No Content
+FE -> FE : limpa tokens do localStorage
+@enduml

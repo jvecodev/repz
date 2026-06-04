@@ -16,9 +16,6 @@ public interface SolicitacaoFichaService {
     /** Aluno cancela uma solicitação pendente própria. */
     SolicitacaoFichaResponse cancelar(Long id, Authentication auth);
 
-    /** Aluno consulta suas próprias solicitações. */
-    List<SolicitacaoFichaResponse> listarMinhas(Authentication auth);
-
     /** Aluno consulta se tem solicitação pendente (atalho). */
     SolicitacaoFichaResponse pendente(Authentication auth);
 

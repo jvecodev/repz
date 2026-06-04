@@ -3,31 +3,285 @@
     "SAVE": "Salvar",
     "CANCEL": "Cancelar",
     "EDIT": "Editar",
-    "DELETE": "Excluir"
-  },
-
-  "MENU": {
-    "HOME": "Início",
-    "USERS": "Usuários",
-    "SETTINGS": "Configurações",
-    "LOGOUT": "Sair"
-  },
-
-  "LOGIN": {
-    "TITLE": "Entrar",
-    "EMAIL": "E-mail",
-    "PASSWORD": "Senha",
-    "BUTTON": "Acessar"
+    "DELETE": "Excluir",
+    "BACK": "Voltar",
+    "LOADING": "Carregando...",
+    "CONFIRM": "Confirmar",
+    "SEARCH": "Buscar",
+    "ACTIONS": "Ações",
+    "ACTIVE": "Ativo",
+    "INACTIVE": "Inativo",
+    "VIEW": "Ver",
+    "OPTIONAL": "(opcional)"
   },
 
   "VALIDATION": {
     "REQUIRED": "Campo obrigatório",
-    "INVALID_EMAIL": "E-mail inválido",
-    "MIN_LENGTH": "Quantidade mínima de caracteres inválida"
+    "EMAIL_REQUIRED": "E-mail obrigatório.",
+    "EMAIL_INVALID": "Formato de e-mail inválido.",
+    "PASSWORD_REQUIRED": "Senha obrigatória.",
+    "PASSWORD_MIN": "Mínimo de 5 caracteres.",
+    "TOKEN_REQUIRED": "Código obrigatório.",
+    "NEW_PASSWORD_REQUIRED": "Nova senha obrigatória.",
+    "CONFIRM_REQUIRED": "Confirmação obrigatória.",
+    "PASSWORD_MISMATCH": "As senhas não coincidem."
   },
 
-  "MESSAGES": {
-    "SUCCESS": "Operação realizada com sucesso",
-    "ERROR": "Erro ao processar operação"
+  "THEME": {
+    "TO_LIGHT": "Modo claro",
+    "TO_DARK": "Modo escuro",
+    "ARIA_TO_LIGHT": "Mudar para modo claro",
+    "ARIA_TO_DARK": "Mudar para modo escuro"
+  },
+
+  "LANG": {
+    "TO_EN": "Switch to English",
+    "TO_PT": "Mudar para português"
+  },
+
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "Entrar",
+      "SUBTITLE": "Acesse sua conta para ver sua ficha de treino.",
+      "SUBMIT": "Entrar",
+      "FORGOT": "Esqueci minha senha"
+    },
+    "FORGOT": {
+      "TITLE": "Recuperar senha",
+      "SUBTITLE": "Informe seu e-mail e enviaremos um código de redefinição.",
+      "SUBMIT": "Enviar código",
+      "BACK": "← Voltar para o login"
+    },
+    "RESET": {
+      "TITLE": "Nova senha",
+      "SUBTITLE": "Insira o código recebido por e-mail e defina sua nova senha.",
+      "TOKEN_LABEL": "Código de verificação",
+      "TOKEN_PLACEHOLDER": "Cole o código aqui",
+      "NEW_PASSWORD_LABEL": "Nova senha",
+      "CONFIRM_LABEL": "Confirmar nova senha",
+      "SUBMIT": "Redefinir senha",
+      "BACK": "← Voltar para o login"
+    },
+    "FIELDS": {
+      "EMAIL": "E-mail",
+      "EMAIL_PLACEHOLDER": "voce@email.com",
+      "PASSWORD": "Senha"
+    },
+    "MESSAGES": {
+      "INVALID_CREDENTIALS": "E-mail ou senha inválidos.",
+      "ACCESS_DENIED": "Acesso negado. Verifique suas permissões.",
+      "LOGIN_ERROR": "Não foi possível entrar. Tente novamente.",
+      "UNKNOWN_ROLE": "Perfil de usuário desconhecido. Contate o administrador.",
+      "RESET_SUCCESS": "Senha redefinida com sucesso! Faça login para continuar.",
+      "RESET_INVALID_CODE": "Código inválido ou expirado. Solicite um novo código.",
+      "RESET_ERROR": "Não foi possível redefinir a senha. Tente novamente.",
+      "CODE_SENT": "Código enviado para {{email}}. Verifique sua caixa de entrada."
+    }
+  },
+
+  "NAV": {
+    "SECTION_GENERAL": "Geral",
+    "DASHBOARD": "Dashboard",
+    "PANEL": "Painel",
+    "MY_WORKOUT": "Meu treino",
+    "ATTENDANCE": "Frequência",
+    "EVOLUTION": "Evolução",
+    "MY_STUDENTS": "Meus alunos",
+    "STUDENTS": "Alunos",
+    "WORKOUTS": "Fichas",
+    "ASSESSMENTS": "Avaliações",
+    "GYMS": "Academias",
+    "USERS": "Usuários",
+    "TRAINERS": "Personais",
+    "PLANS": "Planos",
+    "REPORTS": "Relatórios",
+    "PROFILE": "Perfil",
+    "LOGOUT": "Sair"
+  },
+
+  "SIDEBAR": {
+    "CTA_TITLE": "Bora treinar!",
+    "CTA_DESC": "Registre sua presença e mantenha a sequência.",
+    "CTA_LABEL": "Fazer check-in"
+  },
+
+  "AVATAR": {
+    "CHANGE": "Trocar foto",
+    "UPLOADING": "Enviando…",
+    "INVALID_TYPE": "Selecione um arquivo de imagem.",
+    "TOO_LARGE": "A imagem deve ter no máximo 5 MB.",
+    "UPLOAD_ERROR": "Não foi possível enviar a imagem."
+  },
+
+  "ROLES": {
+    "STUDENT": "Aluno",
+    "TRAINER": "Personal",
+    "ADMIN": "Admin",
+    "MANAGER": "Gerente"
+  },
+
+  "PROFILE": {
+    "TITLE": "Meu perfil",
+    "SUBTITLE": "Visualize e edite suas informações pessoais.",
+    "EDIT_INFO": "Editar informações",
+    "NAME": "Nome",
+    "NAME_PLACEHOLDER": "Seu nome completo",
+    "PHONE": "Telefone",
+    "CHANGE_PASSWORD": "Alterar senha (opcional)",
+    "NEW_PASSWORD": "Nova senha",
+    "NEW_PASSWORD_PLACEHOLDER": "Deixe em branco para manter",
+    "CONFIRM_PASSWORD": "Confirmar nova senha",
+    "CONFIRM_PLACEHOLDER": "Repita a nova senha",
+    "INFO": "Informações",
+    "EMAIL": "E-mail",
+    "GYM": "Academia",
+    "PLAN": "Plano",
+    "TRAINER": "Personal",
+    "GOAL": "Objetivo",
+    "LOAD_ERROR": "Não foi possível carregar seu perfil.",
+    "NAME_REQUIRED": "O nome é obrigatório.",
+    "PASSWORD_MIN": "A nova senha deve ter ao menos 5 caracteres.",
+    "SAVE_SUCCESS": "Perfil atualizado com sucesso!",
+    "SAVE_ERROR": "Erro ao salvar perfil."
+  },
+
+  "ALUNO": {
+    "AREA": "Área do aluno",
+    "DASH": {
+      "GREETING": "Olá, {{nome}}",
+      "WELCOME": "Bom te ver de volta. Continue firme no treino.",
+      "LAST_CHECKIN_LABEL": "Último check-in:",
+      "NO_CHECKIN_YET": "Nenhum check-in ainda",
+      "AT": "às",
+      "FREQ_MONTH": "Frequência do mês",
+      "DAYS": "dias",
+      "DELTA_MONTH": "+{{n}} vs. mês anterior",
+      "PRESENCES_MONTH": "presenças registradas no mês",
+      "TODAY_WORKOUT": "Treino de hoje",
+      "WORKOUT_DIV": "Treino {{div}}",
+      "NO_SHEET": "Sem ficha",
+      "N_EXERCISES": "{{n}} exercícios",
+      "NO_ACTIVE_SHEET": "nenhuma ficha ativa",
+      "CURRENT_WEIGHT": "Peso atual",
+      "KG_SINCE": "kg desde a última avaliação",
+      "LAST_ASSESSMENT": "última avaliação física",
+      "NO_ASSESSMENT": "sem avaliação registrada",
+      "ACTIVE_PLAN": "Plano ativo",
+      "ENROLLMENT_PLAN": "plano de matrícula",
+      "YOUR_WORKOUT_TODAY": "Seu treino de hoje",
+      "VIEW_FULL": "Ver completo",
+      "SETS": "séries",
+      "REPS": "reps",
+      "MORE_EXERCISES": "+{{n}} exercícios na ficha completa",
+      "NO_ACTIVE_SHEET_MSG": "Você ainda não tem uma ficha de treino ativa.",
+      "WEEK_FREQ": "Frequência da semana",
+      "PRESENCES_THIS_MONTH": "{{n}} presença(s) registrada(s) este mês",
+      "YOUR_TRAINER": "Seu personal:",
+      "WEEKDAYS_MON": "Seg,Ter,Qua,Qui,Sex,Sáb,Dom"
+    },
+    "FREQ": {
+      "TITLE": "Frequência",
+      "SUBTITLE": "Histórico de check-ins, sequência e calendário mensal.",
+      "CHECKIN": "Fazer check-in",
+      "CHECKIN_DONE": "Check-in já registrado",
+      "TOTAL": "Check-ins totais",
+      "SINCE_START": "desde o início",
+      "THIS_MONTH": "Este mês",
+      "PRESENCES_IN": "presenças em {{mes}}",
+      "STREAK": "Sequência atual",
+      "CONSECUTIVE_DAYS": "dias consecutivos",
+      "LAST_CHECKIN": "Último check-in",
+      "TODAY": "hoje",
+      "DAYS_AGO": "há {{dias}} dia(s)",
+      "NO_RECORDS": "sem registros",
+      "LEGEND_CHECKIN": "Check-in",
+      "LEGEND_TODAY": "Hoje",
+      "RECENT": "Histórico recente",
+      "LAST_N": "últimas {{n}} presenças",
+      "EMPTY_TITLE": "Nenhum check-in registrado",
+      "EMPTY_SUB": "Faça seu primeiro check-in no painel principal.",
+      "CHECKIN_SUCCESS": "Check-in registrado com sucesso!",
+      "CHECKIN_ERROR": "Não foi possível registrar o check-in.",
+      "LOAD_ERROR": "Não foi possível carregar seu histórico de frequência.",
+      "WEEKDAYS_SHORT": "Dom,Seg,Ter,Qua,Qui,Sex,Sáb"
+    },
+    "FICHA": {
+      "TITLE": "Meu treino",
+      "CREATED_BY": "Ficha criada por {{personal}} · atualizada em {{data}}",
+      "PREVIOUS": "Fichas anteriores",
+      "LOADING": "Carregando sua ficha de treino…",
+      "SETS_REPS_REST": "{{series}} séries × {{reps}} reps · descanso {{descanso}}",
+      "CURRENT_LOAD": "carga atual",
+      "SHEET": "Ficha de treino",
+      "ACTIVE_F": "Ativa",
+      "WORKOUTS_LABEL": "Treinos",
+      "N_DIVISIONS": "{{n}} divisões",
+      "EXERCISES_LABEL": "Exercícios",
+      "TRAINER_NOTES": "Observações do personal",
+      "VALIDITY": "Validade da ficha",
+      "STARTED_AT": "Iniciada em",
+      "EXPIRES_AT": "Vence em",
+      "REQUEST_SENT": "Solicitação enviada",
+      "REQUEST_NEW": "Solicitar nova ficha",
+      "N_CLOSED": "{{n}} ficha(s) encerrada(s)",
+      "CLOSE_HISTORY": "Fechar histórico",
+      "NO_PREVIOUS": "Nenhuma ficha anterior registrada.",
+      "SHEET_COL": "Ficha",
+      "PERIOD": "Período",
+      "REQUEST_INTRO": "Seu personal receberá uma notificação e poderá preparar uma nova ficha para você.",
+      "REQUEST_MSG_LABEL": "Mensagem para o personal",
+      "REQUEST_MSG_PLACEHOLDER": "Ex: quero foco em hipertrofia de membros inferiores…",
+      "REQUEST_SEND": "Enviar solicitação",
+      "NO_ACCESS": "Você não tem acesso a esta ficha (faça login como aluno).",
+      "LOAD_ERROR": "Não foi possível carregar sua ficha de treino.",
+      "REQUEST_ERROR": "Não foi possível enviar a solicitação.",
+      "DEFAULT_GOAL": "Treino"
+    }
+  },
+
+  "PERSONAL": {
+    "AREA": "Personal Trainer",
+    "FICHA": {
+      "EDIT_SHEET": "Editar ficha",
+      "STUDENT_LABEL": "Aluno:",
+      "SAVE_SHEET": "Salvar ficha",
+      "NEW_DIVISION": "Nova divisão",
+      "EXPIRES_TAG": "Vence {{data}}",
+      "REEDIT": "Reeditar",
+      "REMOVE_DIVISION": "Remover divisão",
+      "NO_EXERCISES": "Nenhum exercício cadastrado nesta divisão.",
+      "REEDIT_DIVISION": "Reeditar divisão",
+      "NEW_DIVISION_TITLE": "Nova divisão de treino",
+      "REPLACE_HINT": "(a divisão anterior será substituída ao salvar)",
+      "DIVISION_LABEL": "Divisão *",
+      "SELECT": "Selecione…",
+      "DIVISION_NAME_LABEL": "Nome da divisão *",
+      "DIVISION_NAME_PLACEHOLDER": "Ex: Treino A — Peito e Tríceps",
+      "OBJECTIVE_LABEL": "Objetivo",
+      "OBJECTIVE_PLACEHOLDER": "Ex: Hipertrofia muscular",
+      "VALID_UNTIL": "Válido até",
+      "GENERAL_NOTES": "Observações gerais",
+      "NOTES_PLACEHOLDER": "Ex: Aquecer 10 min na esteira antes…",
+      "N_ADDED_DRAG": "{{n}} adicionado(s) · arraste para reordenar",
+      "DRAG": "Arrastar",
+      "REMOVE": "Remover",
+      "ADD_EXERCISE": "Adicionar exercício",
+      "EX_NAME_LABEL": "Nome *",
+      "EX_NAME_PLACEHOLDER": "Ex: Supino reto",
+      "MUSCLE_GROUP": "Grupo muscular",
+      "MUSCLE_PLACEHOLDER": "Ex: Peito",
+      "SETS_LABEL": "Séries",
+      "REPS_LABEL": "Repetições",
+      "LOAD_LABEL": "Carga (kg)",
+      "REST_LABEL": "Descanso (s)",
+      "NOTE_LABEL": "Observação",
+      "NOTE_PLACEHOLDER": "Ex: Fase excêntrica em 3s",
+      "LOAD_ERROR": "Não foi possível carregar a ficha de treino.",
+      "DIVISION_REMOVED": "Divisão removida.",
+      "REMOVE_ERROR": "Erro ao remover divisão.",
+      "DIVISION_UPDATED": "Divisão {{div}} atualizada com sucesso!",
+      "DIVISION_CREATED": "Divisão {{div}} — \"{{nome}}\" criada com sucesso!",
+      "SAVE_ERROR": "Erro ao salvar divisão."
+    }
   }
 }

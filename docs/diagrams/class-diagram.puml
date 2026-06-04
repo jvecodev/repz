@@ -1,0 +1,117 @@
+@startuml class-diagram
+' Diagrama de Classes — domínio do REPZ
+' Renderize em https://www.plantuml.com/plantuml ou com a extensão PlantUML.
+title REPZ — Diagrama de Classes (Domínio)
+
+skinparam classAttributeIconSize 0
+hide circle
+
+enum UserRole {
+  ADMIN
+  GERENTE
+  PERSONAL
+  ALUNO
+}
+
+class User {
+  +Long id
+  +String name
+  +String email <<unique>>
+  +String password <<bcrypt>>
+  +UserRole role
+  +Boolean active
+}
+
+class Academia {
+  +Long id
+  +String razaoSocial
+  +String cnpj <<unique>>
+  +String telefone
+  +String endereco
+  +Boolean ativo
+}
+
+class Personal {
+  +Long id
+  +String especialidades
+  +String cref
+  +Boolean ativo
+}
+
+class Aluno {
+  +Long id
+  +LocalDate dataNascimento
+  +String telefone
+  +String objetivo
+  +LocalDate dataInicio
+}
+
+class Plano {
+  +Long id
+  +String nome
+  +Integer duracaoDias
+  +BigDecimal valor
+  +Boolean ativo
+}
+
+class Treino {
+  +Long id
+  +String nome
+  +String divisao
+  +String objetivo
+  +Boolean ativo
+}
+
+class ExercicioTreino {
+  +Long id
+  +String nomeExercicio
+  +String grupoMuscular
+  +Integer series
+  +String repeticoes
+  +BigDecimal cargaKg
+  +Integer descansoSeg
+  +Integer ordem
+  +String observacoes
+}
+
+class AvaliacaoFisica {
+  +Long id
+  +LocalDate dataAvaliacao
+  +BigDecimal pesoKg
+  +Integer alturaCm
+  +BigDecimal imc <<calculado>>
+  +BigDecimal percGordura
+  +BigDecimal circCintura
+  +BigDecimal circQuadril
+  +BigDecimal circBraco
+  +BigDecimal circCoxa
+  +Boolean ativo
+}
+
+class Frequencia {
+  +Long id
+  +LocalDateTime dataHora
+  +Boolean ativo
+}
+
+User "1" -- "0..1" Academia : conta >
+User "1" -- "0..1" Personal : conta >
+User "1" -- "0..1" Aluno : conta >
+User --> UserRole
+
+Academia "1" -- "N" Personal : possui >
+Academia "1" -- "N" Aluno : matricula >
+Academia "1" -- "N" Plano : oferece >
+
+Personal "1" -- "N" Aluno : acompanha >
+Personal "1" -- "N" Treino : cria >
+Personal "1" -- "N" AvaliacaoFisica : registra >
+
+Aluno "1" -- "N" Treino : possui (1 ativa) >
+Aluno "1" -- "N" AvaliacaoFisica : avaliado em >
+Aluno "1" -- "N" Frequencia : registra >
+Aluno "0..1" -- "1" Plano : contrata >
+
+Treino "1" -- "N" ExercicioTreino : contém >
+Academia "1" -- "N" Frequencia : sedia >
+@enduml

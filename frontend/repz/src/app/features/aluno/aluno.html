@@ -1,22 +1,22 @@
 <app-shell
   ativo="dashboard"
-  [crumbs]="['Aluno', 'Dashboard']"
+  [crumbs]="[('ROLES.STUDENT' | translate), ('NAV.DASHBOARD' | translate)]"
   [nome]="nome()"
-  subtitulo="Área do aluno"
+  [subtitulo]="'ALUNO.AREA' | translate"
   [mostrarCta]="!freq.jaFezCheckinHoje()"
   (ctaClick)="fazerCheckin()"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Olá, {{ primeiroNome() }} </div>
-      <div class="page-subtitle">Bom te ver de volta. Continue firme no treino.</div>
+      <div class="page-title">{{ 'ALUNO.DASH.GREETING' | translate: { nome: primeiroNome() } }}</div>
+      <div class="page-subtitle">{{ 'ALUNO.DASH.WELCOME' | translate }}</div>
       <div class="ultimo-checkin">
         <i class="pi pi-clock"></i>
-        <span>Último check-in: <strong>{{ ultimoCheckinTexto() }}</strong></span>
+        <span>{{ 'ALUNO.DASH.LAST_CHECKIN_LABEL' | translate }} <strong>{{ ultimoCheckinTexto() }}</strong></span>
       </div>
     </div>
     <p-button
-      [label]="freq.jaFezCheckinHoje() ? 'Check-in já registrado' : 'Fazer check-in'"
+      [label]="(freq.jaFezCheckinHoje() ? 'ALUNO.FREQ.CHECKIN_DONE' : 'ALUNO.FREQ.CHECKIN') | translate"
       [icon]="freq.jaFezCheckinHoje() ? 'pi pi-check' : 'pi pi-bolt'"
       [styleClass]="freq.jaFezCheckinHoje() ? 'repz-ghost' : 'repz-primary'"
       [loading]="fazendoCheckin()"
@@ -41,33 +41,35 @@
     <div class="kpi-grid">
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Frequência do mês</span>
+          <span class="kpi-label">{{ 'ALUNO.DASH.FREQ_MONTH' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-calendar"></i></span>
         </div>
-        <div class="kpi-value">{{ totalMes() }}<span class="kpi-unit"> dias</span></div>
+        <div class="kpi-value">{{ totalMes() }}<span class="kpi-unit"> {{ 'ALUNO.DASH.DAYS' | translate }}</span></div>
         <div class="kpi-delta" *ngIf="deltaMes() > 0">
-          <i class="pi pi-arrow-up"></i> +{{ deltaMes() }} vs. mês anterior
+          <i class="pi pi-arrow-up"></i> {{ 'ALUNO.DASH.DELTA_MONTH' | translate: { n: deltaMes() } }}
         </div>
-        <div class="kpi-sub" *ngIf="deltaMes() <= 0">presenças registradas no mês</div>
+        <div class="kpi-sub" *ngIf="deltaMes() <= 0">{{ 'ALUNO.DASH.PRESENCES_MONTH' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Treino de hoje</span>
+          <span class="kpi-label">{{ 'ALUNO.DASH.TODAY_WORKOUT' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-list-check"></i></span>
         </div>
         <div class="kpi-value kpi-value-sm">
-          {{ treinoDoDia() ? 'Treino ' + treinoDoDia()!.divisao : 'Sem ficha' }}
+          {{ treinoDoDia()
+            ? ('ALUNO.DASH.WORKOUT_DIV' | translate: { div: treinoDoDia()!.divisao })
+            : ('ALUNO.DASH.NO_SHEET' | translate) }}
         </div>
         <div class="kpi-sub" *ngIf="treinoDoDia() as d">
-          {{ focoDoDia() }} · {{ d.exercicios.length }} exercícios
+          {{ focoDoDia() }} · {{ 'ALUNO.DASH.N_EXERCISES' | translate: { n: d.exercicios.length } }}
         </div>
-        <div class="kpi-sub" *ngIf="!treinoDoDia()">nenhuma ficha ativa</div>
+        <div class="kpi-sub" *ngIf="!treinoDoDia()">{{ 'ALUNO.DASH.NO_ACTIVE_SHEET' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Peso atual</span>
+          <span class="kpi-label">{{ 'ALUNO.DASH.CURRENT_WEIGHT' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-chart-line"></i></span>
         </div>
         <div class="kpi-value">
@@ -75,20 +77,20 @@
           }}<span class="kpi-unit" *ngIf="pesoAtual() != null"> kg</span>
         </div>
         <div class="kpi-sub" *ngIf="deltaPeso() != null">
-          {{ deltaPeso()! > 0 ? '+' : '' }}{{ deltaPeso() }} kg desde a última avaliação
+          {{ deltaPeso()! > 0 ? '+' : '' }}{{ deltaPeso() }} {{ 'ALUNO.DASH.KG_SINCE' | translate }}
         </div>
         <div class="kpi-sub" *ngIf="deltaPeso() == null">
-          {{ pesoAtual() != null ? 'última avaliação física' : 'sem avaliação registrada' }}
+          {{ (pesoAtual() != null ? 'ALUNO.DASH.LAST_ASSESSMENT' : 'ALUNO.DASH.NO_ASSESSMENT') | translate }}
         </div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Plano ativo</span>
+          <span class="kpi-label">{{ 'ALUNO.DASH.ACTIVE_PLAN' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-star"></i></span>
         </div>
         <div class="kpi-value kpi-value-sm">{{ planoNome() }}</div>
-        <div class="kpi-sub">{{ objetivo() || 'plano de matrícula' }}</div>
+        <div class="kpi-sub">{{ objetivo() || ('ALUNO.DASH.ENROLLMENT_PLAN' | translate) }}</div>
       </p-card>
     </div>
 
@@ -97,11 +99,11 @@
       <p-card styleClass="repz-card">
         <div class="section-head">
           <div>
-            <div class="section-title">Seu treino de hoje</div>
+            <div class="section-title">{{ 'ALUNO.DASH.YOUR_WORKOUT_TODAY' | translate }}</div>
             <div class="section-sub" *ngIf="treinoDoDia() as d">{{ d.nome }}</div>
           </div>
           <p-button
-            label="Ver completo"
+            [label]="'ALUNO.DASH.VIEW_FULL' | translate"
             icon="pi pi-arrow-right"
             iconPos="right"
             size="small"
@@ -117,7 +119,7 @@
               <div class="ex-meta">
                 <div class="ex-nome">{{ ex.nomeExercicio }}</div>
                 <div class="ex-det">
-                  {{ ex.series || '—' }} séries · {{ ex.repeticoes || '—' }} reps
+                  {{ ex.series || '—' }} {{ 'ALUNO.DASH.SETS' | translate }} · {{ ex.repeticoes || '—' }} {{ 'ALUNO.DASH.REPS' | translate }}
                   <span *ngIf="ex.cargaKg"> · {{ ex.cargaKg }} kg</span>
                 </div>
               </div>
@@ -129,20 +131,20 @@
             </div>
           </div>
           <div class="ex-mais" *ngIf="d.exercicios.length > 5">
-            +{{ d.exercicios.length - 5 }} exercícios na ficha completa
+            {{ 'ALUNO.DASH.MORE_EXERCISES' | translate: { n: d.exercicios.length - 5 } }}
           </div>
         </ng-container>
         <ng-template #semFicha>
           <div class="vazio-inline">
             <i class="pi pi-clipboard"></i>
-            <span>Você ainda não tem uma ficha de treino ativa.</span>
+            <span>{{ 'ALUNO.DASH.NO_ACTIVE_SHEET_MSG' | translate }}</span>
           </div>
         </ng-template>
       </p-card>
 
       <p-card styleClass="repz-card">
         <div class="section-head">
-          <div class="section-title">Frequência da semana</div>
+          <div class="section-title">{{ 'ALUNO.DASH.WEEK_FREQ' | translate }}</div>
         </div>
         <div class="bar-chart">
           <div class="bar-col" *ngFor="let d of semana()">
@@ -152,11 +154,11 @@
         </div>
         <div class="semana-resumo">
           <i class="pi pi-flag"></i>
-          <span>{{ totalMes() }} presença(s) registrada(s) este mês</span>
+          <span>{{ 'ALUNO.DASH.PRESENCES_THIS_MONTH' | translate: { n: totalMes() } }}</span>
         </div>
         <div class="semana-resumo">
           <i class="pi pi-user"></i>
-          <span>Seu personal: <strong>{{ personalNome() }}</strong></span>
+          <span>{{ 'ALUNO.DASH.YOUR_TRAINER' | translate }} <strong>{{ personalNome() }}</strong></span>
         </div>
       </p-card>
     </div>

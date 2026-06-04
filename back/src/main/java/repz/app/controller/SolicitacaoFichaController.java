@@ -47,11 +47,6 @@ public interface SolicitacaoFichaController {
             @PathVariable Long id,
             @Parameter(hidden = true) Authentication auth);
 
-    @GetMapping("/minhas")
-    @Operation(summary = "Minhas solicitações", description = "Aluno lista suas próprias solicitações.")
-    List<SolicitacaoFichaResponse> listarMinhas(
-            @Parameter(hidden = true) Authentication auth);
-
     @GetMapping("/pendente")
     @Operation(summary = "Solicitação pendente", description = "Retorna a solicitação pendente do aluno, se houver (ou null).")
     SolicitacaoFichaResponse pendente(

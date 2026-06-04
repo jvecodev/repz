@@ -11,6 +11,7 @@ import {
 } from '@core/services';
 import type { SolicitacaoFichaResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
@@ -34,6 +35,7 @@ import {
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     DialogModule,
@@ -53,6 +55,7 @@ export class FichaTreino implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly freq = inject(FrequenciaService);
+  private readonly i18n = inject(TranslateService);
 
   readonly ficha = signal<FichaVM | null>(null);
   readonly historico = signal<HistoricoVM[]>([]);
@@ -68,7 +71,9 @@ export class FichaTreino implements OnInit {
   readonly avisoSolicitacao = signal<string | null>(null);
 
   readonly aluno = computed(() => this.ficha()?.alunoNome ?? 'Aluno');
-  readonly alunoObjetivo = computed(() => this.ficha()?.objetivo || 'Treino');
+  readonly alunoObjetivo = computed(
+    () => this.ficha()?.objetivo || this.i18n.instant('ALUNO.FICHA.DEFAULT_GOAL'),
+  );
   readonly letras = computed(() => this.ficha()?.letras ?? []);
 
   readonly treinoAtual = computed<DivisaoVM | null>(
@@ -112,8 +117,8 @@ export class FichaTreino implements OnInit {
         this.carregando.set(false);
         this.erro.set(
           err?.status === 401 || err?.status === 403
-            ? 'Você não tem acesso a esta ficha (faça login como aluno).'
-            : 'Não foi possível carregar sua ficha de treino.',
+            ? this.i18n.instant('ALUNO.FICHA.NO_ACCESS')
+            : this.i18n.instant('ALUNO.FICHA.LOAD_ERROR'),
         );
       },
     });
@@ -155,7 +160,7 @@ export class FichaTreino implements OnInit {
         },
         error: (err) => {
           this.enviando.set(false);
-          const msg = err?.error?.message ?? 'Não foi possível enviar a solicitação.';
+          const msg = err?.error?.message ?? this.i18n.instant('ALUNO.FICHA.REQUEST_ERROR');
           this.avisoSolicitacao.set(msg);
         },
       });

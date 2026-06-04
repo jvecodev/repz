@@ -41,4 +41,13 @@ public interface FileController {
     ResponseEntity<String> preview(
             @Parameter(description = "Nome do objeto no storage (ex: users/1/uuid.jpg)")
             @RequestParam String fileName);
+
+    @GetMapping("/me")
+    @Operation(summary = "Minha foto de perfil", description = "Retorna a URL temporária da foto do usuário autenticado, ou 204 se ele não tiver foto.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "URL da foto retornada"),
+            @ApiResponse(responseCode = "204", description = "Usuário não possui foto"),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido")
+    })
+    ResponseEntity<String> minhaFoto(@Parameter(hidden = true) Authentication authentication);
 }

@@ -1,0 +1,32 @@
+@startuml atividade-checkin
+' Diagrama de Atividades — Check-in (registro de frequência) do aluno
+title REPZ — Atividade: Check-in do Aluno
+
+start
+:Aluno autenticado abre a tela de Frequência;
+:Frontend consulta GET /api/checkins/me;
+if (Já fez check-in hoje?) then (sim)
+  :Exibe "check-in já realizado hoje";
+  stop
+else (não)
+  :Aluno clica em "Fazer check-in";
+  :POST /api/checkins { alunoId, academiaId };
+  :SecurityFilter valida JWT e perfil (ALUNO/PERSONAL);
+  if (Token válido e não revogado?) then (não)
+    :Retorna 401;
+    stop
+  else (sim)
+    :FrequenciaService verifica check-in do dia\n(existsCheckinNoDia);
+    if (Duplicado no mesmo dia?) then (sim)
+      :Retorna 409 Conflict;
+      :Frontend marca como "já feito hoje";
+      stop
+    else (não)
+      :Persiste Frequencia (data_hora = agora);
+      :Retorna 201 Created;
+      :Frontend atualiza dashboard\n(dias treinados, último check-in);
+      stop
+    endif
+  endif
+endif
+@enduml

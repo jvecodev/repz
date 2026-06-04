@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -144,19 +145,39 @@ public class FrequenciaServiceImpl implements FrequenciaService {
 
         Long resolvedAcademiaId = academiaContextService.resolveRequired(auth, academiaId);
 
+        // Total de check-ins por aluno vem da stored procedure fn_relatorio_frequencia
+        // (consulta gerencial agregada no banco, com tabelas relacionadas e índices).
         Map<String, Long> frequenciaPorAluno = new LinkedHashMap<>();
-        long total = 0;
         for (Object[] row : frequenciaRepository.relatorioFrequencia(resolvedAcademiaId, inicio, fim)) {
-            long count = ((Number) row[1]).longValue();
-            frequenciaPorAluno.put((String) row[0], count);
-            total += count;
+            frequenciaPorAluno.put((String) row[0], ((Number) row[1]).longValue());
+        }
+
+        // Ocupação por hora e evolução mensal são derivadas dos check-ins do período.
+        List<Frequencia> frequencias = frequenciaRepository.findByAcademiaIdAndPeriodo(resolvedAcademiaId, inicio, fim);
+
+        Map<String, Long> frequenciaPorMes = new TreeMap<>();
+        Map<String, Long> ocupacaoPorHora = new LinkedHashMap<>();
+        for (int h = 0; h < 24; h++) {
+            ocupacaoPorHora.put(String.valueOf(h), 0L);
+        }
+
+        for (Frequencia f : frequencias) {
+            if (f.getDataHora() == null) {
+                continue;
+            }
+            String hora = String.valueOf(f.getDataHora().getHour());
+            ocupacaoPorHora.merge(hora, 1L, Long::sum);
+            String mes = String.format("%04d-%02d", f.getDataHora().getYear(), f.getDataHora().getMonthValue());
+            frequenciaPorMes.merge(mes, 1L, Long::sum);
         }
 
         FrequenciaRelatorioResponse response = new FrequenciaRelatorioResponse();
         response.setAcademiaId(resolvedAcademiaId);
         response.setPeriodo(java.util.Map.of("inicio", inicio, "fim", fim));
-        response.setTotalFrequencias(total);
+        response.setTotalFrequencias((long) frequencias.size());
         response.setFrequenciaPorAluno(frequenciaPorAluno);
+        response.setOcupacaoPorHora(ocupacaoPorHora);
+        response.setFrequenciaPorMes(frequenciaPorMes);
 
         return response;
     }
