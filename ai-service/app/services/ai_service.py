@@ -10,7 +10,7 @@ def _get_client() -> AsyncOpenAI:
         base_url=settings.base_url,
         api_key=settings.openrouter_api_key,
         default_headers={"X-Title": "Repz AI Service"},
-        timeout=120.0,
+        timeout=60.0,
     )
 
 
@@ -35,6 +35,7 @@ async def report_buffer(prompt: str, system_prompt: str) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
         ],
+        max_tokens=700,
         extra_body={"models": [settings.model, *settings.fallback_models]},
         stream=False,
     )

@@ -11,6 +11,13 @@
       <div class="page-title">Avaliação física</div>
       <div class="page-subtitle">Acompanhe a evolução de {{ alunoNome() }} ao longo do tempo.</div>
     </div>
+    <p-button
+      *ngIf="historico().length > 0"
+      label="Relatórios"
+      icon="pi pi-file-edit"
+      styleClass="repz-ghost"
+      (onClick)="abrirRelatorios()"
+    />
   </div>
 
   <p-card styleClass="repz-card state-card" *ngIf="carregando()">
@@ -212,61 +219,6 @@
           </div>
         </p-card>
 
-        <!-- Relatório IA -->
-        <p-card styleClass="repz-card relatorio-card" *ngIf="historico().length > 0">
-          <div class="relatorio-head">
-            <div>
-              <div class="font-semibold">Relatório de evolução</div>
-              <div class="text-3 text-sm">Análise gerada por inteligência artificial</div>
-            </div>
-            <div class="relatorio-actions">
-              <p-button
-                *ngIf="relatorio()?.status === 'PENDENTE'"
-                label="Cancelar"
-                icon="pi pi-times"
-                styleClass="repz-ghost"
-                (onClick)="cancelarRelatorio()"
-              />
-              <p-button
-                label="Gerar relatório"
-                icon="pi pi-sparkles"
-                styleClass="repz-primary"
-                [loading]="gerandoRelatorio()"
-                [disabled]="gerandoRelatorio()"
-                (onClick)="gerarRelatorio()"
-              />
-            </div>
-          </div>
-
-          <!-- Pendente -->
-          <div class="relatorio-pending" *ngIf="relatorio()?.status === 'PENDENTE'">
-            <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="rel-spinner" />
-            <span class="text-3">Analisando seus dados… isso pode levar alguns segundos.</span>
-          </div>
-
-          <!-- Erro -->
-          <div class="relatorio-status-msg relatorio-erro" *ngIf="relatorio()?.status === 'ERRO'">
-            <i class="pi pi-exclamation-triangle"></i>
-            <span>Não foi possível gerar o relatório. Tente novamente.</span>
-          </div>
-
-          <!-- Cancelado -->
-          <div class="relatorio-status-msg relatorio-cancelado" *ngIf="relatorio()?.status === 'CANCELADO'">
-            <span class="badge-cancelado">Cancelado</span>
-            <span class="text-3 text-sm">A geração do relatório foi cancelada.</span>
-          </div>
-
-          <!-- Concluído -->
-          <div class="relatorio-conteudo" *ngIf="relatorio()?.status === 'CONCLUIDO'">
-            <pre class="relatorio-texto">{{ relatorio()!.conteudo }}</pre>
-          </div>
-
-          <!-- Estado inicial -->
-          <div class="relatorio-vazio text-3 text-sm" *ngIf="!relatorio()">
-            Clique em <strong>Gerar relatório</strong> para receber uma análise personalizada da sua evolução.
-          </div>
-        </p-card>
-
       </div>
 
       <div class="col-side" *ngIf="podeRegistrar()">
@@ -398,4 +350,152 @@
       </div>
     </div>
   </ng-container>
+
+  <!-- Modal Relatórios -->
+  <p-dialog
+    header="Relatórios de Evolução"
+    [visible]="dialogAberto()"
+    (visibleChange)="$event ? null : fecharRelatorios()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '680px', maxWidth: '95vw' }"
+    styleClass="repz-dialog rel-dialog"
+  >
+    <!-- Vista detalhe -->
+    <ng-container *ngIf="relatorioAberto() as r; else vistaLista">
+      <div class="rel-detalhe">
+        <div class="rel-detalhe-head">
+          <button class="rel-back" (click)="fecharDetalhe()">
+            <i class="pi pi-arrow-left"></i> Voltar
+          </button>
+          <div class="rel-meta">
+            <span class="rel-data">{{ r.criadoEm }}</span>
+            <span class="rel-badge rel-badge-concluido">Concluído</span>
+          </div>
+        </div>
+
+        <ng-container *ngIf="!editando(); else modoEdicao">
+          <pre class="relatorio-texto">{{ r.conteudo }}</pre>
+          <div class="rel-detalhe-actions">
+            <p-button
+              label="Editar"
+              icon="pi pi-pencil"
+              styleClass="repz-ghost"
+              (onClick)="iniciarEdicao()"
+            />
+          </div>
+        </ng-container>
+
+        <ng-template #modoEdicao>
+          <textarea
+            class="rel-textarea"
+            [(ngModel)]="conteudoEditado"
+            rows="16"
+          ></textarea>
+          <div class="rel-detalhe-actions">
+            <p-button
+              label="Cancelar"
+              styleClass="repz-ghost"
+              (onClick)="cancelarEdicao()"
+              [disabled]="salvandoEdicao()"
+            />
+            <p-button
+              label="Salvar"
+              icon="pi pi-check"
+              styleClass="repz-primary"
+              (onClick)="salvarEdicao()"
+              [loading]="salvandoEdicao()"
+              [disabled]="salvandoEdicao()"
+            />
+          </div>
+        </ng-template>
+      </div>
+    </ng-container>
+
+    <!-- Vista lista -->
+    <ng-template #vistaLista>
+      <div class="rel-toolbar">
+        <p-button
+          label="Gerar novo relatório"
+          icon="pi pi-sparkles"
+          styleClass="repz-primary"
+          (onClick)="gerarRelatorio()"
+          [loading]="gerandoRelatorio()"
+          [disabled]="gerandoRelatorio()"
+        />
+      </div>
+
+      <div class="rel-loading" *ngIf="carregandoRels()">
+        <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
+        <span class="text-3">Carregando relatórios…</span>
+      </div>
+
+      <div class="rel-vazio text-3 text-sm" *ngIf="!carregandoRels() && relatorios().length === 0">
+        Nenhum relatório gerado ainda. Clique em <strong>Gerar novo relatório</strong> para começar.
+      </div>
+
+      <div class="rel-list" *ngIf="!carregandoRels() && relatorios().length > 0">
+        <div class="rel-item" *ngFor="let r of relatorios()">
+          <div class="rel-item-head">
+            <div class="rel-item-info">
+              <span class="rel-data">{{ r.criadoEm }}</span>
+              <span class="rel-badge"
+                [class.rel-badge-concluido]="r.status === 'CONCLUIDO'"
+                [class.rel-badge-pendente]="r.status === 'PENDENTE'"
+                [class.rel-badge-erro]="r.status === 'ERRO'"
+                [class.rel-badge-cancelado]="r.status === 'CANCELADO'"
+              >
+                {{ r.status === 'CONCLUIDO' ? 'Concluído'
+                 : r.status === 'PENDENTE'  ? 'Gerando…'
+                 : r.status === 'ERRO'      ? 'Erro'
+                 : 'Cancelado' }}
+              </span>
+            </div>
+            <div class="rel-item-actions">
+              <ng-container [ngSwitch]="r.status">
+                <ng-container *ngSwitchCase="'PENDENTE'">
+                  <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="rel-spin-sm" />
+                  <p-button
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    styleClass="repz-ghost rel-btn-sm"
+                    (onClick)="cancelarGeracao(r.id)"
+                  />
+                </ng-container>
+                <ng-container *ngSwitchCase="'CONCLUIDO'">
+                  <p-button
+                    label="Ver / Editar"
+                    icon="pi pi-eye"
+                    styleClass="repz-ghost rel-btn-sm"
+                    (onClick)="abrirDetalhe(r)"
+                  />
+                  <p-button
+                    icon="pi pi-trash"
+                    styleClass="repz-ghost rel-btn-sm rel-btn-danger"
+                    (onClick)="excluirRelatorio(r.id)"
+                  />
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                  <p-button
+                    icon="pi pi-trash"
+                    styleClass="repz-ghost rel-btn-sm rel-btn-danger"
+                    (onClick)="excluirRelatorio(r.id)"
+                  />
+                </ng-container>
+              </ng-container>
+            </div>
+          </div>
+          <div class="rel-preview text-3" *ngIf="r.status === 'CONCLUIDO' && r.conteudo">
+            {{ r.conteudo | slice:0:160 }}{{ (r.conteudo?.length ?? 0) > 160 ? '…' : '' }}
+          </div>
+          <div class="rel-erro-msg" *ngIf="r.status === 'ERRO'">
+            <i class="pi pi-exclamation-triangle"></i>
+            Não foi possível gerar o relatório. Tente gerar um novo.
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-dialog>
+
 </app-shell>

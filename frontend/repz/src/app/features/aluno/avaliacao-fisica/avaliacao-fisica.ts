@@ -19,6 +19,7 @@ import type { ChartData, ChartOptions, TooltipItem } from 'chart.js';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
+import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -34,6 +35,7 @@ import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao
     ButtonModule,
     CardModule,
     ChartModule,
+    DialogModule,
     InputNumberModule,
     MessageModule,
     ProgressSpinnerModule,
@@ -58,8 +60,14 @@ export class AvaliacaoFisica implements OnInit, OnDestroy {
   readonly salvando = signal(false);
   readonly aviso = signal<string | null>(null);
 
-  // --- Relatório IA ---
-  readonly relatorio = signal<RelatorioIAResponse | null>(null);
+  // --- Dialog Relatórios ---
+  readonly dialogAberto = signal(false);
+  readonly relatorios = signal<RelatorioIAResponse[]>([]);
+  readonly carregandoRels = signal(false);
+  readonly relatorioAberto = signal<RelatorioIAResponse | null>(null);
+  readonly editando = signal(false);
+  conteudoEditado = '';
+  readonly salvandoEdicao = signal(false);
   readonly gerandoRelatorio = signal(false);
   private pollSub: Subscription | null = null;
 
@@ -342,44 +350,113 @@ export class AvaliacaoFisica implements OnInit, OnDestroy {
     this.form.coxaCm = null;
   }
 
+  // --- Dialog Relatórios ---
+
+  abrirRelatorios(): void {
+    this.dialogAberto.set(true);
+    this.relatorioAberto.set(null);
+    this.editando.set(false);
+    this.listarRelatorios();
+  }
+
+  fecharRelatorios(): void {
+    this.pararPolling();
+    this.dialogAberto.set(false);
+  }
+
+  private listarRelatorios(): void {
+    if (!this.alunoId) return;
+    this.carregandoRels.set(true);
+    this.relatorioService.listar(this.alunoId).subscribe({
+      next: (lista) => {
+        this.relatorios.set(lista);
+        this.carregandoRels.set(false);
+        const pendente = lista.find((r) => r.status === 'PENDENTE');
+        if (pendente) this.iniciarPolling(pendente.id);
+      },
+      error: () => this.carregandoRels.set(false),
+    });
+  }
+
   gerarRelatorio(): void {
     if (!this.alunoId || this.gerandoRelatorio()) return;
     this.gerandoRelatorio.set(true);
-    this.relatorio.set(null);
 
     this.relatorioService.iniciar(this.alunoId).subscribe({
       next: (r) => {
-        this.relatorio.set(r);
+        this.relatorios.set([r, ...this.relatorios()]);
         this.iniciarPolling(r.id);
       },
-      error: () => {
+      error: () => this.gerandoRelatorio.set(false),
+    });
+  }
+
+  cancelarGeracao(id: number): void {
+    this.pararPolling();
+    this.relatorioService.excluir(id).subscribe({
+      next: () => {
         this.gerandoRelatorio.set(false);
+        this.relatorios.set(this.relatorios().filter((r) => r.id !== id));
       },
     });
   }
 
-  cancelarRelatorio(): void {
-    const r = this.relatorio();
-    if (!r || r.status !== 'PENDENTE') return;
-    this.relatorioService.cancelar(r.id).subscribe({
-      next: () => {
-        this.pararPolling();
-        this.gerandoRelatorio.set(false);
-        this.relatorio.set({ ...r, status: 'CANCELADO' });
+  excluirRelatorio(id: number): void {
+    const aberto = this.relatorioAberto();
+    if (aberto?.id === id) this.relatorioAberto.set(null);
+    this.relatorioService.excluir(id).subscribe({
+      next: () => this.relatorios.set(this.relatorios().filter((r) => r.id !== id)),
+    });
+  }
+
+  abrirDetalhe(r: RelatorioIAResponse): void {
+    this.relatorioAberto.set(r);
+    this.editando.set(false);
+    this.conteudoEditado = r.conteudo ?? '';
+  }
+
+  fecharDetalhe(): void {
+    this.relatorioAberto.set(null);
+    this.editando.set(false);
+  }
+
+  iniciarEdicao(): void {
+    this.conteudoEditado = this.relatorioAberto()?.conteudo ?? '';
+    this.editando.set(true);
+  }
+
+  cancelarEdicao(): void {
+    this.editando.set(false);
+  }
+
+  salvarEdicao(): void {
+    const r = this.relatorioAberto();
+    if (!r || this.salvandoEdicao()) return;
+    this.salvandoEdicao.set(true);
+
+    this.relatorioService.atualizar(r.id, this.conteudoEditado).subscribe({
+      next: (atualizado) => {
+        this.relatorios.set(this.relatorios().map((x) => (x.id === atualizado.id ? atualizado : x)));
+        this.relatorioAberto.set(atualizado);
+        this.editando.set(false);
+        this.salvandoEdicao.set(false);
       },
+      error: () => this.salvandoEdicao.set(false),
     });
   }
 
   private iniciarPolling(id: number): void {
     this.pararPolling();
-    this.pollSub = interval(3000)
+    this.pollSub = interval(2000)
       .pipe(
         switchMap(() => this.relatorioService.buscar(id)),
         takeWhile((r) => r.status === 'PENDENTE', true),
       )
       .subscribe({
         next: (r) => {
-          this.relatorio.set(r);
+          this.relatorios.set(this.relatorios().map((x) => (x.id === r.id ? r : x)));
+          const aberto = this.relatorioAberto();
+          if (aberto?.id === r.id) this.relatorioAberto.set(r);
           if (r.status !== 'PENDENTE') {
             this.gerandoRelatorio.set(false);
             this.pararPolling();

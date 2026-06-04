@@ -29,7 +29,11 @@ export class RelatorioIAService {
     return this.http.get<RelatorioIAResponse[]>(`${this.base}/aluno/${alunoId}`);
   }
 
-  cancelar(id: number): Observable<void> {
+  atualizar(id: number, conteudo: string): Observable<RelatorioIAResponse> {
+    return this.http.put<RelatorioIAResponse>(`${this.base}/${id}`, { conteudo });
+  }
+
+  excluir(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
 }

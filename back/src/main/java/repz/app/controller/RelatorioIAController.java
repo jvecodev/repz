@@ -5,12 +5,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import repz.app.dto.request.RelatorioIAUpdateRequest;
 import repz.app.dto.response.RelatorioIAResponse;
 
 import java.util.List;
@@ -33,8 +37,14 @@ public interface RelatorioIAController {
     @Operation(summary = "Listar relatórios do aluno")
     List<RelatorioIAResponse> listar(@PathVariable Long alunoId);
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar conteúdo do relatório", description = "Permite edição manual do conteúdo. Status é forçado para CONCLUIDO.")
+    RelatorioIAResponse atualizar(@PathVariable Long id,
+                                  @Valid @RequestBody RelatorioIAUpdateRequest request,
+                                  Authentication auth);
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Cancelar geração do relatório")
-    void cancelar(@PathVariable Long id);
+    @Operation(summary = "Excluir relatório", description = "Remove o relatório permanentemente. Se estiver PENDENTE, a geração é interrompida.")
+    void excluir(@PathVariable Long id);
 }

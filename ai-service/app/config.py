@@ -7,10 +7,10 @@ _ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 class Settings(BaseSettings):
     openrouter_api_key: str
-    model: str = "google/gemma-4-31b-it:free"
+    model: str = "google/gemma-3-4b-it:free"
     fallback_models: list[str] = [
+        "google/gemma-4-31b-it:free",
         "deepseek/deepseek-v4-flash:free",
-        "openai/gpt-oss-20b:free",
     ]
     base_url: str = "https://openrouter.ai/api/v1"
 

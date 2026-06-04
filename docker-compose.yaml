@@ -29,7 +29,9 @@ services:
       - minio_data:/data
 
   api:
-    build: ./back
+    build:
+      context: ./back
+      dockerfile: Dockerfile.dev
     container_name: repzapi
     ports:
       - "8080:8080"
@@ -44,6 +46,9 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       MINIO_BUCKET: ${MINIO_BUCKET:-repz}
       AI_SERVICE_URL: http://ai-service:8000
+    volumes:
+      - ./back/src:/app/src
+      - maven_cache:/root/.m2
     depends_on:
       postgres:
         condition: service_healthy
@@ -58,6 +63,7 @@ services:
     volumes:
       - ./frontend/repz:/app
       - /app/node_modules
+    command: ["npx", "ng", "serve", "--host", "0.0.0.0", "--poll", "2000"]
     depends_on:
       - api
 
@@ -69,7 +75,9 @@ services:
     ports:
       - "8055:8000"
     env_file: ./ai-service/.env
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     restart: unless-stopped
 
 volumes:
   minio_data:
+  maven_cache:

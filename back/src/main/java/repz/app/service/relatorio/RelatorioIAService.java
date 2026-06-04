@@ -75,15 +75,29 @@ public class RelatorioIAService {
     }
 
     @Transactional
-    public void cancelar(Long id) {
+    public RelatorioIAResponse atualizar(Long id, String conteudo, Authentication auth) {
         RelatorioIA relatorio = relatorioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Relatório não encontrado."));
 
-        if (relatorio.getStatus() == RelatorioStatus.PENDENTE) {
-            relatorio.setStatus(RelatorioStatus.CANCELADO);
-            relatorio.setAtualizadoEm(LocalDateTime.now());
-            relatorioRepository.save(relatorio);
+        User currentUser = userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+
+        if (currentUser.getRole() == UserRole.ALUNO
+                && !relatorio.getAluno().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Acesso negado.");
         }
+
+        relatorio.setConteudo(conteudo);
+        relatorio.setStatus(RelatorioStatus.CONCLUIDO);
+        relatorio.setAtualizadoEm(LocalDateTime.now());
+        return toDTO(relatorioRepository.save(relatorio));
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        RelatorioIA relatorio = relatorioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Relatório não encontrado."));
+        relatorioRepository.delete(relatorio);
     }
 
     @Async("relatorioExecutor")
@@ -124,40 +138,28 @@ public class RelatorioIAService {
 
     private String buildPrompt(String nomeAluno, List<AvaliacaoFisica> avaliacoes) {
         if (avaliacoes.isEmpty()) {
-            return "O aluno " + nomeAluno + " ainda não possui avaliações físicas registradas.";
+            return "Aluno " + nomeAluno + " não possui avaliações físicas. Oriente-o a registrar a primeira.";
         }
 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yy");
         StringBuilder sb = new StringBuilder();
-        sb.append("Gere um relatório de evolução física detalhado e motivador para o aluno **")
-          .append(nomeAluno).append("**.\n\n");
-        sb.append("Abaixo estão todas as avaliações físicas registradas em ordem cronológica:\n\n");
+        sb.append("Aluno: ").append(nomeAluno).append("\n\n");
+        sb.append("Data | Peso(kg) | Alt(cm) | IMC | Gord% | Cin(cm) | Qua(cm) | Bra(cm) | Cox(cm)\n");
+        sb.append("-----|----------|---------|-----|-------|---------|---------|---------|--------\n");
 
-        for (int i = 0; i < avaliacoes.size(); i++) {
-            AvaliacaoFisica av = avaliacoes.get(i);
-            sb.append("### Avaliação ").append(i + 1)
-              .append(" — ").append(av.getDataAvaliacao() != null ? av.getDataAvaliacao().format(fmt) : "?")
-              .append("\n");
-            if (av.getPesoKg() != null)           sb.append("- Peso: ").append(av.getPesoKg()).append(" kg\n");
-            if (av.getAlturaCm() != null)          sb.append("- Altura: ").append(av.getAlturaCm()).append(" cm\n");
-            if (av.getImc() != null)               sb.append("- IMC: ").append(String.format("%.1f", av.getImc())).append("\n");
-            if (av.getPercentualGordura() != null) sb.append("- % Gordura: ").append(av.getPercentualGordura()).append("%\n");
-            if (av.getCinturaCm() != null)         sb.append("- Cintura: ").append(av.getCinturaCm()).append(" cm\n");
-            if (av.getQuadrilCm() != null)         sb.append("- Quadril: ").append(av.getQuadrilCm()).append(" cm\n");
-            if (av.getBracoCm() != null)           sb.append("- Braço: ").append(av.getBracoCm()).append(" cm\n");
-            if (av.getCoxaCm() != null)            sb.append("- Coxa: ").append(av.getCoxaCm()).append(" cm\n");
-            sb.append("\n");
+        for (AvaliacaoFisica av : avaliacoes) {
+            sb.append(av.getDataAvaliacao() != null ? av.getDataAvaliacao().format(fmt) : "?").append(" | ");
+            sb.append(av.getPesoKg() != null           ? av.getPesoKg()                          : "-").append(" | ");
+            sb.append(av.getAlturaCm() != null         ? av.getAlturaCm()                        : "-").append(" | ");
+            sb.append(av.getImc() != null              ? String.format("%.1f", av.getImc())      : "-").append(" | ");
+            sb.append(av.getPercentualGordura() != null? av.getPercentualGordura()                : "-").append(" | ");
+            sb.append(av.getCinturaCm() != null        ? av.getCinturaCm()                       : "-").append(" | ");
+            sb.append(av.getQuadrilCm() != null        ? av.getQuadrilCm()                       : "-").append(" | ");
+            sb.append(av.getBracoCm() != null          ? av.getBracoCm()                         : "-").append(" | ");
+            sb.append(av.getCoxaCm() != null           ? av.getCoxaCm()                          : "-").append("\n");
         }
 
-        sb.append("""
-                Com base nesses dados, escreva um relatório discursivo que:
-                1. Resuma a evolução geral do aluno ao longo do tempo.
-                2. Destaque os pontos positivos e as conquistas alcançadas.
-                3. Identifique áreas que precisam de atenção ou melhoria.
-                4. Forneça recomendações práticas e motivadoras para os próximos passos.
-                5. Use linguagem clara, acolhedora e encorajadora, sem termos médicos excessivamente técnicos.
-                """);
-
+        sb.append("\nEscreva um relatório motivador e objetivo em português: resumo da evolução, conquistas, pontos de atenção e próximos passos. Máximo 3 parágrafos curtos.");
         return sb.toString();
     }
 

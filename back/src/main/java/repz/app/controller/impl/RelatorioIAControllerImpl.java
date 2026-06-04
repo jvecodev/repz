@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 import repz.app.controller.RelatorioIAController;
+import repz.app.dto.request.RelatorioIAUpdateRequest;
 import repz.app.dto.response.RelatorioIAResponse;
 import repz.app.service.relatorio.RelatorioIAService;
 
@@ -31,7 +32,12 @@ public class RelatorioIAControllerImpl implements RelatorioIAController {
     }
 
     @Override
-    public void cancelar(Long id) {
-        relatorioIAService.cancelar(id);
+    public RelatorioIAResponse atualizar(Long id, RelatorioIAUpdateRequest request, Authentication auth) {
+        return relatorioIAService.atualizar(id, request.conteudo(), auth);
+    }
+
+    @Override
+    public void excluir(Long id) {
+        relatorioIAService.excluir(id);
     }
 }
