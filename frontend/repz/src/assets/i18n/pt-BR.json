@@ -142,7 +142,26 @@
     "NAME_REQUIRED": "O nome é obrigatório.",
     "PASSWORD_MIN": "A nova senha deve ter ao menos 5 caracteres.",
     "SAVE_SUCCESS": "Perfil atualizado com sucesso!",
-    "SAVE_ERROR": "Erro ao salvar perfil."
+    "SAVE_ERROR": "Erro ao salvar perfil.",
+    "SUBTITLE_PERSONAL": "Visualize e edite suas informações de personal.",
+    "SUBTITLE_ADMIN": "Edite seus dados de acesso.",
+    "NAME_PLACEHOLDER_SHORT": "Seu nome",
+    "EMAIL_PLACEHOLDER": "voce@email.com",
+    "SPECIALTY": "Especialidade",
+    "SPECIALTY_PLACEHOLDER": "Ex.: Musculação, Funcional, CrossFit…",
+    "SPECIALTY_HINT": "Exibida para os alunos vinculados a você.",
+    "ADMINISTRATOR": "Administrador",
+    "LAST_LOGIN": "Último login",
+    "NAME_EMAIL_SPECIALTY_REQUIRED": "Nome, e-mail e especialidade são obrigatórios.",
+    "NAME_EMAIL_REQUIRED": "Nome e e-mail são obrigatórios."
+  },
+
+  "ADMIN": {
+    "AREA": "Administração"
+  },
+
+  "ACADEMIA": {
+    "AREA": "Gestão da academia"
   },
 
   "ALUNO": {

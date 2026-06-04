@@ -142,7 +142,26 @@
     "NAME_REQUIRED": "Name is required.",
     "PASSWORD_MIN": "The new password must be at least 5 characters.",
     "SAVE_SUCCESS": "Profile updated successfully!",
-    "SAVE_ERROR": "Error saving profile."
+    "SAVE_ERROR": "Error saving profile.",
+    "SUBTITLE_PERSONAL": "View and edit your trainer information.",
+    "SUBTITLE_ADMIN": "Edit your access details.",
+    "NAME_PLACEHOLDER_SHORT": "Your name",
+    "EMAIL_PLACEHOLDER": "you@email.com",
+    "SPECIALTY": "Specialty",
+    "SPECIALTY_PLACEHOLDER": "E.g.: Bodybuilding, Functional, CrossFit…",
+    "SPECIALTY_HINT": "Shown to the students linked to you.",
+    "ADMINISTRATOR": "Administrator",
+    "LAST_LOGIN": "Last login",
+    "NAME_EMAIL_SPECIALTY_REQUIRED": "Name, e-mail and specialty are required.",
+    "NAME_EMAIL_REQUIRED": "Name and e-mail are required."
+  },
+
+  "ADMIN": {
+    "AREA": "Administration"
+  },
+
+  "ACADEMIA": {
+    "AREA": "Gym management"
   },
 
   "ALUNO": {
