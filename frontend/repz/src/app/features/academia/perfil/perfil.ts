@@ -103,4 +103,26 @@ export class AcademiaPerfil implements OnInit {
       },
     });
   }
+
+  readonly uploadandoFoto = signal(false);
+
+  onFotoSelecionada(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    input.value = '';
+
+    this.uploadandoFoto.set(true);
+    this.userService.uploadFoto(file).subscribe({
+      next: (u) => {
+        this.perfil.update((p) => (p ? { ...p, fotoUrl: u.fotoUrl } : p));
+        this.uploadandoFoto.set(false);
+      },
+      error: (err) => {
+        this.uploadandoFoto.set(false);
+        this.avisoSeverity.set('error');
+        this.aviso.set(err?.error?.message ?? 'Erro ao enviar a foto.');
+      },
+    });
+  }
 }

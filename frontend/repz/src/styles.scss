@@ -105,6 +105,11 @@ body {
     background: var(--mint-soft);
     color: var(--mint);
   }
+
+  &.avatar-img {
+    object-fit: cover;
+    background: none;
+  }
 }
 
 .divider {

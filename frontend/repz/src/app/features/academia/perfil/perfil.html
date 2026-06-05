@@ -89,12 +89,36 @@
       </div>
     </p-card>
 
-    <div class="perfil-info-col">
-      <p-card styleClass="repz-card avatar-card">
-        <app-avatar-upload [iniciais]="(perfil()?.name ?? 'G').charAt(0).toUpperCase()" tamanho="xl" />
-        <div class="avatar-name">{{ perfil()?.name }}</div>
-        <p-tag styleClass="repz-tag-success" value="Gerente" />
-      </p-card>
+    <p-card styleClass="repz-card info-card">
+      <div class="avatar-wrap">
+        <div class="avatar avatar-xl" *ngIf="!perfil()?.fotoUrl">
+          {{ (perfil()?.name ?? 'G').charAt(0).toUpperCase() }}
+        </div>
+        <img
+          *ngIf="perfil()?.fotoUrl"
+          [src]="perfil()!.fotoUrl"
+          class="avatar avatar-xl avatar-img"
+          alt="Foto de perfil"
+        />
+        <button
+          class="avatar-edit-btn"
+          type="button"
+          (click)="fotoInput.click()"
+          [disabled]="uploadandoFoto()"
+          title="Alterar foto"
+        >
+          <i class="pi" [ngClass]="uploadandoFoto() ? 'pi-spin pi-spinner' : 'pi-camera'"></i>
+        </button>
+        <input
+          #fotoInput
+          type="file"
+          accept="image/jpeg,image/png"
+          class="hidden-input"
+          (change)="onFotoSelecionada($event)"
+        />
+      </div>
+      <div class="avatar-name">{{ perfil()?.name }}</div>
+      <p-tag styleClass="repz-tag-success" value="Gerente" />
 
       <p-card styleClass="repz-card">
         <div class="card-title">Informações</div>
@@ -107,6 +131,6 @@
           <span class="info-value">{{ perfil()?.lastLogin }}</span>
         </div>
       </p-card>
-    </div>
+    </p-card>
   </div>
 </app-shell>

@@ -47,6 +47,11 @@ public class SecurityConfig {
                                 "/api/auth/forgot-password", "/api/auth/reset-password").permitAll()
 
                         .requestMatchers(
+                                "/swagger-ui.html", "/swagger-ui/**",
+                                "/v3/api-docs", "/v3/api-docs/**",
+                                "/swagger-resources/**", "/webjars/**").permitAll()
+
+                        .requestMatchers(
                                 "/v3/api-docsativar", "/api/usersativar", "/api/academiasinativar").hasAnyRole("ADMIN", "GERENTE")
 
                         .requestMatchers(HttpMethod.POST, "/api/checkins").hasAnyRole("ALUNO", "PERSONAL")
