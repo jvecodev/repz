@@ -43,6 +43,8 @@ export class UserService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/users`;
 
+  
+
   private readonly _nomeUsuario = signal<string>('');
   readonly nomeUsuario = computed(() => this._nomeUsuario());
   private readonly _fotoUrl = signal<string | null>(null);

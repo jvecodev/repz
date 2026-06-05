@@ -69,15 +69,17 @@ export class AppSidebar implements OnInit {
   private readonly academiaService = inject(AcademiaService);
   private readonly personalService = inject(PersonalService);
   private readonly alunoService = inject(AlunoService);
+  public readonly userService = inject(UserService);
 
   readonly _academiaNomeCarregado = signal<string>('');
-  protected readonly userService = inject(UserService);
 
   readonly nome = input<string>('Usuário');
 
   readonly subtitulo = input<string>('');
 
   readonly academiaNome = computed(() => this._academiaNomeCarregado());
+
+  readonly fotoUrl = computed(() => this.userService.fotoUrl());
 
   readonly ativo = input<string>('');
 
@@ -104,6 +106,8 @@ export class AppSidebar implements OnInit {
   readonly inicial = computed(() => (this.nome().trim()[0] ?? 'U').toUpperCase());
 
   ngOnInit(): void {
+    this.userService.carregarNomeLogado();
+
     const role = this.auth.getUserRole();
     if (role === 'GERENTE') {
       this.academiaService

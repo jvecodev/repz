@@ -38,6 +38,7 @@ export class Perfil implements OnInit {
   private readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
 
+
   readonly carregando = signal(true);
   readonly salvando = signal(false);
   readonly uploadandoFoto = signal(false);
@@ -155,7 +156,7 @@ export class Perfil implements OnInit {
       error: (err) => {
         this.uploadandoFoto.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Não foi possível enviar a foto.');
+        this.aviso.set(err?.error?.message ?? 'Erro ao enviar a foto.');
       },
     });
   }

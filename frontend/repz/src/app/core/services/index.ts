@@ -59,3 +59,5 @@ export type {
   UserSelfUpdateRequest,
   UserCreateRequest,
 } from './user';
+export { RelatorioIAService } from './relatorio-ia';
+export type { RelatorioIAResponse, RelatorioStatus } from './relatorio-ia';

@@ -1,14 +1,19 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, interval, Subscription } from 'rxjs';
+import { switchMap, takeWhile } from 'rxjs/operators';
 import {
   AuthService,
   AvaliacaoFisicaService,
   DadoGrafico,
   FrequenciaService,
   PersonalService,
+  RelatorioIAResponse,
+  RelatorioIAService,
   ThemeService,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
@@ -16,6 +21,7 @@ import type { ChartData, ChartOptions, TooltipItem } from 'chart.js';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
+import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -31,6 +37,7 @@ import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao
     ButtonModule,
     CardModule,
     ChartModule,
+    DialogModule,
     InputNumberModule,
     MessageModule,
     ProgressSpinnerModule,
@@ -38,14 +45,16 @@ import { AvaliacaoVM, formatarData, Metrica, mapearHistorico } from './avaliacao
   templateUrl: './avaliacao-fisica.html',
   styleUrl: './avaliacao-fisica.scss',
 })
-export class AvaliacaoFisica implements OnInit {
+export class AvaliacaoFisica implements OnInit, OnDestroy {
   private readonly service = inject(AvaliacaoFisicaService);
   protected readonly auth = inject(AuthService);
   protected readonly personalService = inject(PersonalService);
   protected readonly freq = inject(FrequenciaService);
+  private readonly relatorioService = inject(RelatorioIAService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly themeService = inject(ThemeService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   private alunoId: number | null = null;
 
@@ -53,6 +62,17 @@ export class AvaliacaoFisica implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly salvando = signal(false);
   readonly aviso = signal<string | null>(null);
+
+  // --- Dialog Relatórios ---
+  readonly dialogAberto = signal(false);
+  readonly relatorios = signal<RelatorioIAResponse[]>([]);
+  readonly carregandoRels = signal(false);
+  readonly relatorioAberto = signal<RelatorioIAResponse | null>(null);
+  readonly editando = signal(false);
+  conteudoEditado = '';
+  readonly salvandoEdicao = signal(false);
+  readonly gerandoRelatorio = signal(false);
+  private pollSub: Subscription | null = null;
 
   readonly historico = signal<AvaliacaoVM[]>([]);
   readonly dados = signal<DadoGrafico[]>([]);
@@ -331,5 +351,138 @@ export class AvaliacaoFisica implements OnInit {
     this.form.quadrilCm = null;
     this.form.bracoCm = null;
     this.form.coxaCm = null;
+  }
+
+  // --- Dialog Relatórios ---
+
+  abrirRelatorios(): void {
+    this.dialogAberto.set(true);
+    this.relatorioAberto.set(null);
+    this.editando.set(false);
+    this.listarRelatorios();
+  }
+
+  fecharRelatorios(): void {
+    this.pararPolling();
+    this.dialogAberto.set(false);
+  }
+
+  private listarRelatorios(): void {
+    if (!this.alunoId) return;
+    this.carregandoRels.set(true);
+    this.relatorioService.listar(this.alunoId).subscribe({
+      next: (lista) => {
+        this.relatorios.set(lista);
+        this.carregandoRels.set(false);
+        const pendente = lista.find((r) => r.status === 'PENDENTE');
+        if (pendente) this.iniciarPolling(pendente.id);
+      },
+      error: () => this.carregandoRels.set(false),
+    });
+  }
+
+  gerarRelatorio(): void {
+    if (!this.alunoId || this.gerandoRelatorio()) return;
+    this.gerandoRelatorio.set(true);
+
+    this.relatorioService.iniciar(this.alunoId).subscribe({
+      next: (r) => {
+        this.relatorios.set([r, ...this.relatorios()]);
+        this.iniciarPolling(r.id);
+      },
+      error: () => this.gerandoRelatorio.set(false),
+    });
+  }
+
+  cancelarGeracao(id: number): void {
+    this.pararPolling();
+    this.relatorioService.excluir(id).subscribe({
+      next: () => {
+        this.gerandoRelatorio.set(false);
+        this.relatorios.set(this.relatorios().filter((r) => r.id !== id));
+      },
+    });
+  }
+
+  excluirRelatorio(id: number): void {
+    const aberto = this.relatorioAberto();
+    if (aberto?.id === id) this.relatorioAberto.set(null);
+    this.relatorioService.excluir(id).subscribe({
+      next: () => this.relatorios.set(this.relatorios().filter((r) => r.id !== id)),
+    });
+  }
+
+  abrirDetalhe(r: RelatorioIAResponse): void {
+    this.relatorioAberto.set(r);
+    this.editando.set(false);
+    this.conteudoEditado = r.conteudo ?? '';
+  }
+
+  fecharDetalhe(): void {
+    this.relatorioAberto.set(null);
+    this.editando.set(false);
+  }
+
+  iniciarEdicao(): void {
+    this.conteudoEditado = this.relatorioAberto()?.conteudo ?? '';
+    this.editando.set(true);
+  }
+
+  cancelarEdicao(): void {
+    this.editando.set(false);
+  }
+
+  salvarEdicao(): void {
+    const r = this.relatorioAberto();
+    if (!r || this.salvandoEdicao()) return;
+    this.salvandoEdicao.set(true);
+
+    this.relatorioService.atualizar(r.id, this.conteudoEditado).subscribe({
+      next: (atualizado) => {
+        this.relatorios.set(this.relatorios().map((x) => (x.id === atualizado.id ? atualizado : x)));
+        this.relatorioAberto.set(atualizado);
+        this.editando.set(false);
+        this.salvandoEdicao.set(false);
+      },
+      error: () => this.salvandoEdicao.set(false),
+    });
+  }
+
+  private iniciarPolling(id: number): void {
+    this.pararPolling();
+    this.pollSub = interval(2000)
+      .pipe(
+        switchMap(() => this.relatorioService.buscar(id)),
+        takeWhile((r) => r.status === 'PENDENTE', true),
+      )
+      .subscribe({
+        next: (r) => {
+          this.relatorios.set(this.relatorios().map((x) => (x.id === r.id ? r : x)));
+          const aberto = this.relatorioAberto();
+          if (aberto?.id === r.id) this.relatorioAberto.set(r);
+          if (r.status !== 'PENDENTE') {
+            this.gerandoRelatorio.set(false);
+            this.pararPolling();
+          }
+        },
+        error: () => {
+          this.gerandoRelatorio.set(false);
+          this.pararPolling();
+        },
+      });
+  }
+
+  private pararPolling(): void {
+    this.pollSub?.unsubscribe();
+    this.pollSub = null;
+  }
+
+  markdownParaHtml(texto: string | undefined): SafeHtml {
+    const html = marked.parse(texto ?? '', { async: false }) as string;
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  ngOnDestroy(): void {
+    this.pararPolling();
   }
 }
