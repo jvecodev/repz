@@ -20,6 +20,23 @@
 </div>
 
 <div class="nav-section">{{ 'NAV.SECTION_GENERAL' | translate }}</div>
+<div class="profile-block">
+  <div class="avatar avatar-lg" *ngIf="!userService.fotoUrl()">
+    {{ inicial() }}
+  </div>
+  <img
+    *ngIf="userService.fotoUrl()"
+    [src]="userService.fotoUrl()!"
+    alt="Foto de perfil"
+    class="avatar avatar-lg avatar-img"
+  />
+  <div class="pb-info">
+    <div class="pb-role">{{ subtitulo() }}</div>
+    <div class="pb-name">{{ nome() }}</div>
+  </div>
+</div>
+
+<div class="nav-section">Geral</div>
 <nav class="nav">
   @for (item of navItems(); track item.key) {
     <a

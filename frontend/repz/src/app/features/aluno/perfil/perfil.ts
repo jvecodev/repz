@@ -34,10 +34,10 @@ import { TagModule } from 'primeng/tag';
 })
 export class Perfil implements OnInit {
   private readonly auth = inject(AuthService);
-  private readonly service = inject(AlunoService);
-  private readonly i18n = inject(TranslateService);
   private readonly alunoService = inject(AlunoService);
   private readonly userService = inject(UserService);
+  private readonly i18n = inject(TranslateService);
+
 
   readonly carregando = signal(true);
   readonly salvando = signal(false);

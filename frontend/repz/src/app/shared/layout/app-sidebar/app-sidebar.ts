@@ -57,7 +57,7 @@ const PERFIL_LINK_BY_ROLE: Record<string, string> = {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonModule, TranslatePipe],
+  imports: [RouterLink, ButtonModule, TranslatePipe, CommonModule],
   templateUrl: './app-sidebar.html',
   styleUrl: './app-sidebar.scss',
   host: { '[class.is-collapsed]': 'layout.colapsada()' },
