@@ -11,6 +11,7 @@ import {
   UserService,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -51,6 +52,7 @@ const FORM_VAZIO = (): PersonalForm => ({
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     ConfirmDialogModule,
@@ -74,6 +76,7 @@ export class Personais implements OnInit {
   private readonly academiaService = inject(AcademiaService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
 
   readonly role = computed(() => this.auth.getUserRole());
   readonly isAdmin = computed(() => this.role() === 'ADMIN');
@@ -106,7 +109,7 @@ export class Personais implements OnInit {
         },
         error: () => {
           this.carregando.set(false);
-          this.erro.set('Não foi possível carregar a lista de academias.');
+          this.erro.set(this.i18n.instant('MGMT.TRAINERS.GYMS_LOAD_ERROR'));
         },
       });
     } else {
@@ -136,7 +139,7 @@ export class Personais implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os personais.');
+        this.erro.set(this.i18n.instant('MGMT.TRAINERS.LOAD_ERROR'));
       },
     });
   }
@@ -175,12 +178,12 @@ export class Personais implements OnInit {
 
     if (this.modo() === 'criar') {
       if (formEl.invalid || !f.academiaId) {
-        this.erroForm.set('Preencha todos os campos obrigatórios.');
+        this.erroForm.set(this.i18n.instant('MGMT.TRAINERS.FILL_REQUIRED'));
         Object.values(formEl.controls).forEach((c) => c.markAsTouched());
         return;
       }
       if (f.password.length < 5) {
-        this.erroForm.set('A senha precisa ter no mínimo 5 caracteres.');
+        this.erroForm.set(this.i18n.instant('MGMT.STUDENTS.PASSWORD_MIN'));
         return;
       }
       this.salvando.set(true);
@@ -197,13 +200,13 @@ export class Personais implements OnInit {
           next: () => this.aplicarEspecialidadePosCriacao(f),
           error: (err) => {
             this.salvando.set(false);
-            this.erroForm.set(err?.error?.message || 'Falha ao criar o personal.');
+            this.erroForm.set(err?.error?.message || this.i18n.instant('MGMT.TRAINERS.CREATE_FAIL'));
           },
         });
     } else {
       // Atualização: apenas especialidade (e ativo é tratado pelo botão).
       if (!f.id || !f.especialidade.trim()) {
-        this.erroForm.set('Especialidade é obrigatória.');
+        this.erroForm.set(this.i18n.instant('MGMT.TRAINERS.SPECIALTY_REQUIRED'));
         return;
       }
       this.salvando.set(true);
@@ -212,7 +215,7 @@ export class Personais implements OnInit {
         next: () => {
           this.salvando.set(false);
           this.dialogAberto.set(false);
-          this.toast.add({ severity: 'success', summary: 'Personal atualizado', life: 3000 });
+          this.toast.add({ severity: 'success', summary: this.i18n.instant('MGMT.TRAINERS.TRAINER_UPDATED'), life: 3000 });
           this.carregar();
         },
         error: (err) => {
@@ -234,7 +237,7 @@ export class Personais implements OnInit {
       next: (lista) => {
         const novo = (lista ?? []).find((p) => p.email === f.email);
         if (!novo) {
-          this.finalizarCriacao('Personal criado, mas não foi possível salvar a especialidade.');
+          this.finalizarCriacao(this.i18n.instant('MGMT.TRAINERS.PARTIAL_NO_SPECIALTY'));
           return;
         }
         this.service
@@ -242,10 +245,10 @@ export class Personais implements OnInit {
           .subscribe({
             next: () => this.finalizarCriacao(),
             error: () =>
-              this.finalizarCriacao('Personal criado, mas falhou ao gravar a especialidade.'),
+              this.finalizarCriacao(this.i18n.instant('MGMT.TRAINERS.PARTIAL_SPECIALTY_FAIL')),
           });
       },
-      error: () => this.finalizarCriacao('Personal criado, mas a lista não pôde ser recarregada.'),
+      error: () => this.finalizarCriacao(this.i18n.instant('MGMT.TRAINERS.PARTIAL_RELOAD_FAIL')),
     });
   }
 
@@ -254,7 +257,7 @@ export class Personais implements OnInit {
     this.dialogAberto.set(false);
     this.toast.add({
       severity: mensagemAviso ? 'warn' : 'success',
-      summary: mensagemAviso ?? 'Personal criado',
+      summary: mensagemAviso ?? this.i18n.instant('MGMT.TRAINERS.TRAINER_CREATED'),
       life: 3500,
     });
     this.carregar();
@@ -263,11 +266,14 @@ export class Personais implements OnInit {
   confirmarToggleAtivo(p: PersonalResponse): void {
     const ativar = !p.ativo;
     this.confirmation.confirm({
-      header: ativar ? 'Ativar personal' : 'Inativar personal',
-      message: `Tem certeza que deseja ${ativar ? 'ativar' : 'inativar'} o personal "${p.userName}"?`,
+      header: this.i18n.instant(ativar ? 'MGMT.TRAINERS.ACTIVATE_TRAINER' : 'MGMT.TRAINERS.DEACTIVATE_TRAINER'),
+      message: this.i18n.instant(
+        ativar ? 'MGMT.TRAINERS.CONFIRM_ACTIVATE' : 'MGMT.TRAINERS.CONFIRM_DEACTIVATE',
+        { nome: p.userName },
+      ),
       icon: ativar ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle',
-      acceptLabel: ativar ? 'Ativar' : 'Inativar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE' : 'ADMIN.DASH.DEACTIVATE'),
+      rejectLabel: this.i18n.instant('COMMON.CANCEL'),
       acceptButtonStyleClass: ativar ? 'p-button-success' : 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => this.alterarStatus(p, ativar),
@@ -283,7 +289,7 @@ export class Personais implements OnInit {
       next: () => {
         this.toast.add({
           severity: 'success',
-          summary: ativar ? 'Personal ativado' : 'Personal inativado',
+          summary: this.i18n.instant(ativar ? 'MGMT.TRAINERS.TRAINER_ACTIVATED' : 'MGMT.TRAINERS.TRAINER_DEACTIVATED'),
           life: 3000,
         });
         this.carregar();
@@ -291,7 +297,7 @@ export class Personais implements OnInit {
       error: () =>
         this.toast.add({
           severity: 'error',
-          summary: ativar ? 'Falha ao ativar' : 'Falha ao inativar',
+          summary: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE_FAIL' : 'ADMIN.DASH.DEACTIVATE_FAIL'),
           life: 3500,
         }),
     });

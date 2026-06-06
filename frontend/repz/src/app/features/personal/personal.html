@@ -1,26 +1,26 @@
 <app-shell
   ativo="dashboard"
-  [crumbs]="['Personal Trainer', 'Painel']"
+  [crumbs]="[('PERSONAL.AREA' | translate), ('NAV.PANEL' | translate)]"
   [nome]="nomePersonal()"
-  subtitulo="Personal Trainer"
+  [subtitulo]="'PERSONAL.AREA' | translate"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Painel do Personal</div>
+      <div class="page-title">{{ 'PERSONAL.DASH.TITLE' | translate }}</div>
       <div class="page-subtitle">
-        Bem-vindo de volta, {{ nomePersonal() }}.
+        {{ 'PERSONAL.DASH.WELCOME' | translate: { nome: nomePersonal() } }}
       </div>
     </div>
     <div class="header-actions">
       <p-button
-        label="Nova ficha"
+        [label]="'PERSONAL.DASH.NEW_SHEET' | translate"
         icon="pi pi-list-check"
         styleClass="repz-ghost"
         routerLink="/personal/alunos"
       />
       <p-button
-        label="Registrar avaliação"
+        [label]="'PERSONAL.DASH.REGISTER_EVAL' | translate"
         icon="pi pi-pencil"
         styleClass="repz-primary"
         routerLink="/personal/alunos"
@@ -31,43 +31,45 @@
   <div class="kpi-grid" *ngIf="!carregando()">
     <p-card styleClass="repz-card kpi-card">
       <div class="kpi-head">
-        <span class="kpi-label">Meus alunos</span>
+        <span class="kpi-label">{{ 'NAV.MY_STUDENTS' | translate }}</span>
         <span class="kpi-icon"><i class="pi pi-users"></i></span>
       </div>
       <div class="kpi-value">{{ totalAlunos() }}</div>
-      <div class="kpi-sub">vinculados à sua conta</div>
+      <div class="kpi-sub">{{ 'PERSONAL.DASH.LINKED' | translate }}</div>
     </p-card>
 
     <p-card styleClass="repz-card kpi-card">
       <div class="kpi-head">
-        <span class="kpi-label">Ativos</span>
+        <span class="kpi-label">{{ 'PERSONAL.DASH.ACTIVE_PLURAL' | translate }}</span>
         <span class="kpi-icon"><i class="pi pi-check"></i></span>
       </div>
       <div class="kpi-value">{{ ativos() }}</div>
       <div class="kpi-sub" *ngIf="totalAlunos() > 0">
-        {{ ((ativos() / totalAlunos()) * 100) | number: '1.0-0' }}% da base
+        {{ 'PERSONAL.DASH.PCT_BASE' | translate: { pct: ((ativos() / totalAlunos()) * 100) | number: '1.0-0' } }}
       </div>
-      <div class="kpi-sub" *ngIf="totalAlunos() === 0">sem alunos vinculados</div>
+      <div class="kpi-sub" *ngIf="totalAlunos() === 0">{{ 'PERSONAL.DASH.NO_STUDENTS' | translate }}</div>
     </p-card>
 
     <p-card styleClass="repz-card kpi-card">
       <div class="kpi-head">
-        <span class="kpi-label">Ausentes (>7d)</span>
+        <span class="kpi-label">{{ 'PERSONAL.DASH.ABSENT_7' | translate }}</span>
         <span class="kpi-icon kpi-icon-warn"><i class="pi pi-exclamation-triangle"></i></span>
       </div>
       <div class="kpi-value">{{ ausentes7d() }}</div>
       <div class="kpi-sub">
-        {{ ausentes14d() > 0 ? ausentes14d() + ' crítico(s) >14d' : 'sem casos críticos' }}
+        {{ ausentes14d() > 0
+          ? ('PERSONAL.DASH.N_CRITICAL' | translate: { n: ausentes14d() })
+          : ('PERSONAL.DASH.NO_CRITICAL' | translate) }}
       </div>
     </p-card>
 
     <p-card styleClass="repz-card kpi-card">
       <div class="kpi-head">
-        <span class="kpi-label">Avaliações no mês</span>
+        <span class="kpi-label">{{ 'PERSONAL.DASH.EVALS_MONTH' | translate }}</span>
         <span class="kpi-icon"><i class="pi pi-pencil"></i></span>
       </div>
       <div class="kpi-value">{{ avaliacoesMes() }}</div>
-      <div class="kpi-sub">registradas este mês</div>
+      <div class="kpi-sub">{{ 'PERSONAL.DASH.RECORDED_MONTH' | translate }}</div>
     </p-card>
   </div>
 
@@ -77,13 +79,13 @@
 
   <p-card styleClass="repz-card" *ngIf="!carregando() && rows().length > 0">
     <div class="section-head">
-      <div class="section-title">Meus alunos</div>
+      <div class="section-title">{{ 'NAV.MY_STUDENTS' | translate }}</div>
       <div class="search-wrap-sm">
         <i class="pi pi-search"></i>
         <input
           pInputText
           type="text"
-          placeholder="Buscar aluno…"
+          [placeholder]="'PERSONAL.DASH.SEARCH_STUDENT' | translate"
           [ngModel]="busca()"
           (ngModelChange)="busca.set($event)"
           class="search-input"
@@ -100,13 +102,13 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Aluno</th>
-          <th>Plano</th>
-          <th>Frequência (mês)</th>
-          <th>Último check-in</th>
-          <th>Status treino</th>
-          <th>Matrícula</th>
-          <th>Ações</th>
+          <th>{{ 'PERSONAL.DASH.COL_STUDENT' | translate }}</th>
+          <th>{{ 'PERSONAL.DASH.COL_PLAN' | translate }}</th>
+          <th>{{ 'PERSONAL.DASH.COL_FREQ' | translate }}</th>
+          <th>{{ 'PERSONAL.DASH.COL_LAST_CHECKIN' | translate }}</th>
+          <th>{{ 'PERSONAL.DASH.COL_WORKOUT_STATUS' | translate }}</th>
+          <th>{{ 'PERSONAL.DASH.COL_ENROLLMENT' | translate }}</th>
+          <th>{{ 'COMMON.ACTIONS' | translate }}</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-r>
@@ -135,7 +137,7 @@
           <td class="cell-sub">
             <span>{{ r.ultimoCheckin ?? '—' }}</span>
             <span class="dias-sub" *ngIf="r.diasSemTreino != null && r.diasSemTreino > 0">
-              há {{ r.diasSemTreino }}d
+              {{ 'PERSONAL.DASH.DAYS_AGO_SHORT' | translate: { n: r.diasSemTreino } }}
             </span>
           </td>
           <td>
@@ -144,16 +146,16 @@
               *ngIf="r.statusTreino === 'atencao' || r.statusTreino === 'ausente'"
               class="pi pi-exclamation-triangle alerta-icon"
               [title]="
-                r.statusTreino === 'ausente'
-                  ? 'Sem treinar há mais de 14 dias'
-                  : 'Sem treinar há mais de 7 dias'
+                (r.statusTreino === 'ausente'
+                  ? 'PERSONAL.DASH.ABSENT_14_TIP'
+                  : 'PERSONAL.DASH.ABSENT_7_TIP') | translate
               "
             ></i>
           </td>
           <td>
             <p-tag
               [styleClass]="r.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
-              [value]="r.ativo ? 'Ativo' : 'Inativo'"
+              [value]="(r.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
             />
           </td>
           <td class="td-action">
@@ -164,7 +166,7 @@
                 [rounded]="true"
                 size="small"
                 styleClass="repz-icon-button"
-                title="Ver perfil completo"
+                [title]="'PERSONAL.DASH.VIEW_PROFILE' | translate"
                 (onClick)="verDetalhes(r)"
               />
               <p-button
@@ -173,7 +175,7 @@
                 [rounded]="true"
                 size="small"
                 styleClass="repz-icon-button"
-                title="Criar/editar ficha de treino"
+                [title]="'PERSONAL.DASH.EDIT_SHEET_TIP' | translate"
                 (onClick)="verFicha(r)"
               />
             </div>
@@ -186,8 +188,8 @@
   <p-card styleClass="repz-card sol-card" *ngIf="!carregandoSol() && solicitacoes().length > 0">
     <div class="section-head">
       <div>
-        <div class="section-title">Solicitações de nova ficha</div>
-        <div class="section-sub">{{ totalPendentes() }} pendente(s)</div>
+        <div class="section-title">{{ 'PERSONAL.DASH.REQUESTS' | translate }}</div>
+        <div class="section-sub">{{ 'PERSONAL.DASH.N_PENDING' | translate: { n: totalPendentes() } }}</div>
       </div>
       <p-tag styleClass="repz-tag-success" [value]="totalPendentes().toString()" />
     </div>
@@ -199,12 +201,12 @@
             <div class="avatar avatar-md">{{ s.alunoNome.charAt(0).toUpperCase() }}</div>
             <div>
               <div class="sol-aluno-nome">{{ s.alunoNome }}</div>
-              <div class="sol-data text-3">Solicitado em {{ s.criadaEm }}</div>
+              <div class="sol-data text-3">{{ 'PERSONAL.DASH.REQUESTED_AT' | translate: { data: s.criadaEm } }}</div>
             </div>
           </div>
           <div class="sol-actions" *ngIf="respondendoId() !== s.id">
             <p-button
-              label="Responder"
+              [label]="'PERSONAL.DASH.REPLY' | translate"
               icon="pi pi-reply"
               size="small"
               styleClass="repz-ghost"
@@ -222,7 +224,7 @@
           <textarea
             pTextarea
             rows="3"
-            placeholder="Comentário opcional…"
+            [placeholder]="'PERSONAL.DASH.COMMENT_PLACEHOLDER' | translate"
             [ngModel]="respostaTexto()"
             (ngModelChange)="respostaTexto.set($event)"
             class="sol-reply-textarea"
@@ -236,14 +238,14 @@
           />
           <div class="sol-reply-btns">
             <p-button
-              label="Cancelar"
+              [label]="'COMMON.CANCEL' | translate"
               size="small"
               styleClass="repz-ghost"
               (onClick)="fecharResposta()"
               [disabled]="salvandoResposta()"
             />
             <p-button
-              label="Rejeitar"
+              [label]="'PERSONAL.DASH.REJECT' | translate"
               icon="pi pi-times"
               size="small"
               styleClass="repz-ghost sol-btn-rejeitar"
@@ -251,7 +253,7 @@
               [loading]="salvandoResposta()"
             />
             <p-button
-              label="Aprovar"
+              [label]="'PERSONAL.DASH.APPROVE' | translate"
               icon="pi pi-check"
               size="small"
               styleClass="repz-primary"

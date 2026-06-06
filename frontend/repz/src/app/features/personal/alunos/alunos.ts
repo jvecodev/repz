@@ -8,6 +8,7 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { AlunoService, FrequenciaService, PersonalService } from '@core/services';
 import type { AlunoDetalheResponse, FrequenciaResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -41,6 +42,7 @@ function parseBR(s: string): Date {
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     InputTextModule,
@@ -58,6 +60,7 @@ export class PersonalAlunos implements OnInit {
   private readonly freqService = inject(FrequenciaService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly i18n = inject(TranslateService);
 
   private readonly foco = toSignal(
     this.route.queryParamMap.pipe(map((p) => p.get('foco') ?? 'alunos')),
@@ -71,9 +74,9 @@ export class PersonalAlunos implements OnInit {
   });
   readonly tituloPagina = computed(() => {
     const f = this.foco();
-    if (f === 'ficha') return 'Fichas dos alunos';
-    if (f === 'avaliacao') return 'Avaliações dos alunos';
-    return 'Meus alunos';
+    if (f === 'ficha') return this.i18n.instant('PERSONAL.STUDENTS.TITLE_SHEETS');
+    if (f === 'avaliacao') return this.i18n.instant('PERSONAL.STUDENTS.TITLE_EVALS');
+    return this.i18n.instant('NAV.MY_STUDENTS');
   });
 
   readonly carregando = signal(true);
@@ -125,7 +128,7 @@ export class PersonalAlunos implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os alunos.');
+        this.erro.set(this.i18n.instant('PERSONAL.STUDENTS.LOAD_ERROR'));
       },
     });
   }

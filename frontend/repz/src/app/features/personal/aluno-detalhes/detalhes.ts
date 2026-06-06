@@ -15,6 +15,7 @@ import type {
   TreinoResponse,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
@@ -36,6 +37,7 @@ function parseBR(s: string): Date {
     CommonModule,
     RouterLink,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     ChartModule,
@@ -54,6 +56,7 @@ export class PersonalAlunoDetalhes implements OnInit {
   private readonly freqService = inject(FrequenciaService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly i18n = inject(TranslateService);
 
   private userId!: number;
 
@@ -147,7 +150,7 @@ export class PersonalAlunoDetalhes implements OnInit {
       const aluno = alunos.find((a) => a.userId === this.userId) ?? null;
       if (!aluno) {
         this.carregando.set(false);
-        this.erro.set('Aluno não encontrado ou sem vínculo com você.');
+        this.erro.set(this.i18n.instant('PERSONAL.DETAILS.NOT_FOUND'));
         return;
       }
       this.aluno.set(aluno);

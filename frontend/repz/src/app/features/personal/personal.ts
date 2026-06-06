@@ -19,6 +19,7 @@ import type {
   SolicitacaoFichaResponse,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -69,6 +70,7 @@ function parseBR(s: string): Date {
     FormsModule,
     RouterLink,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     InputTextModule,
@@ -89,6 +91,7 @@ export class Personal implements OnInit {
   private readonly freqService = inject(FrequenciaService);
   private readonly avaliacaoService = inject(AvaliacaoFisicaService);
   private readonly router = inject(Router);
+  private readonly i18n = inject(TranslateService);
 
   readonly perfil = signal<PersonalResponse | null>(null);
   readonly nomePersonal = () => this.perfil()?.userName ?? 'Personal';
@@ -217,13 +220,13 @@ export class Personal implements OnInit {
   statusLabel(s: StatusTreino): string {
     switch (s) {
       case 'em_dia':
-        return 'Em dia';
+        return this.i18n.instant('PERSONAL.DASH.STATUS_OK');
       case 'atencao':
-        return 'Atenção';
+        return this.i18n.instant('PERSONAL.DASH.STATUS_WARN');
       case 'ausente':
-        return 'Ausente';
+        return this.i18n.instant('PERSONAL.DASH.STATUS_ABSENT');
       case 'sem_checkin':
-        return 'Sem check-in';
+        return this.i18n.instant('PERSONAL.DASH.STATUS_NO_CHECKIN');
     }
   }
 
@@ -312,7 +315,7 @@ export class Personal implements OnInit {
         },
         error: (err) => {
           this.salvandoResposta.set(false);
-          this.avisoResposta.set(err?.error?.message ?? 'Erro ao responder.');
+          this.avisoResposta.set(err?.error?.message ?? this.i18n.instant('PERSONAL.DASH.REPLY_ERROR'));
         },
       });
   }

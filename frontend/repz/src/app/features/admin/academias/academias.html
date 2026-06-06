@@ -1,8 +1,8 @@
 <app-shell
   ativo="academias"
-  [crumbs]="['Admin', 'Academias']"
+  [crumbs]="[('ROLES.ADMIN' | translate), ('NAV.GYMS' | translate)]"
   nome="Administrador"
-  subtitulo="Administração"
+  [subtitulo]="'ADMIN.AREA' | translate"
   [mostrarCta]="false"
 >
   <p-toast />
@@ -10,11 +10,11 @@
 
   <div class="page-header">
     <div>
-      <div class="page-title">Academias</div>
-      <div class="page-subtitle">Gerencie as academias cadastradas na plataforma.</div>
+      <div class="page-title">{{ 'NAV.GYMS' | translate }}</div>
+      <div class="page-subtitle">{{ 'ADMIN.GYMS.SUBTITLE' | translate }}</div>
     </div>
     <p-button
-      label="Nova academia"
+      [label]="'ADMIN.GYMS.NEW_GYM' | translate"
       icon="pi pi-plus"
       styleClass="repz-primary"
       (onClick)="novo()"
@@ -23,23 +23,23 @@
 
   <p-card styleClass="repz-card state-card" *ngIf="carregando()">
     <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
-    <span>Carregando academias…</span>
+    <span>{{ 'ADMIN.GYMS.LOADING' | translate }}</span>
   </p-card>
 
   <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
     <i class="pi pi-exclamation-triangle"></i>
     <span>{{ erro() }}</span>
-    <p-button label="Tentar novamente" icon="pi pi-refresh" (onClick)="carregar()" />
+    <p-button [label]="'ADMIN.GYMS.RETRY' | translate" icon="pi pi-refresh" (onClick)="carregar()" />
   </p-card>
 
   <p-card styleClass="repz-card" *ngIf="!carregando() && !erro()">
     <div class="hist-head">
-      <div class="font-semibold">Academias cadastradas</div>
-      <div class="text-3 text-sm">{{ lista().length }} registro(s)</div>
+      <div class="font-semibold">{{ 'ADMIN.GYMS.REGISTERED' | translate }}</div>
+      <div class="text-3 text-sm">{{ 'ALUNO.AVAL.N_RECORDS' | translate: { n: lista().length } }}</div>
     </div>
 
     <div class="empty-message text-3 text-sm" *ngIf="lista().length === 0">
-      Nenhuma academia cadastrada. Clique em "Nova academia" para começar.
+      {{ 'ADMIN.GYMS.EMPTY' | translate }}
     </div>
 
     <p-table
@@ -52,12 +52,12 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Nome</th>
-          <th>CNPJ</th>
-          <th>Responsável</th>
-          <th>Contato</th>
-          <th>Alunos</th>
-          <th>Status</th>
+          <th>{{ 'PROFILE.NAME' | translate }}</th>
+          <th>{{ 'ADMIN.GYMS.COL_CNPJ' | translate }}</th>
+          <th>{{ 'ADMIN.GYMS.COL_RESPONSIBLE' | translate }}</th>
+          <th>{{ 'ADMIN.GYMS.COL_CONTACT' | translate }}</th>
+          <th>{{ 'NAV.STUDENTS' | translate }}</th>
+          <th>{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
           <th style="width: 180px"></th>
         </tr>
       </ng-template>
@@ -76,7 +76,7 @@
           <td>{{ a.totalStudents ?? 0 }}</td>
           <td>
             <p-tag
-              [value]="a.active ? 'Ativa' : 'Inativa'"
+              [value]="(a.active ? 'COMMON.ACTIVE_F' : 'COMMON.INACTIVE_F') | translate"
               [severity]="a.active ? 'success' : 'danger'"
             />
           </td>
@@ -111,45 +111,45 @@
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '560px' }"
-    [header]="editando() ? 'Editar academia' : 'Nova academia'"
+    [header]="(editando() ? 'ADMIN.GYMS.EDIT_GYM' : 'ADMIN.GYMS.NEW_GYM') | translate"
     (onHide)="fecharDialog()"
   >
     <form #f="ngForm" (ngSubmit)="salvar(f)" class="form-academia">
       <label class="field">
-        <span>Nome *</span>
+        <span>{{ 'ADMIN.GYMS.NAME_REQ' | translate }}</span>
         <input pInputText name="name" [(ngModel)]="form().name" required maxlength="120" />
       </label>
 
       <div class="grid2">
         <label class="field">
-          <span>CNPJ *</span>
+          <span>{{ 'ADMIN.GYMS.CNPJ_REQ' | translate }}</span>
           <input
             pInputText
             name="cnpj"
             [(ngModel)]="form().cnpj"
             required
             maxlength="14"
-            placeholder="14 dígitos"
+            [placeholder]="'ADMIN.GYMS.CNPJ_PLACEHOLDER' | translate"
           />
         </label>
         <label class="field">
-          <span>Responsável *</span>
+          <span>{{ 'ADMIN.GYMS.RESPONSIBLE_REQ' | translate }}</span>
           <input pInputText name="responsible" [(ngModel)]="form().responsible" required />
         </label>
       </div>
 
       <label class="field">
-        <span>Endereço *</span>
+        <span>{{ 'ADMIN.GYMS.ADDRESS_REQ' | translate }}</span>
         <input pInputText name="address" [(ngModel)]="form().address" required />
       </label>
 
       <div class="grid2">
         <label class="field">
-          <span>E-mail</span>
+          <span>{{ 'PROFILE.EMAIL' | translate }}</span>
           <input pInputText type="email" name="email" [(ngModel)]="form().email" />
         </label>
         <label class="field">
-          <span>Telefone</span>
+          <span>{{ 'PROFILE.PHONE' | translate }}</span>
           <input pInputText name="phone" [(ngModel)]="form().phone" maxlength="20" />
         </label>
       </div>
@@ -164,7 +164,7 @@
       <div class="form-actions">
         <p-button
           type="button"
-          label="Cancelar"
+          [label]="'COMMON.CANCEL' | translate"
           severity="secondary"
           text
           [disabled]="salvando()"
@@ -172,7 +172,7 @@
         />
         <p-button
           type="submit"
-          [label]="editando() ? 'Salvar' : 'Criar'"
+          [label]="(editando() ? 'COMMON.SAVE' : 'ADMIN.GYMS.CREATE') | translate"
           icon="pi pi-save"
           [loading]="salvando()"
           [disabled]="salvando()"

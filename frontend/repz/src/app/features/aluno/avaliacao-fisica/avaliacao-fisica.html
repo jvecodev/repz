@@ -2,14 +2,14 @@
   [ativo]="ativoNav()"
   [crumbs]="crumbs()"
   [nome]="nomeSidebar()"
-  subtitulo="Área do aluno"
+  [subtitulo]="'ALUNO.AREA' | translate"
   [mostrarCta]="mostrarCheckin()"
   (ctaClick)="irParaCheckin()"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Avaliação física</div>
-      <div class="page-subtitle">Acompanhe a evolução de {{ alunoNome() }} ao longo do tempo.</div>
+      <div class="page-title">{{ 'ALUNO.AVAL.TITLE' | translate }}</div>
+      <div class="page-subtitle">{{ 'ALUNO.AVAL.SUBTITLE' | translate: { nome: alunoNome() } }}</div>
     </div>
     <p-button
       *ngIf="historico().length > 0"
@@ -22,7 +22,7 @@
 
   <p-card styleClass="repz-card state-card" *ngIf="carregando()">
     <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
-    <span>Carregando avaliações…</span>
+    <span>{{ 'ALUNO.AVAL.LOADING' | translate }}</span>
   </p-card>
 
   <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
@@ -35,7 +35,7 @@
     <div class="kpi-grid" *ngIf="kpis() as k">
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Peso</span>
+          <span class="kpi-label">{{ 'ALUNO.AVAL.WEIGHT' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-chart-line"></i></span>
         </div>
         <div class="kpi-value">
@@ -43,15 +43,17 @@
           }}<span class="kpi-unit" *ngIf="k.peso != null"> kg</span>
         </div>
         <div class="kpi-sub">
-          {{ k.pesoDelta != null
-            ? (k.pesoDelta > 0 ? '+' : '') + k.pesoDelta + ' kg desde a 1ª avaliação'
-            : 'peso da última avaliação' }}
+          @if (k.pesoDelta != null) {
+            {{ (k.pesoDelta > 0 ? '+' : '') + k.pesoDelta }} {{ 'ALUNO.AVAL.KG_SINCE_FIRST' | translate }}
+          } @else {
+            {{ 'ALUNO.AVAL.WEIGHT_LAST' | translate }}
+          }
         </div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">% Gordura</span>
+          <span class="kpi-label">{{ 'ALUNO.AVAL.BODY_FAT' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-percentage"></i></span>
         </div>
         <div class="kpi-value">
@@ -59,15 +61,17 @@
           }}<span class="kpi-unit" *ngIf="k.gordura != null">%</span>
         </div>
         <div class="kpi-sub">
-          {{ k.gorduraDelta != null
-            ? (k.gorduraDelta > 0 ? '+' : '') + k.gorduraDelta + ' pp desde a 1ª avaliação'
-            : 'percentual da última avaliação' }}
+          @if (k.gorduraDelta != null) {
+            {{ (k.gorduraDelta > 0 ? '+' : '') + k.gorduraDelta }} {{ 'ALUNO.AVAL.PP_SINCE_FIRST' | translate }}
+          } @else {
+            {{ 'ALUNO.AVAL.FAT_LAST' | translate }}
+          }
         </div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Massa magra</span>
+          <span class="kpi-label">{{ 'ALUNO.AVAL.LEAN_MASS' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-bolt"></i></span>
         </div>
         <div class="kpi-value">
@@ -75,15 +79,17 @@
           }}<span class="kpi-unit" *ngIf="k.massaMagra != null"> kg</span>
         </div>
         <div class="kpi-sub">
-          {{ k.massaMagraDelta != null
-            ? (k.massaMagraDelta > 0 ? '+' : '') + k.massaMagraDelta + ' kg desde a 1ª avaliação'
-            : 'estimada por peso e % gordura' }}
+          @if (k.massaMagraDelta != null) {
+            {{ (k.massaMagraDelta > 0 ? '+' : '') + k.massaMagraDelta }} {{ 'ALUNO.AVAL.KG_SINCE_FIRST' | translate }}
+          } @else {
+            {{ 'ALUNO.AVAL.LEAN_ESTIMATED' | translate }}
+          }
         </div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Cintura</span>
+          <span class="kpi-label">{{ 'ALUNO.AVAL.WAIST' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-circle"></i></span>
         </div>
         <div class="kpi-value">
@@ -91,9 +97,11 @@
           }}<span class="kpi-unit" *ngIf="k.cintura != null"> cm</span>
         </div>
         <div class="kpi-sub">
-          {{ k.cinturaDelta != null
-            ? (k.cinturaDelta > 0 ? '+' : '') + k.cinturaDelta + ' cm desde a 1ª avaliação'
-            : 'medida da última avaliação' }}
+          @if (k.cinturaDelta != null) {
+            {{ (k.cinturaDelta > 0 ? '+' : '') + k.cinturaDelta }} {{ 'ALUNO.AVAL.CM_SINCE_FIRST' | translate }}
+          } @else {
+            {{ 'ALUNO.AVAL.MEASURE_LAST' | translate }}
+          }
         </div>
       </p-card>
     </div>
@@ -110,17 +118,17 @@
                 class="tab-pill"
                 [class.active]="metrica() === m.value"
                 (click)="selecionarMetrica($any(m.value))"
-              >{{ m.label }}</button>
+              >{{ m.labelKey | translate }}</button>
             </div>
             <div class="last-date" *ngIf="ultimaAvaliacao()">
-              <span class="last-date-label text-3">Última avaliação</span>
+              <span class="last-date-label text-3">{{ 'ALUNO.AVAL.LAST_EVAL' | translate }}</span>
               <strong class="last-date-val">{{ ultimaAvaliacao()!.data }}</strong>
             </div>
           </div>
 
           <div class="stats-row" *ngIf="ultimaAvaliacao()">
             <div class="stat-item">
-              <span class="stat-label">Peso</span>
+              <span class="stat-label">{{ 'ALUNO.AVAL.WEIGHT' | translate }}</span>
               <span class="stat-val">
                 {{ ultimaAvaliacao()!.peso != null ? ultimaAvaliacao()!.peso + ' kg' : '—' }}
               </span>
@@ -133,12 +141,12 @@
             </div>
             <div class="stat-sep"></div>
             <div class="stat-item">
-              <span class="stat-label">IMC</span>
+              <span class="stat-label">{{ 'ALUNO.AVAL.IMC' | translate }}</span>
               <span class="stat-val">{{ ultimaAvaliacao()!.imc ?? '—' }}</span>
             </div>
             <div class="stat-sep"></div>
             <div class="stat-item">
-              <span class="stat-label">% Gordura</span>
+              <span class="stat-label">{{ 'ALUNO.AVAL.BODY_FAT' | translate }}</span>
               <span class="stat-val">
                 {{ ultimaAvaliacao()!.gordura != null ? ultimaAvaliacao()!.gordura + '%' : '—' }}
               </span>
@@ -158,7 +166,7 @@
             </div>
             <ng-template #semGrafico>
               <div class="chart-empty text-3">
-                São necessárias ao menos 2 avaliações para comparar a evolução.
+                {{ 'ALUNO.AVAL.NEED_2' | translate }}
               </div>
             </ng-template>
           </div>
@@ -166,12 +174,12 @@
 
         <p-card styleClass="repz-card historico">
           <div class="hist-head">
-            <div class="font-semibold">Avaliações anteriores</div>
-            <div class="text-3 text-sm">{{ historico().length }} registro(s)</div>
+            <div class="font-semibold">{{ 'ALUNO.AVAL.PREVIOUS' | translate }}</div>
+            <div class="text-3 text-sm">{{ 'ALUNO.AVAL.N_RECORDS' | translate: { n: historico().length } }}</div>
           </div>
 
           <div class="empty-message text-3 text-sm" *ngIf="historico().length === 0">
-            Nenhuma avaliação registrada ainda.
+            {{ 'ALUNO.AVAL.NONE_YET' | translate }}
           </div>
 
           <div class="av-list" *ngIf="historico().length > 0">
@@ -181,7 +189,7 @@
                   <div class="av-data">{{ a.data }}</div>
                   <div class="av-resumo text-3">
                     {{ a.peso != null ? a.peso + ' kg' : '—' }}
-                    <span *ngIf="a.gordura != null"> · {{ a.gordura }}% gordura</span>
+                    <span *ngIf="a.gordura != null"> · {{ a.gordura }}% {{ 'ALUNO.AVAL.FAT_WORD' | translate }}</span>
                   </div>
                 </div>
                 <span
@@ -196,24 +204,24 @@
 
               <div class="av-medidas">
                 <div class="av-medida" *ngIf="a.imc != null">
-                  <span>IMC</span><strong>{{ a.imc }}</strong>
+                  <span>{{ 'ALUNO.AVAL.IMC' | translate }}</span><strong>{{ a.imc }}</strong>
                 </div>
                 <div class="av-medida" *ngIf="a.cintura != null">
-                  <span>Cintura</span><strong>{{ a.cintura }} cm</strong>
+                  <span>{{ 'ALUNO.AVAL.WAIST' | translate }}</span><strong>{{ a.cintura }} cm</strong>
                 </div>
                 <div class="av-medida" *ngIf="a.quadril != null">
-                  <span>Quadril</span><strong>{{ a.quadril }} cm</strong>
+                  <span>{{ 'ALUNO.AVAL.HIP' | translate }}</span><strong>{{ a.quadril }} cm</strong>
                 </div>
                 <div class="av-medida" *ngIf="a.braco != null">
-                  <span>Braço</span><strong>{{ a.braco }} cm</strong>
+                  <span>{{ 'ALUNO.AVAL.ARM' | translate }}</span><strong>{{ a.braco }} cm</strong>
                 </div>
                 <div class="av-medida" *ngIf="a.coxa != null">
-                  <span>Coxa</span><strong>{{ a.coxa }} cm</strong>
+                  <span>{{ 'ALUNO.AVAL.THIGH' | translate }}</span><strong>{{ a.coxa }} cm</strong>
                 </div>
               </div>
 
               <div class="av-personal text-3" *ngIf="a.personal">
-                <i class="pi pi-user"></i> Avaliado por {{ a.personal }}
+                <i class="pi pi-user"></i> {{ 'ALUNO.AVAL.EVALUATED_BY' | translate: { personal: a.personal } }}
               </div>
             </div>
           </div>
@@ -224,13 +232,13 @@
       <div class="col-side" *ngIf="podeRegistrar()">
         <form (ngSubmit)="salvar()">
           <p-card styleClass="repz-card form-card-shell">
-            <div class="scard-label">Nova avaliação</div>
+            <div class="scard-label">{{ 'ALUNO.AVAL.NEW_EVAL' | translate }}</div>
 
             <div class="form-section">
-              <div class="form-section-hd">Composição corporal</div>
+              <div class="form-section-hd">{{ 'ALUNO.AVAL.BODY_COMPOSITION' | translate }}</div>
               <div class="grid2">
                 <label class="field">
-                  <span>Peso (kg) *</span>
+                  <span>{{ 'ALUNO.AVAL.WEIGHT_KG' | translate }}</span>
                   <p-inputNumber
                     inputId="peso"
                     name="peso"
@@ -243,7 +251,7 @@
                   />
                 </label>
                 <label class="field">
-                  <span>Altura (cm) *</span>
+                  <span>{{ 'ALUNO.AVAL.HEIGHT_CM' | translate }}</span>
                   <p-inputNumber
                     inputId="altura"
                     name="altura"
@@ -256,7 +264,7 @@
                   />
                 </label>
                 <label class="field">
-                  <span>% Gordura</span>
+                  <span>{{ 'ALUNO.AVAL.BODY_FAT' | translate }}</span>
                   <p-inputNumber
                     inputId="gordura"
                     name="gordura"
@@ -269,7 +277,7 @@
                   />
                 </label>
                 <div class="field">
-                  <span>IMC estimado</span>
+                  <span>{{ 'ALUNO.AVAL.IMC_ESTIMATED' | translate }}</span>
                   <div class="imc-inline" [class.imc-filled]="imcPreview() != null">
                     {{ imcPreview() ?? '—' }}
                   </div>
@@ -278,10 +286,10 @@
             </div>
 
             <div class="form-section">
-              <div class="form-section-hd">Circunferências</div>
+              <div class="form-section-hd">{{ 'ALUNO.AVAL.CIRCUMFERENCES' | translate }}</div>
               <div class="grid2">
                 <label class="field">
-                  <span>Cintura (cm)</span>
+                  <span>{{ 'ALUNO.AVAL.WAIST_CM' | translate }}</span>
                   <p-inputNumber
                     inputId="cintura"
                     name="cintura"
@@ -294,7 +302,7 @@
                   />
                 </label>
                 <label class="field">
-                  <span>Quadril (cm)</span>
+                  <span>{{ 'ALUNO.AVAL.HIP_CM' | translate }}</span>
                   <p-inputNumber
                     inputId="quadril"
                     name="quadril"
@@ -307,7 +315,7 @@
                   />
                 </label>
                 <label class="field">
-                  <span>Braço (cm)</span>
+                  <span>{{ 'ALUNO.AVAL.ARM_CM' | translate }}</span>
                   <p-inputNumber
                     inputId="braco"
                     name="braco"
@@ -320,7 +328,7 @@
                   />
                 </label>
                 <label class="field">
-                  <span>Coxa (cm)</span>
+                  <span>{{ 'ALUNO.AVAL.THIGH_CM' | translate }}</span>
                   <p-inputNumber
                     inputId="coxa"
                     name="coxa"
@@ -339,7 +347,7 @@
 
             <p-button
               type="submit"
-              label="Registrar avaliação"
+              [label]="'ALUNO.AVAL.REGISTER' | translate"
               icon="pi pi-save"
               [loading]="salvando()"
               [disabled]="salvando()"

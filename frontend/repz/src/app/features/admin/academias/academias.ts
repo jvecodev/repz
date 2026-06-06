@@ -4,6 +4,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { AcademiaRequest, AcademiaResponse, AcademiaService } from '@core/services';
 import { validarCNPJ } from '@core/validators/cpf-cnpj';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -36,6 +37,7 @@ const FORM_VAZIO = (): AcademiaForm => ({
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     ConfirmDialogModule,
@@ -55,6 +57,7 @@ export class AdminAcademias implements OnInit {
   private readonly service = inject(AcademiaService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
 
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
@@ -80,7 +83,7 @@ export class AdminAcademias implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar as academias.');
+        this.erro.set(this.i18n.instant('ADMIN.GYMS.LOAD_ERROR'));
       },
     });
   }
@@ -115,14 +118,14 @@ export class AdminAcademias implements OnInit {
   salvar(formEl: NgForm): void {
     if (this.salvando()) return;
     if (formEl.invalid) {
-      this.erroForm.set('Verifique os campos obrigatórios.');
+      this.erroForm.set(this.i18n.instant('ADMIN.GYMS.CHECK_REQUIRED'));
       Object.values(formEl.controls).forEach((c) => c.markAsTouched());
       return;
     }
     const f = this.form();
     const cnpjLimpo = f.cnpj.replace(/\D/g, '');
     if (!validarCNPJ(cnpjLimpo)) {
-      this.erroForm.set('CNPJ inválido. Verifique o número informado.');
+      this.erroForm.set(this.i18n.instant('ADMIN.GYMS.CNPJ_INVALID'));
       return;
     }
     this.erroForm.set(null);
@@ -146,7 +149,7 @@ export class AdminAcademias implements OnInit {
         this.dialogAberto.set(false);
         this.toast.add({
           severity: 'success',
-          summary: this.editando() ? 'Academia atualizada' : 'Academia criada',
+          summary: this.i18n.instant(this.editando() ? 'ADMIN.GYMS.GYM_UPDATED' : 'ADMIN.GYMS.GYM_CREATED'),
           life: 3000,
         });
         this.carregar();
@@ -155,7 +158,7 @@ export class AdminAcademias implements OnInit {
         this.salvando.set(false);
         this.erroForm.set(
           err?.error?.message ||
-            (this.editando() ? 'Falha ao atualizar a academia.' : 'Falha ao criar a academia.'),
+            this.i18n.instant(this.editando() ? 'ADMIN.GYMS.UPDATE_FAIL' : 'ADMIN.GYMS.CREATE_FAIL'),
         );
       },
     });
@@ -164,11 +167,14 @@ export class AdminAcademias implements OnInit {
   confirmarToggleAtivo(a: AcademiaResponse): void {
     const ativar = !a.active;
     this.confirmation.confirm({
-      header: ativar ? 'Ativar academia' : 'Inativar academia',
-      message: `Tem certeza que deseja ${ativar ? 'ativar' : 'inativar'} a academia "${a.name}"?`,
+      header: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE_GYM' : 'ADMIN.DASH.DEACTIVATE_GYM'),
+      message: this.i18n.instant(
+        ativar ? 'ADMIN.DASH.CONFIRM_ACTIVATE' : 'ADMIN.DASH.CONFIRM_DEACTIVATE',
+        { nome: a.name },
+      ),
       icon: ativar ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle',
-      acceptLabel: ativar ? 'Ativar' : 'Inativar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE' : 'ADMIN.DASH.DEACTIVATE'),
+      rejectLabel: this.i18n.instant('COMMON.CANCEL'),
       acceptButtonStyleClass: ativar ? 'p-button-success' : 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => this.alterarStatus(a, ativar),
@@ -181,7 +187,7 @@ export class AdminAcademias implements OnInit {
       next: () => {
         this.toast.add({
           severity: 'success',
-          summary: ativar ? 'Academia ativada' : 'Academia inativada',
+          summary: this.i18n.instant(ativar ? 'ADMIN.DASH.GYM_ACTIVATED' : 'ADMIN.DASH.GYM_DEACTIVATED'),
           life: 3000,
         });
         this.carregar();
@@ -189,7 +195,7 @@ export class AdminAcademias implements OnInit {
       error: () => {
         this.toast.add({
           severity: 'error',
-          summary: ativar ? 'Falha ao ativar' : 'Falha ao inativar',
+          summary: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE_FAIL' : 'ADMIN.DASH.DEACTIVATE_FAIL'),
           life: 3500,
         });
       },

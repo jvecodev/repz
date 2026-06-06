@@ -5,6 +5,7 @@ import { UserService } from '@core/services';
 import type { UserGetResponse, UserSelfUpdateRequest } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { AvatarUpload } from '@shared/avatar-upload';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -20,6 +21,7 @@ import { TagModule } from 'primeng/tag';
     FormsModule,
     AppShell,
     AvatarUpload,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     InputTextModule,
@@ -32,6 +34,7 @@ import { TagModule } from 'primeng/tag';
 })
 export class AdminPerfil implements OnInit {
   protected readonly userService = inject(UserService);
+  private readonly i18n = inject(TranslateService);
 
   readonly carregando = signal(true);
   readonly salvando = signal(false);
@@ -55,7 +58,7 @@ export class AdminPerfil implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar o perfil.');
+        this.erro.set(this.i18n.instant('PROFILE.LOAD_ERROR'));
       },
     });
   }
@@ -64,17 +67,17 @@ export class AdminPerfil implements OnInit {
     if (this.salvando()) return;
     if (!this.nome.trim() || !this.email.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Nome e e-mail são obrigatórios.');
+      this.aviso.set(this.i18n.instant('PROFILE.NAME_EMAIL_REQUIRED'));
       return;
     }
     if (this.novaSenha && this.novaSenha.length < 5) {
       this.avisoSeverity.set('error');
-      this.aviso.set('A nova senha deve ter ao menos 5 caracteres.');
+      this.aviso.set(this.i18n.instant('PROFILE.PASSWORD_MIN'));
       return;
     }
     if (this.novaSenha !== this.confirmarSenha) {
       this.avisoSeverity.set('error');
-      this.aviso.set('As senhas não coincidem.');
+      this.aviso.set(this.i18n.instant('VALIDATION.PASSWORD_MISMATCH'));
       return;
     }
 
@@ -94,12 +97,12 @@ export class AdminPerfil implements OnInit {
         this.confirmarSenha = '';
         this.salvando.set(false);
         this.avisoSeverity.set('success');
-        this.aviso.set('Perfil atualizado com sucesso!');
+        this.aviso.set(this.i18n.instant('PROFILE.SAVE_SUCCESS'));
       },
       error: (err) => {
         this.salvando.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Não foi possível atualizar o perfil.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('PROFILE.SAVE_ERROR'));
       },
     });
   }

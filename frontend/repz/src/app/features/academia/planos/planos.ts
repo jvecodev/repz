@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { PlanoRequest, PlanoResponse, PlanoService } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -32,6 +33,7 @@ const FORM_VAZIO = (): PlanoForm => ({ nome: '', duracaoDias: null, valor: null 
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     ConfirmDialogModule,
@@ -52,6 +54,7 @@ export class AcademiaPlanos implements OnInit {
   private readonly service = inject(PlanoService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
 
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
@@ -77,7 +80,7 @@ export class AcademiaPlanos implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os planos.');
+        this.erro.set(this.i18n.instant('ACADEMIA.PLANS.LOAD_ERROR'));
       },
     });
   }
@@ -105,12 +108,12 @@ export class AcademiaPlanos implements OnInit {
     if (this.salvando()) return;
     const f = this.form();
     if (formEl.invalid || !f.duracaoDias || !f.valor) {
-      this.erroForm.set('Preencha todos os campos obrigatórios.');
+      this.erroForm.set(this.i18n.instant('ACADEMIA.PLANS.FILL_REQUIRED'));
       Object.values(formEl.controls).forEach((c) => c.markAsTouched());
       return;
     }
     if (f.duracaoDias <= 0 || f.valor <= 0) {
-      this.erroForm.set('Duração e valor devem ser positivos.');
+      this.erroForm.set(this.i18n.instant('ACADEMIA.PLANS.POSITIVE_VALUES'));
       return;
     }
     this.erroForm.set(null);
@@ -131,7 +134,7 @@ export class AcademiaPlanos implements OnInit {
         this.dialogAberto.set(false);
         this.toast.add({
           severity: 'success',
-          summary: this.editando() ? 'Plano atualizado' : 'Plano criado',
+          summary: this.i18n.instant(this.editando() ? 'ACADEMIA.PLANS.PLAN_UPDATED' : 'ACADEMIA.PLANS.PLAN_CREATED'),
           life: 3000,
         });
         this.carregar();
@@ -140,7 +143,7 @@ export class AcademiaPlanos implements OnInit {
         this.salvando.set(false);
         this.erroForm.set(
           err?.error?.message ||
-            (this.editando() ? 'Falha ao atualizar o plano.' : 'Falha ao criar o plano.'),
+            this.i18n.instant(this.editando() ? 'ACADEMIA.PLANS.UPDATE_FAIL' : 'ACADEMIA.PLANS.CREATE_FAIL'),
         );
       },
     });
@@ -149,11 +152,14 @@ export class AcademiaPlanos implements OnInit {
   confirmarToggleAtivo(p: PlanoResponse): void {
     const ativar = !p.ativo;
     this.confirmation.confirm({
-      header: ativar ? 'Ativar plano' : 'Inativar plano',
-      message: `Tem certeza que deseja ${ativar ? 'ativar' : 'inativar'} o plano "${p.nome}"?`,
+      header: this.i18n.instant(ativar ? 'ACADEMIA.PLANS.ACTIVATE_PLAN' : 'ACADEMIA.PLANS.DEACTIVATE_PLAN'),
+      message: this.i18n.instant(
+        ativar ? 'ACADEMIA.PLANS.CONFIRM_ACTIVATE' : 'ACADEMIA.PLANS.CONFIRM_DEACTIVATE',
+        { nome: p.nome },
+      ),
       icon: ativar ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle',
-      acceptLabel: ativar ? 'Ativar' : 'Inativar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE' : 'ADMIN.DASH.DEACTIVATE'),
+      rejectLabel: this.i18n.instant('COMMON.CANCEL'),
       acceptButtonStyleClass: ativar ? 'p-button-success' : 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => this.alterarStatus(p, ativar),
@@ -166,7 +172,7 @@ export class AcademiaPlanos implements OnInit {
       next: () => {
         this.toast.add({
           severity: 'success',
-          summary: ativar ? 'Plano ativado' : 'Plano inativado',
+          summary: this.i18n.instant(ativar ? 'ACADEMIA.PLANS.PLAN_ACTIVATED' : 'ACADEMIA.PLANS.PLAN_DEACTIVATED'),
           life: 3000,
         });
         this.carregar();
@@ -174,7 +180,7 @@ export class AcademiaPlanos implements OnInit {
       error: () =>
         this.toast.add({
           severity: 'error',
-          summary: ativar ? 'Falha ao ativar' : 'Falha ao inativar',
+          summary: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE_FAIL' : 'ADMIN.DASH.DEACTIVATE_FAIL'),
           life: 3500,
         }),
     });

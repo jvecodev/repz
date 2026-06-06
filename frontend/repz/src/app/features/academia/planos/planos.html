@@ -1,8 +1,8 @@
 <app-shell
   ativo="planos"
-  [crumbs]="['Academia', 'Planos']"
+  [crumbs]="[('ROLES.MANAGER' | translate), ('NAV.PLANS' | translate)]"
   nome="Academia"
-  subtitulo="Gestão da academia"
+  [subtitulo]="'ACADEMIA.AREA' | translate"
   [mostrarCta]="false"
 >
   <p-toast />
@@ -10,31 +10,31 @@
 
   <div class="page-header">
     <div>
-      <div class="page-title">Planos</div>
-      <div class="page-subtitle">Cadastre, edite e inative os planos da academia.</div>
+      <div class="page-title">{{ 'NAV.PLANS' | translate }}</div>
+      <div class="page-subtitle">{{ 'ACADEMIA.PLANS.SUBTITLE' | translate }}</div>
     </div>
-    <p-button label="Novo plano" icon="pi pi-plus" styleClass="repz-primary" (onClick)="novo()" />
+    <p-button [label]="'ACADEMIA.PLANS.NEW_PLAN' | translate" icon="pi pi-plus" styleClass="repz-primary" (onClick)="novo()" />
   </div>
 
   <p-card styleClass="repz-card state-card" *ngIf="carregando()">
     <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
-    <span>Carregando planos…</span>
+    <span>{{ 'ACADEMIA.PLANS.LOADING' | translate }}</span>
   </p-card>
 
   <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
     <i class="pi pi-exclamation-triangle"></i>
     <span>{{ erro() }}</span>
-    <p-button label="Tentar novamente" icon="pi pi-refresh" (onClick)="carregar()" />
+    <p-button [label]="'ADMIN.GYMS.RETRY' | translate" icon="pi pi-refresh" (onClick)="carregar()" />
   </p-card>
 
   <p-card styleClass="repz-card" *ngIf="!carregando() && !erro()">
     <div class="hist-head">
-      <div class="font-semibold">Planos cadastrados</div>
-      <div class="text-3 text-sm">{{ lista().length }} registro(s)</div>
+      <div class="font-semibold">{{ 'ACADEMIA.PLANS.REGISTERED' | translate }}</div>
+      <div class="text-3 text-sm">{{ 'ALUNO.AVAL.N_RECORDS' | translate: { n: lista().length } }}</div>
     </div>
 
     <div class="empty-message text-3 text-sm" *ngIf="lista().length === 0">
-      Nenhum plano cadastrado ainda.
+      {{ 'ACADEMIA.PLANS.EMPTY' | translate }}
     </div>
 
     <p-table
@@ -47,21 +47,21 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Nome</th>
-          <th>Duração</th>
-          <th>Valor</th>
-          <th>Status</th>
+          <th>{{ 'PROFILE.NAME' | translate }}</th>
+          <th>{{ 'ACADEMIA.PLANS.DURATION' | translate }}</th>
+          <th>{{ 'ACADEMIA.PLANS.VALUE' | translate }}</th>
+          <th>{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
           <th style="width: 160px"></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-p>
         <tr>
           <td><strong>{{ p.nome }}</strong></td>
-          <td>{{ p.duracaoDias }} dias</td>
+          <td>{{ 'ACADEMIA.PLANS.N_DAYS' | translate: { n: p.duracaoDias } }}</td>
           <td>R$ {{ p.valor | number: '1.2-2' }}</td>
           <td>
             <p-tag
-              [value]="p.ativo ? 'Ativo' : 'Inativo'"
+              [value]="(p.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
               [severity]="p.ativo ? 'success' : 'danger'"
             />
           </td>
@@ -95,18 +95,18 @@
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '480px' }"
-    [header]="editando() ? 'Editar plano' : 'Novo plano'"
+    [header]="(editando() ? 'ACADEMIA.PLANS.EDIT_PLAN' : 'ACADEMIA.PLANS.NEW_PLAN') | translate"
     (onHide)="fecharDialog()"
   >
     <form #f="ngForm" (ngSubmit)="salvar(f)" class="form-plano">
       <label class="field">
-        <span>Nome *</span>
+        <span>{{ 'ADMIN.GYMS.NAME_REQ' | translate }}</span>
         <input pInputText name="nome" [(ngModel)]="form().nome" required maxlength="80" />
       </label>
 
       <div class="grid2">
         <label class="field">
-          <span>Duração (dias) *</span>
+          <span>{{ 'ACADEMIA.PLANS.DURATION_REQ' | translate }}</span>
           <p-inputNumber
             inputId="duracao"
             name="duracaoDias"
@@ -116,7 +116,7 @@
           />
         </label>
         <label class="field">
-          <span>Valor (R$) *</span>
+          <span>{{ 'ACADEMIA.PLANS.VALUE_REQ' | translate }}</span>
           <p-inputNumber
             inputId="valor"
             name="valor"
@@ -139,7 +139,7 @@
       <div class="form-actions">
         <p-button
           type="button"
-          label="Cancelar"
+          [label]="'COMMON.CANCEL' | translate"
           severity="secondary"
           text
           [disabled]="salvando()"
@@ -147,7 +147,7 @@
         />
         <p-button
           type="submit"
-          [label]="editando() ? 'Salvar' : 'Criar'"
+          [label]="(editando() ? 'COMMON.SAVE' : 'ADMIN.GYMS.CREATE') | translate"
           icon="pi pi-save"
           [loading]="salvando()"
           [disabled]="salvando()"

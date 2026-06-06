@@ -1,8 +1,8 @@
 <app-shell
   ativo="alunos"
-  [crumbs]="['Personal Trainer', 'Avaliações']"
+  [crumbs]="[('PERSONAL.AREA' | translate), ('NAV.ASSESSMENTS' | translate)]"
   [nome]="personalService.nomePersonal()"
-  subtitulo="Personal Trainer"
+  [subtitulo]="'PERSONAL.AREA' | translate"
   [mostrarCta]="false"
 >
 
@@ -29,22 +29,22 @@
           (onClick)="voltar()"
         />
         <div>
-          <div class="page-title">Registrar avaliação física</div>
+          <div class="page-title">{{ 'PERSONAL.NEWEVAL.TITLE' | translate }}</div>
           <div class="page-subtitle">
-            Aluno: <strong>{{ alunoNome() }}</strong>
-            <span *ngIf="ultima()"> · Última avaliação {{ dataUltimaStr() }}</span>
+            {{ 'PERSONAL.FICHA.STUDENT_LABEL' | translate }} <strong>{{ alunoNome() }}</strong>
+            <span *ngIf="ultima()"> · {{ 'PERSONAL.NEWEVAL.LAST_EVAL_DATE' | translate: { data: dataUltimaStr() } }}</span>
           </div>
         </div>
       </div>
       <div class="hd-actions">
         <p-button
-          label="Cancelar"
+          [label]="'COMMON.CANCEL' | translate"
           styleClass="repz-ghost"
           (onClick)="voltar()"
           [disabled]="salvando()"
         />
         <p-button
-          label="Salvar avaliação"
+          [label]="'PERSONAL.NEWEVAL.SAVE_EVAL' | translate"
           icon="pi pi-check"
           styleClass="repz-primary"
           [loading]="salvando()"
@@ -63,11 +63,11 @@
     <div class="layout">
 
       <p-card styleClass="repz-card">
-        <div class="form-title">Medidas de hoje ({{ dataHoje }})</div>
+        <div class="form-title">{{ 'PERSONAL.NEWEVAL.TODAY_MEASURES' | translate: { data: dataHoje } }}</div>
 
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Peso (kg) *</label>
+            <label class="form-label">{{ 'ALUNO.AVAL.WEIGHT_KG' | translate }}</label>
             <input
               pInputText
               type="number"
@@ -78,12 +78,12 @@
               placeholder="0.0"
             />
             <span class="form-prev" *ngIf="ultima()?.pesoKg != null">
-              Última: {{ ultima()!.pesoKg }} kg
+              {{ 'PERSONAL.NEWEVAL.LAST_LABEL' | translate }} {{ ultima()!.pesoKg }} kg
             </span>
           </div>
 
           <div class="form-group">
-            <label class="form-label">% Gordura</label>
+            <label class="form-label">{{ 'ALUNO.AVAL.BODY_FAT' | translate }}</label>
             <input
               pInputText
               type="number"
@@ -94,26 +94,26 @@
               placeholder="0.0"
             />
             <span class="form-prev" *ngIf="ultima()?.percentualGordura != null">
-              Última: {{ ultima()!.percentualGordura }} %
+              {{ 'PERSONAL.NEWEVAL.LAST_LABEL' | translate }} {{ ultima()!.percentualGordura }} %
             </span>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Massa magra (kg)</label>
+            <label class="form-label">{{ 'PERSONAL.NEWEVAL.LEAN_MASS_KG' | translate }}</label>
             <input
               pInputText
               [value]="fMassaMagra() ?? ''"
               disabled
               class="w-full"
-              placeholder="Calculada automaticamente"
+              [placeholder]="'PERSONAL.NEWEVAL.AUTO_CALC' | translate"
             />
             <span class="form-prev" *ngIf="massaMagraAnterior() != null">
-              Última: {{ massaMagraAnterior() }} kg
+              {{ 'PERSONAL.NEWEVAL.LAST_LABEL' | translate }} {{ massaMagraAnterior() }} kg
             </span>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Altura (cm) *</label>
+            <label class="form-label">{{ 'ALUNO.AVAL.HEIGHT_CM' | translate }}</label>
             <input
               pInputText
               type="number"
@@ -124,12 +124,12 @@
               placeholder="0"
             />
             <span class="form-prev" *ngIf="ultima()?.alturaCm != null">
-              Última: {{ ultima()!.alturaCm }} cm
+              {{ 'PERSONAL.NEWEVAL.LAST_LABEL' | translate }} {{ ultima()!.alturaCm }} cm
             </span>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Cintura (cm)</label>
+            <label class="form-label">{{ 'ALUNO.AVAL.WAIST_CM' | translate }}</label>
             <input
               pInputText
               type="number"
@@ -140,12 +140,12 @@
               placeholder="0"
             />
             <span class="form-prev" *ngIf="ultima()?.cinturaCm != null">
-              Última: {{ ultima()!.cinturaCm }} cm
+              {{ 'PERSONAL.NEWEVAL.LAST_LABEL' | translate }} {{ ultima()!.cinturaCm }} cm
             </span>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Braço (cm)</label>
+            <label class="form-label">{{ 'ALUNO.AVAL.ARM_CM' | translate }}</label>
             <input
               pInputText
               type="number"
@@ -156,12 +156,12 @@
               placeholder="0"
             />
             <span class="form-prev" *ngIf="ultima()?.bracoCm != null">
-              Última: {{ ultima()!.bracoCm }} cm
+              {{ 'PERSONAL.NEWEVAL.LAST_LABEL' | translate }} {{ ultima()!.bracoCm }} cm
             </span>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Coxa (cm)</label>
+            <label class="form-label">{{ 'ALUNO.AVAL.THIGH_CM' | translate }}</label>
             <input
               pInputText
               type="number"
@@ -172,37 +172,37 @@
               placeholder="0"
             />
             <span class="form-prev" *ngIf="ultima()?.coxaCm != null">
-              Última: {{ ultima()!.coxaCm }} cm
+              {{ 'PERSONAL.NEWEVAL.LAST_LABEL' | translate }} {{ ultima()!.coxaCm }} cm
             </span>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Observações</label>
+          <label class="form-label">{{ 'PERSONAL.NEWEVAL.NOTES' | translate }}</label>
           <textarea
             pTextarea
             [(ngModel)]="observacoes"
             rows="3"
             class="w-full"
-            placeholder="Notas para a próxima avaliação… (não enviadas ao backend)"
+            [placeholder]="'PERSONAL.NEWEVAL.NOTES_PLACEHOLDER' | translate"
             [autoResize]="false"
           ></textarea>
         </div>
       </p-card>
 
       <p-card styleClass="repz-card compare-card" *ngIf="ultima(); else semCompare">
-        <div class="form-title">Comparativo com última avaliação</div>
+        <div class="form-title">{{ 'PERSONAL.NEWEVAL.COMPARE_TITLE' | translate }}</div>
 
         <div class="cmp-list">
           <div class="cmp-item">
             <div class="cmp-info">
-              <span class="cmp-label">Peso</span>
+              <span class="cmp-label">{{ 'ALUNO.AVAL.WEIGHT' | translate }}</span>
               <strong class="cmp-cur">
                 {{ fPeso() != null ? fPeso() + ' kg' : '—' }}
               </strong>
             </div>
             <div class="cmp-prev">
-              <span class="cmp-prev-label">Anterior: {{ ultima()!.pesoKg ?? '—' }} kg</span>
+              <span class="cmp-prev-label">{{ 'PERSONAL.NEWEVAL.PREVIOUS_LABEL' | translate }} {{ ultima()!.pesoKg ?? '—' }} kg</span>
               <span class="cmp-delta" [class.up]="(deltaPeso() ?? 0) > 0" [class.down]="(deltaPeso() ?? 0) < 0">
                 {{ fmtDelta(deltaPeso(), 'kg') }}
               </span>
@@ -211,13 +211,13 @@
 
           <div class="cmp-item">
             <div class="cmp-info">
-              <span class="cmp-label">% Gordura</span>
+              <span class="cmp-label">{{ 'ALUNO.AVAL.BODY_FAT' | translate }}</span>
               <strong class="cmp-cur">
                 {{ fGordura() != null ? fGordura() + ' %' : '—' }}
               </strong>
             </div>
             <div class="cmp-prev">
-              <span class="cmp-prev-label">Anterior: {{ ultima()!.percentualGordura ?? '—' }} %</span>
+              <span class="cmp-prev-label">{{ 'PERSONAL.NEWEVAL.PREVIOUS_LABEL' | translate }} {{ ultima()!.percentualGordura ?? '—' }} %</span>
               <span class="cmp-delta" [class.up]="(deltaGordura() ?? 0) > 0" [class.down]="(deltaGordura() ?? 0) < 0">
                 {{ fmtDelta(deltaGordura(), '%') }}
               </span>
@@ -226,14 +226,14 @@
 
           <div class="cmp-item">
             <div class="cmp-info">
-              <span class="cmp-label">Massa magra</span>
+              <span class="cmp-label">{{ 'ALUNO.AVAL.LEAN_MASS' | translate }}</span>
               <strong class="cmp-cur">
                 {{ fMassaMagra() != null ? fMassaMagra() + ' kg' : '—' }}
               </strong>
             </div>
             <div class="cmp-prev">
               <span class="cmp-prev-label">
-                Anterior: {{ massaMagraAnterior() != null ? massaMagraAnterior() + ' kg' : '—' }}
+                {{ 'PERSONAL.NEWEVAL.PREVIOUS_LABEL' | translate }} {{ massaMagraAnterior() != null ? massaMagraAnterior() + ' kg' : '—' }}
               </span>
               <span class="cmp-delta" [class.up]="(deltaMassaMagra() ?? 0) > 0" [class.down]="(deltaMassaMagra() ?? 0) < 0">
                 {{ fmtDelta(deltaMassaMagra(), 'kg') }}
@@ -243,13 +243,13 @@
 
           <div class="cmp-item">
             <div class="cmp-info">
-              <span class="cmp-label">Cintura</span>
+              <span class="cmp-label">{{ 'ALUNO.AVAL.WAIST' | translate }}</span>
               <strong class="cmp-cur">
                 {{ fCintura() != null ? fCintura() + ' cm' : '—' }}
               </strong>
             </div>
             <div class="cmp-prev">
-              <span class="cmp-prev-label">Anterior: {{ ultima()!.cinturaCm ?? '—' }} cm</span>
+              <span class="cmp-prev-label">{{ 'PERSONAL.NEWEVAL.PREVIOUS_LABEL' | translate }} {{ ultima()!.cinturaCm ?? '—' }} cm</span>
               <span class="cmp-delta" [class.up]="(deltaCintura() ?? 0) > 0" [class.down]="(deltaCintura() ?? 0) < 0">
                 {{ fmtDelta(deltaCintura(), 'cm') }}
               </span>
@@ -260,10 +260,10 @@
 
       <ng-template #semCompare>
         <p-card styleClass="repz-card compare-card">
-          <div class="form-title">Comparativo</div>
+          <div class="form-title">{{ 'PERSONAL.NEWEVAL.COMPARE' | translate }}</div>
           <div class="cmp-empty">
             <i class="pi pi-info-circle"></i>
-            <span>Esta é a primeira avaliação do aluno. Comparativos aparecerão a partir da próxima.</span>
+            <span>{{ 'PERSONAL.NEWEVAL.FIRST_EVAL_MSG' | translate }}</span>
           </div>
         </p-card>
       </ng-template>

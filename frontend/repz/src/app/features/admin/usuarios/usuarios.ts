@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AcademiaService, AuthService, UserService } from '@core/services';
 import type { AcademiaResponse, UserGetResponse, UserPutRequest, UserRole } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
@@ -22,6 +23,7 @@ type FiltroRole = 'TODOS' | UserRole;
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     DialogModule,
@@ -38,6 +40,7 @@ export class AdminUsuarios implements OnInit {
   protected readonly userService = inject(UserService);
   private readonly auth = inject(AuthService);
   private readonly academiaService = inject(AcademiaService);
+  private readonly i18n = inject(TranslateService);
 
   readonly academias = signal<AcademiaResponse[]>([]);
 
@@ -50,19 +53,19 @@ export class AdminUsuarios implements OnInit {
   readonly filtroRole = signal<FiltroRole>('TODOS');
   readonly alterandoId = signal<number | null>(null);
 
-  readonly roles: { label: string; value: FiltroRole }[] = [
-    { label: 'Todos', value: 'TODOS' },
-    { label: 'Admin', value: 'ADMIN' },
-    { label: 'Gerente', value: 'GERENTE' },
-    { label: 'Personal', value: 'PERSONAL' },
-    { label: 'Aluno', value: 'ALUNO' },
+  readonly roles: { labelKey: string; value: FiltroRole }[] = [
+    { labelKey: 'ADMIN.USERS.ALL', value: 'TODOS' },
+    { labelKey: 'ROLES.ADMIN', value: 'ADMIN' },
+    { labelKey: 'ROLES.MANAGER', value: 'GERENTE' },
+    { labelKey: 'ROLES.TRAINER', value: 'PERSONAL' },
+    { labelKey: 'ROLES.STUDENT', value: 'ALUNO' },
   ];
 
-  readonly rolesEdicao: { label: string; value: UserRole }[] = [
-    { label: 'Admin', value: 'ADMIN' },
-    { label: 'Gerente', value: 'GERENTE' },
-    { label: 'Personal', value: 'PERSONAL' },
-    { label: 'Aluno', value: 'ALUNO' },
+  readonly rolesEdicao: { labelKey: string; value: UserRole }[] = [
+    { labelKey: 'ROLES.ADMIN', value: 'ADMIN' },
+    { labelKey: 'ROLES.MANAGER', value: 'GERENTE' },
+    { labelKey: 'ROLES.TRAINER', value: 'PERSONAL' },
+    { labelKey: 'ROLES.STUDENT', value: 'ALUNO' },
   ];
 
   readonly editando = signal<UserGetResponse | null>(null);
@@ -104,7 +107,7 @@ export class AdminUsuarios implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os usuários.');
+        this.erro.set(this.i18n.instant('ADMIN.USERS.LOAD_ERROR'));
       },
     });
   }
@@ -116,13 +119,13 @@ export class AdminUsuarios implements OnInit {
   rotuloRole(role: UserRole): string {
     switch (role) {
       case 'ADMIN':
-        return 'Admin';
+        return this.i18n.instant('ROLES.ADMIN');
       case 'GERENTE':
-        return 'Gerente';
+        return this.i18n.instant('ROLES.MANAGER');
       case 'PERSONAL':
-        return 'Personal';
+        return this.i18n.instant('ROLES.TRAINER');
       case 'ALUNO':
-        return 'Aluno';
+        return this.i18n.instant('ROLES.STUDENT');
       default:
         return role;
     }
@@ -164,7 +167,7 @@ export class AdminUsuarios implements OnInit {
     if (!u || this.salvandoEdicao()) return;
     if (!this.formNome.trim() || !this.formEmail.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Nome e e-mail são obrigatórios.');
+      this.aviso.set(this.i18n.instant('PROFILE.NAME_EMAIL_REQUIRED'));
       return;
     }
     this.salvandoEdicao.set(true);
@@ -187,13 +190,13 @@ export class AdminUsuarios implements OnInit {
         this.salvandoEdicao.set(false);
         this.editando.set(null);
         this.avisoSeverity.set('success');
-        this.aviso.set(`Usuário "${req.name}" atualizado.`);
+        this.aviso.set(this.i18n.instant('ADMIN.USERS.USER_UPDATED', { nome: req.name }));
         setTimeout(() => this.aviso.set(null), 3500);
       },
       error: (err) => {
         this.salvandoEdicao.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao atualizar usuário.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ADMIN.USERS.UPDATE_ERROR'));
       },
     });
   }
@@ -212,13 +215,18 @@ export class AdminUsuarios implements OnInit {
         );
         this.alterandoId.set(null);
         this.avisoSeverity.set('success');
-        this.aviso.set(`Usuário "${u.name}" ${u.active ? 'desativado' : 'ativado'}.`);
+        this.aviso.set(
+          this.i18n.instant(
+            u.active ? 'ADMIN.USERS.USER_DEACTIVATED' : 'ADMIN.USERS.USER_ACTIVATED',
+            { nome: u.name },
+          ),
+        );
         setTimeout(() => this.aviso.set(null), 3500);
       },
       error: (err) => {
         this.alterandoId.set(null);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao alterar status do usuário.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ADMIN.USERS.STATUS_ERROR'));
       },
     });
   }

@@ -13,6 +13,7 @@ import type {
   UserPutRequest,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
@@ -29,6 +30,7 @@ import { TagModule } from 'primeng/tag';
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     DialogModule,
@@ -45,6 +47,7 @@ export class AcademiaPersonais implements OnInit {
   protected readonly userService = inject(UserService);
   private readonly personalService = inject(PersonalService);
   private readonly academiaService = inject(AcademiaService);
+  private readonly i18n = inject(TranslateService);
   private readonly academia = signal<AcademiaResponse | null>(null);
 
   readonly carregando = signal(true);
@@ -106,7 +109,7 @@ export class AcademiaPersonais implements OnInit {
     if (!academia || this.salvandoCad()) return;
     if (!this.cadNome.trim() || !this.cadEmail.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Nome e e-mail são obrigatórios.');
+      this.aviso.set(this.i18n.instant('PROFILE.NAME_EMAIL_REQUIRED'));
       return;
     }
 
@@ -143,8 +146,10 @@ export class AcademiaPersonais implements OnInit {
         this.cadastrando.set(false);
         this.avisoSeverity.set('success');
         this.aviso.set(
-          `Personal "${req.name}" cadastrado(a)! Senha temporária: ${senha}` +
-            (this.cadCref ? ` · CREF ${this.cadCref}` : ''),
+          this.i18n.instant('ACADEMIA.TRAINERS.TRAINER_REGISTERED_PWD', { nome: req.name, senha }) +
+            (this.cadCref
+              ? this.i18n.instant('ACADEMIA.TRAINERS.CREF_SUFFIX', { cref: this.cadCref })
+              : ''),
         );
         setTimeout(() => this.aviso.set(null), 6000);
         this.carregar();
@@ -152,7 +157,7 @@ export class AcademiaPersonais implements OnInit {
       error: (err) => {
         this.salvandoCad.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao cadastrar personal.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.TRAINERS.REGISTER_ERROR'));
       },
     });
   }
@@ -167,7 +172,7 @@ export class AcademiaPersonais implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os personais.');
+        this.erro.set(this.i18n.instant('ACADEMIA.TRAINERS.LOAD_ERROR'));
       },
     });
   }
@@ -189,7 +194,7 @@ export class AcademiaPersonais implements OnInit {
     if (!p || this.salvandoEdicao()) return;
     if (!this.formNome.trim() || !this.formEmail.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Nome e e-mail são obrigatórios.');
+      this.aviso.set(this.i18n.instant('PROFILE.NAME_EMAIL_REQUIRED'));
       return;
     }
     this.salvandoEdicao.set(true);
@@ -218,14 +223,14 @@ export class AcademiaPersonais implements OnInit {
               this.salvandoEdicao.set(false);
               this.editando.set(null);
               this.avisoSeverity.set('success');
-              this.aviso.set(`Personal "${nome}" atualizado.`);
+              this.aviso.set(this.i18n.instant('ACADEMIA.TRAINERS.TRAINER_UPDATED', { nome }));
               setTimeout(() => this.aviso.set(null), 3500);
             },
             error: () => {
               this.salvandoEdicao.set(false);
               this.editando.set(null);
               this.avisoSeverity.set('success');
-              this.aviso.set(`Personal "${this.formNome.trim()}" atualizado.`);
+              this.aviso.set(this.i18n.instant('ACADEMIA.TRAINERS.TRAINER_UPDATED', { nome: this.formNome.trim() }));
               setTimeout(() => this.aviso.set(null), 3500);
             },
           });
@@ -233,7 +238,7 @@ export class AcademiaPersonais implements OnInit {
       error: (err) => {
         this.salvandoEdicao.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao atualizar o personal.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.TRAINERS.UPDATE_ERROR'));
       },
     });
   }
@@ -252,13 +257,18 @@ export class AcademiaPersonais implements OnInit {
           );
           this.alterandoId.set(null);
           this.avisoSeverity.set('success');
-          this.aviso.set(`Personal "${p.userName}" ${p.ativo ? 'desativado' : 'ativado'}.`);
+          this.aviso.set(
+            this.i18n.instant(
+              p.ativo ? 'ACADEMIA.TRAINERS.TRAINER_DEACTIVATED' : 'ACADEMIA.TRAINERS.TRAINER_ACTIVATED',
+              { nome: p.userName },
+            ),
+          );
           setTimeout(() => this.aviso.set(null), 3500);
         },
         error: (err) => {
           this.alterandoId.set(null);
           this.avisoSeverity.set('error');
-          this.aviso.set(err?.error?.message ?? 'Erro ao alterar status.');
+          this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.TRAINERS.STATUS_ERROR'));
         },
       });
   }

@@ -1,8 +1,8 @@
 <app-shell
   ativo="alunos"
-  [crumbs]="['Personal Trainer', 'Detalhes']"
+  [crumbs]="[('PERSONAL.AREA' | translate), ('PERSONAL.DETAILS.TITLE' | translate)]"
   [nome]="personalService.nomePersonal()"
-  subtitulo="Personal Trainer"
+  [subtitulo]="'PERSONAL.AREA' | translate"
   [mostrarCta]="false"
 >
 
@@ -40,14 +40,14 @@
       </div>
       <div class="header-actions">
         <p-button
-          label="Avaliação"
+          [label]="'PERSONAL.DETAILS.EVAL' | translate"
           icon="pi pi-pencil"
           styleClass="repz-ghost"
           [routerLink]="['/personal/aluno', a.userId, 'avaliacao-nova']"
           [queryParams]="{ nome: a.nome }"
         />
         <p-button
-          label="Editar ficha"
+          [label]="'PERSONAL.FICHA.EDIT_SHEET' | translate"
           icon="pi pi-list-check"
           styleClass="repz-primary"
           [routerLink]="['/personal/aluno', a.userId, 'ficha-treino']"
@@ -59,44 +59,44 @@
     <div class="kpi-grid">
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Peso atual</span>
+          <span class="kpi-label">{{ 'ALUNO.DASH.CURRENT_WEIGHT' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-chart-line"></i></span>
         </div>
         <div class="kpi-value">
           {{ pesoAtual() != null ? pesoAtual() : '—'
           }}<span class="kpi-unit" *ngIf="pesoAtual() != null"> kg</span>
         </div>
-        <div class="kpi-sub">última avaliação</div>
+        <div class="kpi-sub">{{ 'PERSONAL.DETAILS.LAST_EVAL' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Altura</span>
+          <span class="kpi-label">{{ 'PERSONAL.DETAILS.HEIGHT' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-arrows-v"></i></span>
         </div>
         <div class="kpi-value">
           {{ alturaAtual() != null ? alturaAtual() : '—'
           }}<span class="kpi-unit" *ngIf="alturaAtual() != null"> cm</span>
         </div>
-        <div class="kpi-sub">registrada na avaliação</div>
+        <div class="kpi-sub">{{ 'PERSONAL.DETAILS.RECORDED_IN_EVAL' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Frequência (mês)</span>
+          <span class="kpi-label">{{ 'PERSONAL.DASH.COL_FREQ' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-calendar"></i></span>
         </div>
-        <div class="kpi-value">{{ freqMes() }}<span class="kpi-unit"> d</span></div>
-        <div class="kpi-sub">presenças neste mês</div>
+        <div class="kpi-value">{{ freqMes() }}<span class="kpi-unit"> {{ 'ALUNO.DASH.DAYS' | translate }}</span></div>
+        <div class="kpi-sub">{{ 'PERSONAL.DETAILS.PRESENCES_MONTH' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Objetivo</span>
+          <span class="kpi-label">{{ 'PROFILE.GOAL' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-flag"></i></span>
         </div>
         <div class="kpi-value kpi-value-sm">{{ a.objetivo ?? '—' }}</div>
-        <div class="kpi-sub">{{ a.planoNome ?? 'sem plano' }}</div>
+        <div class="kpi-sub">{{ a.planoNome ?? ('PERSONAL.DETAILS.NO_PLAN' | translate) }}</div>
       </p-card>
     </div>
 
@@ -105,15 +105,15 @@
       <p-card styleClass="repz-card">
         <div class="section-head">
           <div>
-            <div class="section-title">Ficha de treino atual</div>
+            <div class="section-title">{{ 'PERSONAL.DETAILS.CURRENT_SHEET' | translate }}</div>
             <div class="section-sub">
-              {{ divisoes().length }} divisão(ões) ativa(s)
+              {{ 'PERSONAL.DETAILS.N_DIVISIONS_ACTIVE' | translate: { n: divisoes().length } }}
             </div>
           </div>
           <p-tag
             *ngIf="divisoes().length > 0"
             styleClass="repz-tag-success"
-            value="Ativa"
+            [value]="'ALUNO.FICHA.ACTIVE_F' | translate"
           />
         </div>
 
@@ -123,7 +123,7 @@
             <div class="ficha-info">
               <div class="ficha-nome">{{ d.nome }}</div>
               <div class="ficha-meta text-3">
-                {{ focoDivisao(d) }} · {{ d.exercicios.length }} exercícios
+                {{ focoDivisao(d) }} · {{ 'ALUNO.DASH.N_EXERCISES' | translate: { n: d.exercicios.length } }}
               </div>
             </div>
             <p-button
@@ -134,16 +134,16 @@
               styleClass="repz-icon-button"
               [routerLink]="['/personal/aluno', a.userId, 'ficha-treino']"
               [queryParams]="{ nome: a.nome }"
-              title="Editar"
+              [title]="'COMMON.EDIT' | translate"
             />
           </div>
         </div>
         <ng-template #semFicha>
           <div class="vazio-inline">
             <i class="pi pi-clipboard"></i>
-            <span>Sem ficha ativa.</span>
+            <span>{{ 'PERSONAL.DETAILS.NO_ACTIVE_SHEET' | translate }}</span>
             <p-button
-              label="Criar ficha"
+              [label]="'PERSONAL.DETAILS.CREATE_SHEET' | translate"
               icon="pi pi-plus"
               size="small"
               styleClass="repz-primary"
@@ -156,28 +156,28 @@
 
       <p-card styleClass="repz-card">
         <div class="section-head">
-          <div class="section-title">Última avaliação</div>
+          <div class="section-title">{{ 'ALUNO.AVAL.LAST_EVAL' | translate }}</div>
         </div>
 
         <ng-container *ngIf="ultimaAvaliacao() as u; else semAv">
           <div class="ult-data">{{ u.dataAvaliacao.split(' ')[0] }}</div>
           <div class="ult-grid">
             <div class="ult-item" *ngIf="u.percentualGordura != null">
-              <span>% Gordura</span><strong>{{ u.percentualGordura }}%</strong>
+              <span>{{ 'ALUNO.AVAL.BODY_FAT' | translate }}</span><strong>{{ u.percentualGordura }}%</strong>
             </div>
             <div class="ult-item" *ngIf="massaMagra() != null">
-              <span>Massa magra</span><strong>{{ massaMagra() }} kg</strong>
+              <span>{{ 'ALUNO.AVAL.LEAN_MASS' | translate }}</span><strong>{{ massaMagra() }} kg</strong>
             </div>
             <div class="ult-item" *ngIf="u.cinturaCm != null">
-              <span>Cintura</span><strong>{{ u.cinturaCm }} cm</strong>
+              <span>{{ 'ALUNO.AVAL.WAIST' | translate }}</span><strong>{{ u.cinturaCm }} cm</strong>
             </div>
             <div class="ult-item" *ngIf="u.bracoCm != null">
-              <span>Braço</span><strong>{{ u.bracoCm }} cm</strong>
+              <span>{{ 'ALUNO.AVAL.ARM' | translate }}</span><strong>{{ u.bracoCm }} cm</strong>
             </div>
           </div>
 
           <div class="chart-block" *ngIf="avaliacoes().length > 1">
-            <div class="chart-title">Evolução do peso</div>
+            <div class="chart-title">{{ 'PERSONAL.DETAILS.WEIGHT_EVOLUTION' | translate }}</div>
             <div class="chart-mini">
               <p-chart
                 type="line"
@@ -190,9 +190,9 @@
         <ng-template #semAv>
           <div class="vazio-inline">
             <i class="pi pi-chart-line"></i>
-            <span>Nenhuma avaliação registrada.</span>
+            <span>{{ 'PERSONAL.DETAILS.NO_EVAL' | translate }}</span>
             <p-button
-              label="Registrar"
+              [label]="'PERSONAL.DETAILS.REGISTER' | translate"
               icon="pi pi-plus"
               size="small"
               styleClass="repz-primary"

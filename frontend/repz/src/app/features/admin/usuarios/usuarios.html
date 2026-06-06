@@ -1,16 +1,16 @@
 <app-shell
   ativo="usuarios"
-  [crumbs]="['Admin', 'Usuários']"
+  [crumbs]="[('ROLES.ADMIN' | translate), ('NAV.USERS' | translate)]"
   [nome]="userService.nomeUsuario() || 'Administrador'"
-  subtitulo="Administração"
+  [subtitulo]="'ADMIN.AREA' | translate"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Usuários</div>
+      <div class="page-title">{{ 'NAV.USERS' | translate }}</div>
       <div class="page-subtitle">
         @if (!carregando()) {
-          {{ usuarios().length }} usuário(s) no sistema
+          {{ 'ADMIN.USERS.N_USERS' | translate: { n: usuarios().length } }}
         }
       </div>
     </div>
@@ -42,7 +42,7 @@
         <input
           pInputText
           type="text"
-          placeholder="Buscar por nome ou e-mail…"
+          [placeholder]="'PERSONAL.STUDENTS.SEARCH_NAME_EMAIL' | translate"
           [ngModel]="busca()"
           (ngModelChange)="busca.set($event)"
           class="search-input"
@@ -57,7 +57,7 @@
           [class.active]="filtroRole() === r.value"
           (click)="filtroRole.set(r.value)"
         >
-          {{ r.label }}
+          {{ r.labelKey | translate }}
         </button>
       </div>
     </div>
@@ -65,7 +65,7 @@
     <p-card styleClass="repz-card" *ngIf="usuarios().length === 0">
       <div class="empty-state">
         <i class="pi pi-users empty-icon"></i>
-        <div class="empty-title">Nenhum usuário cadastrado</div>
+        <div class="empty-title">{{ 'ADMIN.USERS.NONE' | translate }}</div>
       </div>
     </p-card>
 
@@ -79,10 +79,10 @@
       >
         <ng-template pTemplate="header">
           <tr>
-            <th>Usuário</th>
-            <th>Perfil</th>
-            <th>Último login</th>
-            <th>Status</th>
+            <th>{{ 'ADMIN.USERS.COL_USER' | translate }}</th>
+            <th>{{ 'ADMIN.USERS.COL_ROLE' | translate }}</th>
+            <th>{{ 'PROFILE.LAST_LOGIN' | translate }}</th>
+            <th>{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
             <th></th>
           </tr>
         </ng-template>
@@ -91,7 +91,7 @@
             <td>
               <div class="cell-strong">
                 {{ u.name }}
-                <span class="voce-tag" *ngIf="ehProprioUsuario(u)">você</span>
+                <span class="voce-tag" *ngIf="ehProprioUsuario(u)">{{ 'ADMIN.USERS.YOU' | translate }}</span>
               </div>
               <div class="cell-sub">{{ u.email }}</div>
             </td>
@@ -102,7 +102,7 @@
             <td>
               <p-tag
                 [styleClass]="u.active ? 'repz-tag-success' : 'repz-tag-muted'"
-                [value]="u.active ? 'Ativo' : 'Inativo'"
+                [value]="(u.active ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
               />
             </td>
             <td>
@@ -113,7 +113,7 @@
                   rounded
                   severity="secondary"
                   [disabled]="!podeEditar(u)"
-                  [title]="!podeEditar(u) ? 'Você não pode editar outro admin' : ''"
+                  [title]="!podeEditar(u) ? ('ADMIN.USERS.CANT_EDIT_ADMIN' | translate) : ''"
                   (onClick)="abrirEdicao(u)"
                 />
                 <p-button
@@ -123,7 +123,7 @@
                   [severity]="u.active ? 'danger' : 'success'"
                   [loading]="alterandoId() === u.id"
                   [disabled]="ehProprioUsuario(u) || (alterandoId() !== null && alterandoId() !== u.id)"
-                  [title]="ehProprioUsuario(u) ? 'Você não pode desativar a si mesmo' : ''"
+                  [title]="ehProprioUsuario(u) ? ('ADMIN.USERS.CANT_DEACTIVATE_SELF' | translate) : ''"
                   (onClick)="alternarStatus(u)"
                 />
               </div>
@@ -132,7 +132,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="5" class="empty-row">Nenhum usuário corresponde aos filtros.</td>
+            <td colspan="5" class="empty-row">{{ 'ADMIN.USERS.NO_MATCH' | translate }}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -140,7 +140,7 @@
   </ng-container>
 
   <p-dialog
-    header="Editar usuário"
+    [header]="'ADMIN.USERS.EDIT_USER' | translate"
     [visible]="editando() !== null"
     (visibleChange)="$event ? null : fecharEdicao()"
     [modal]="true"
@@ -151,49 +151,49 @@
   >
     <div class="edit-form" *ngIf="editando()">
       <div class="form-group">
-        <label class="form-label">Nome</label>
-        <input pInputText [(ngModel)]="formNome" class="w-full" placeholder="Nome completo" />
+        <label class="form-label">{{ 'PROFILE.NAME' | translate }}</label>
+        <input pInputText [(ngModel)]="formNome" class="w-full" [placeholder]="'ADMIN.USERS.FULL_NAME' | translate" />
       </div>
       <div class="form-group">
-        <label class="form-label">E-mail</label>
+        <label class="form-label">{{ 'PROFILE.EMAIL' | translate }}</label>
         <input
           pInputText
           type="email"
           [(ngModel)]="formEmail"
           class="w-full"
-          placeholder="email@exemplo.com"
+          [placeholder]="'PROFILE.EMAIL_PLACEHOLDER' | translate"
         />
       </div>
       <div class="form-group">
-        <label class="form-label">Perfil</label>
+        <label class="form-label">{{ 'ADMIN.USERS.COL_ROLE' | translate }}</label>
         <select class="form-select" [(ngModel)]="formRole" [disabled]="editandoProprioPerfil()">
-          <option *ngFor="let r of rolesEdicao" [value]="r.value">{{ r.label }}</option>
+          <option *ngFor="let r of rolesEdicao" [value]="r.value">{{ r.labelKey | translate }}</option>
         </select>
         <div class="form-hint" *ngIf="editandoProprioPerfil()">
-          Você não pode alterar o próprio perfil.
+          {{ 'ADMIN.USERS.CANT_CHANGE_OWN_ROLE' | translate }}
         </div>
       </div>
       <div class="form-group" *ngIf="precisaAcademia()">
-        <label class="form-label">Academia</label>
+        <label class="form-label">{{ 'PROFILE.GYM' | translate }}</label>
         <select class="form-select" [(ngModel)]="formAcademiaId">
-          <option [ngValue]="null">Sem academia</option>
+          <option [ngValue]="null">{{ 'ADMIN.USERS.NO_GYM' | translate }}</option>
           <option *ngFor="let a of academias()" [ngValue]="a.id">{{ a.name }}</option>
         </select>
         <div class="form-hint">
-          Vincula o usuário a uma academia específica.
+          {{ 'ADMIN.USERS.LINK_GYM_HINT' | translate }}
         </div>
       </div>
     </div>
 
     <ng-template pTemplate="footer">
       <p-button
-        label="Cancelar"
+        [label]="'COMMON.CANCEL' | translate"
         styleClass="repz-ghost"
         (onClick)="fecharEdicao()"
         [disabled]="salvandoEdicao()"
       />
       <p-button
-        label="Salvar"
+        [label]="'COMMON.SAVE' | translate"
         icon="pi pi-check"
         styleClass="repz-primary"
         [loading]="salvandoEdicao()"

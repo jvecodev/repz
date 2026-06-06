@@ -20,6 +20,7 @@ import type {
   UserCreateRequest,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
@@ -43,6 +44,7 @@ function senhaTemporaria(): string {
     FormsModule,
     RouterLink,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     DialogModule,
@@ -63,6 +65,7 @@ export class Academia implements OnInit {
   private readonly freqService = inject(FrequenciaService);
   private readonly planoService = inject(PlanoService);
   private readonly router = inject(Router);
+  private readonly i18n = inject(TranslateService);
 
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
@@ -122,7 +125,7 @@ export class Academia implements OnInit {
     }).subscribe(({ academia, alunos, personais, planos, inativos }) => {
       if (!academia) {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os dados da academia.');
+        this.erro.set(this.i18n.instant('ACADEMIA.DASH.LOAD_ERROR'));
         return;
       }
       this.academia.set(academia);
@@ -174,7 +177,7 @@ export class Academia implements OnInit {
       !this.formResponsavel.trim()
     ) {
       this.avisoSeverity.set('error');
-      this.aviso.set('CNPJ, nome, endereço e responsável são obrigatórios.');
+      this.aviso.set(this.i18n.instant('ACADEMIA.DASH.REQUIRED_FIELDS'));
       return;
     }
     this.salvando.set(true);
@@ -193,12 +196,12 @@ export class Academia implements OnInit {
         );
         this.salvando.set(false);
         this.editando.set(false);
-        this.flash('success', 'Dados da academia atualizados.');
+        this.flash('success', this.i18n.instant('ACADEMIA.DASH.GYM_UPDATED'));
       },
       error: (err) => {
         this.salvando.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao atualizar a academia.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.DASH.UPDATE_ERROR'));
       },
     });
   }
@@ -213,12 +216,12 @@ export class Academia implements OnInit {
     if (!academia || this.cadastrando()) return;
     if (!this.cadNome.trim() || !this.cadEmail.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Nome e e-mail são obrigatórios.');
+      this.aviso.set(this.i18n.instant('PROFILE.NAME_EMAIL_REQUIRED'));
       return;
     }
     if (this.abaCadastro() === 'aluno' && !this.cadPlanoId) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Selecione um plano para o aluno.');
+      this.aviso.set(this.i18n.instant('ACADEMIA.DASH.SELECT_PLAN'));
       return;
     }
 
@@ -236,8 +239,11 @@ export class Academia implements OnInit {
 
     this.userService.criar(req).subscribe({
       next: () => {
-        const label = this.abaCadastro() === 'aluno' ? 'Aluno' : 'Personal';
-        this.flash('success', `${label} ${req.name} cadastrado(a)! Senha temporária: ${senha}`);
+        const label = this.i18n.instant(this.abaCadastro() === 'aluno' ? 'ROLES.STUDENT' : 'ROLES.TRAINER');
+        this.flash(
+          'success',
+          this.i18n.instant('ACADEMIA.DASH.REGISTERED_TEMP_PWD', { role: label, nome: req.name, senha }),
+        );
         this.cadNome = '';
         this.cadEmail = '';
         this.cadEspecialidade = '';
@@ -247,7 +253,7 @@ export class Academia implements OnInit {
       error: (err) => {
         this.cadastrando.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao cadastrar.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.DASH.REGISTER_ERROR'));
       },
     });
   }
