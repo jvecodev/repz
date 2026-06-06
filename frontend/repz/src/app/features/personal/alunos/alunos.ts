@@ -6,7 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { catchError, forkJoin, of } from 'rxjs';
 import { AlunoService, FrequenciaService, PersonalService } from '@core/services';
-import type { AlunoDetalheResponse, FrequenciaResponse } from '@core/services';
+import type { AlunoDetalheResponse, AlunoInativoResponse, FrequenciaResponse } from '@core/services';
 import { AppShell } from '@shared/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -17,8 +17,9 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-interface AlunoRow {
+export type StatusTreino = 'em_dia' | 'atencao' | 'ausente' | 'sem_checkin';
 
+interface AlunoRow {
   userId: number;
   nome: string;
   email: string;
@@ -26,6 +27,8 @@ interface AlunoRow {
   ativo: boolean;
   freqMes: number;
   ultimoCheckin: string | null;
+  diasSemTreino: number | null;
+  statusTreino: StatusTreino;
 }
 
 function parseBR(s: string): Date {
@@ -33,6 +36,17 @@ function parseBR(s: string): Date {
   const [dia, mes, ano] = d.split('/').map(Number);
   const [h, mi, se] = t.split(':').map(Number);
   return new Date(ano, (mes ?? 1) - 1, dia ?? 1, h ?? 0, mi ?? 0, se ?? 0);
+}
+
+function diasEntre(a: Date, b: Date): number {
+  return Math.floor((b.getTime() - a.getTime()) / 86400000);
+}
+
+function classificarStatus(dias: number | null): StatusTreino {
+  if (dias == null) return 'sem_checkin';
+  if (dias <= 7) return 'em_dia';
+  if (dias <= 14) return 'atencao';
+  return 'ausente';
 }
 
 @Component({
@@ -107,8 +121,11 @@ export class PersonalAlunos implements OnInit {
     const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
     const mesFim = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
-    this.alunoService.listar().subscribe({
-      next: (alunos) => {
+    forkJoin({
+      alunos: this.alunoService.listar().pipe(catchError(() => of([] as AlunoDetalheResponse[]))),
+      inativos: this.freqService.alunosInativos().pipe(catchError(() => of([] as AlunoInativoResponse[]))),
+    }).subscribe({
+      next: ({ alunos, inativos }) => {
         if (alunos.length === 0) {
           this.rows.set([]);
           this.carregando.set(false);
@@ -122,7 +139,7 @@ export class PersonalAlunos implements OnInit {
         );
 
         forkJoin(freqCalls).subscribe((freqs) => {
-          this.rows.set(this.montarRows(alunos, freqs));
+          this.rows.set(this.montarRows(alunos, freqs, inativos));
           this.carregando.set(false);
         });
       },
@@ -136,13 +153,30 @@ export class PersonalAlunos implements OnInit {
   private montarRows(
     alunos: AlunoDetalheResponse[],
     freqs: FrequenciaResponse[][],
+    inativos: AlunoInativoResponse[],
   ): AlunoRow[] {
+    const inativoPorId = new Map<number, AlunoInativoResponse>();
+    for (const i of inativos) inativoPorId.set(i.alunoId, i);
+    const hoje = new Date();
+
     return alunos.map((a, i) => {
       const lista = freqs[i] ?? [];
       const ordenado = [...lista].sort(
         (x, y) => parseBR(y.dataHora).getTime() - parseBR(x.dataHora).getTime(),
       );
-      const ultimo = ordenado[0]?.dataHora?.split(' ')[0] ?? null;
+      const ultimoData = ordenado[0]?.dataHora ?? null;
+      const ultimo = ultimoData?.split(' ')[0] ?? null;
+
+      let diasSemTreino: number | null;
+      const inativoInfo = inativoPorId.get(a.userId);
+      if (inativoInfo) {
+        diasSemTreino = inativoInfo.diasSemTreino;
+      } else if (ultimoData) {
+        diasSemTreino = diasEntre(parseBR(ultimoData), hoje);
+      } else {
+        diasSemTreino = null;
+      }
+
       return {
         userId: a.userId,
         nome: a.nome,
@@ -151,8 +185,28 @@ export class PersonalAlunos implements OnInit {
         ativo: a.ativo,
         freqMes: lista.length,
         ultimoCheckin: ultimo,
+        diasSemTreino,
+        statusTreino: classificarStatus(diasSemTreino),
       };
     });
+  }
+
+  statusLabel(s: StatusTreino): string {
+    switch (s) {
+      case 'em_dia':       return this.i18n.instant('PERSONAL.DASH.STATUS_OK');
+      case 'atencao':      return this.i18n.instant('PERSONAL.DASH.STATUS_WARN');
+      case 'ausente':      return this.i18n.instant('PERSONAL.DASH.STATUS_ABSENT');
+      case 'sem_checkin':  return this.i18n.instant('PERSONAL.DASH.STATUS_NO_CHECKIN');
+    }
+  }
+
+  statusClass(s: StatusTreino): string {
+    switch (s) {
+      case 'em_dia':      return 'repz-tag-success';
+      case 'atencao':     return 'repz-tag-warn';
+      case 'ausente':     return 'repz-tag-danger';
+      case 'sem_checkin': return 'repz-tag-muted';
+    }
   }
 
   inicial(nome: string): string {

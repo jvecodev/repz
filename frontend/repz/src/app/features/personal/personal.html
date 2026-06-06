@@ -77,6 +77,14 @@
     <p-progressSpinner strokeWidth="4" />
   </div>
 
+  <p-card styleClass="repz-card" *ngIf="!carregando() && rows().length === 0">
+    <div class="empty-dash">
+      <i class="pi pi-users"></i>
+      <div class="empty-dash-title">{{ 'PERSONAL.STUDENTS.NONE_LINKED' | translate }}</div>
+      <div class="empty-dash-desc">{{ 'PERSONAL.STUDENTS.NONE_DESC' | translate }}</div>
+    </div>
+  </p-card>
+
   <p-card styleClass="repz-card" *ngIf="!carregando() && rows().length > 0">
     <div class="section-head">
       <div class="section-title">{{ 'NAV.MY_STUDENTS' | translate }}</div>

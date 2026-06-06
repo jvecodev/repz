@@ -63,15 +63,19 @@
         <ng-template pTemplate="header">
           <tr>
             <th>{{ 'PERSONAL.DASH.COL_STUDENT' | translate }}</th>
-            <th style="width: 160px">{{ 'PERSONAL.DASH.COL_PLAN' | translate }}</th>
-            <th style="width: 180px">{{ 'PERSONAL.DASH.COL_FREQ' | translate }}</th>
-            <th style="width: 150px">{{ 'PERSONAL.DASH.COL_LAST_CHECKIN' | translate }}</th>
-            <th style="width: 100px">{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
+            <th style="width: 140px">{{ 'PERSONAL.DASH.COL_PLAN' | translate }}</th>
+            <th style="width: 160px">{{ 'PERSONAL.DASH.COL_FREQ' | translate }}</th>
+            <th style="width: 140px">{{ 'PERSONAL.DASH.COL_LAST_CHECKIN' | translate }}</th>
+            <th style="width: 150px">{{ 'PERSONAL.DASH.COL_WORKOUT_STATUS' | translate }}</th>
+            <th style="width: 90px">{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
             <th style="width: 90px"></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-r>
-          <tr>
+          <tr
+            [class.row-warn]="r.statusTreino === 'atencao'"
+            [class.row-danger]="r.statusTreino === 'ausente'"
+          >
             <td>
               <div class="al-cell">
                 <div class="avatar avatar-md">{{ inicial(r.nome) }}</div>
@@ -90,7 +94,20 @@
                 <span class="freq-num">{{ r.freqMes }}d</span>
               </div>
             </td>
-            <td class="cell-sub">{{ r.ultimoCheckin ?? '—' }}</td>
+            <td class="cell-sub">
+              <span>{{ r.ultimoCheckin ?? '—' }}</span>
+              <span class="dias-sub" *ngIf="r.diasSemTreino != null && r.diasSemTreino > 0">
+                {{ 'PERSONAL.DASH.DAYS_AGO_SHORT' | translate: { n: r.diasSemTreino } }}
+              </span>
+            </td>
+            <td>
+              <p-tag [styleClass]="statusClass(r.statusTreino)" [value]="statusLabel(r.statusTreino)" />
+              <i
+                *ngIf="r.statusTreino === 'atencao' || r.statusTreino === 'ausente'"
+                class="pi pi-exclamation-triangle alerta-icon"
+                [title]="(r.statusTreino === 'ausente' ? 'PERSONAL.DASH.ABSENT_14_TIP' : 'PERSONAL.DASH.ABSENT_7_TIP') | translate"
+              ></i>
+            </td>
             <td>
               <p-tag
                 [styleClass]="r.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
@@ -121,7 +138,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="6" class="empty-row">{{ 'PERSONAL.STUDENTS.NO_MATCH' | translate }}</td>
+            <td colspan="7" class="empty-row">{{ 'PERSONAL.STUDENTS.NO_MATCH' | translate }}</td>
           </tr>
         </ng-template>
       </p-table>
