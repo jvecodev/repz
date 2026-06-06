@@ -47,7 +47,6 @@ class StorageServiceUnitTest {
     @BeforeEach
     void setup() {
         ReflectionTestUtils.setField(storageService, "bucket", "repz");
-        ReflectionTestUtils.setField(storageService, "urlExpiryHours", 1);
         ReflectionTestUtils.setField(storageService, "externalUrl", "http://localhost:9000");
     }
 
@@ -60,7 +59,6 @@ class StorageServiceUnitTest {
         when(file.getInputStream()).thenReturn(InputStream.nullInputStream());
         when(file.getContentType()).thenReturn("image/jpeg");
         when(minioClient.putObject(any())).thenReturn(mock(ObjectWriteResponse.class));
-        when(minioClient.getPresignedObjectUrl(any())).thenReturn("http://minio:9000/repz/users/1/uuid.jpg?token=abc");
         when(arquivoRepository.findByUserId(1L)).thenReturn(Optional.empty());
         when(arquivoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -82,7 +80,6 @@ class StorageServiceUnitTest {
         when(file.getInputStream()).thenReturn(InputStream.nullInputStream());
         when(file.getContentType()).thenReturn("image/png");
         when(minioClient.putObject(any())).thenReturn(mock(ObjectWriteResponse.class));
-        when(minioClient.getPresignedObjectUrl(any())).thenReturn("http://minio:9000/repz/users/2/new.png?token=xyz");
         when(arquivoRepository.findByUserId(2L)).thenReturn(Optional.of(existente));
         when(arquivoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -95,9 +92,6 @@ class StorageServiceUnitTest {
 
     @Test
     void getPreviewUrlRetornaUrlComHostExterno() throws Exception {
-        when(minioClient.getPresignedObjectUrl(any()))
-                .thenReturn("http://minio:9000/repz/users/1/photo.jpg?token=abc");
-
         String url = storageService.getPreviewUrl("users/1/photo.jpg");
 
         assertThat(url).startsWith("http://localhost:9000/");
@@ -120,11 +114,52 @@ class StorageServiceUnitTest {
     }
 
     @Test
-    void getPreviewUrlLancaExcecaoQuandoMinioFalha() throws Exception {
-        when(minioClient.getPresignedObjectUrl(any())).thenThrow(new RuntimeException("connection refused"));
-        when(mensagens.get("arquivo.erro.url")).thenReturn("Erro ao gerar URL");
+    void validateProfilePhotoAceitaJpeg() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getContentType()).thenReturn("image/jpeg");
 
-        assertThatThrownBy(() -> storageService.getPreviewUrl("users/1/photo.jpg"))
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(
+                () -> storageService.validateProfilePhoto(file));
+    }
+
+    @Test
+    void validateProfilePhotoAceitaPng() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getContentType()).thenReturn("image/png");
+
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(
+                () -> storageService.validateProfilePhoto(file));
+    }
+
+    @Test
+    void validateProfilePhotoRejeitaArquivoNulo() {
+        when(mensagens.get("foto.arquivo.obrigatorio")).thenReturn("Foto obrigatória.");
+
+        assertThatThrownBy(() -> storageService.validateProfilePhoto(null))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    void validateProfilePhotoRejeitaArquivoVazio() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(true);
+        when(mensagens.get("foto.arquivo.obrigatorio")).thenReturn("Foto obrigatória.");
+
+        assertThatThrownBy(() -> storageService.validateProfilePhoto(file))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+
+    void validateProfilePhotoRejeitaFormatoInvalido() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getContentType()).thenReturn("image/gif");
+        when(mensagens.get("foto.formato.invalido")).thenReturn("Formato inválido.");
+
+        assertThatThrownBy(() -> storageService.validateProfilePhoto(file))
                 .isInstanceOf(ResponseStatusException.class);
     }
 }

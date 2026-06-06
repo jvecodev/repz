@@ -8,10 +8,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import repz.app.dto.request.AdminCreateRequest;
 import repz.app.dto.request.UserCreateRequest;
+import repz.app.dto.response.UserGetResponse;
 import repz.app.message.Mensagens;
 import repz.app.persistence.entity.Academia;
 import repz.app.persistence.entity.Aluno;
@@ -24,6 +28,7 @@ import repz.app.persistence.repository.AlunoRepository;
 import repz.app.persistence.repository.PersonalRepository;
 import repz.app.persistence.repository.PlanoRepository;
 import repz.app.persistence.repository.UserRepository;
+import repz.app.service.storage.StorageService;
 import repz.app.service.user.UserDetailsServiceImpl;
 import repz.app.service.user.UserServiceImpl;
 
@@ -33,6 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,6 +72,9 @@ class UserServiceUnitTest {
 
     @Mock
     private Mensagens mensagens;
+
+    @Mock
+    private StorageService storageService;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -169,5 +179,80 @@ class UserServiceUnitTest {
         when(userRepository.findByEmail("missing@repz.com")).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.loadUserByUsername("missing@repz.com"))
                 .isInstanceOf(org.springframework.security.core.userdetails.UsernameNotFoundException.class);
+    }
+
+
+    @Test
+    void atualizarFotoPerfilSalvaUrlNoUser() {
+        User u = user(10L, UserRole.ADMIN);
+        Authentication auth = new UsernamePasswordAuthenticationToken(u, null, u.getAuthorities());
+        MultipartFile foto = mock(MultipartFile.class);
+        String expectedUrl = "http://localhost:9000/repz/users/10/uuid.jpg";
+
+        doNothing().when(storageService).validateProfilePhoto(foto);
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.of(u));
+        when(storageService.upload(foto, u)).thenReturn(expectedUrl);
+        when(userRepository.save(u)).thenReturn(u);
+        when(userMapper.toResponse(u)).thenReturn(
+                new UserGetResponse(u.getId(), u.getName(), u.getEmail(), null, u.getRole(), u.getActive(), expectedUrl));
+
+        UserGetResponse response = userService.atualizarFotoPerfil(foto, auth);
+
+        assertThat(u.getFotoUrl()).isEqualTo(expectedUrl);
+        assertThat(response.fotoUrl()).isEqualTo(expectedUrl);
+        verify(storageService).validateProfilePhoto(foto);
+        verify(storageService).upload(foto, u);
+        verify(userRepository).save(u);
+    }
+
+    @Test
+    void atualizarFotoPerfilAtualizaAlunoTambem() {
+        User u = user(20L, UserRole.ALUNO);
+        Authentication auth = new UsernamePasswordAuthenticationToken(u, null, u.getAuthorities());
+        MultipartFile foto = mock(MultipartFile.class);
+        String expectedUrl = "http://localhost:9000/repz/users/20/photo.png";
+        Aluno aluno = new Aluno();
+        aluno.setUsuario(u);
+
+        doNothing().when(storageService).validateProfilePhoto(foto);
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.of(u));
+        when(storageService.upload(foto, u)).thenReturn(expectedUrl);
+        when(userRepository.save(u)).thenReturn(u);
+        when(alunoRepository.findByUsuarioId(20L)).thenReturn(Optional.of(aluno));
+        when(userMapper.toResponse(u)).thenReturn(
+                new UserGetResponse(u.getId(), u.getName(), u.getEmail(), null, u.getRole(), u.getActive(), expectedUrl));
+
+        userService.atualizarFotoPerfil(foto, auth);
+
+        assertThat(aluno.getFotoUrl()).isEqualTo(expectedUrl);
+        verify(alunoRepository).save(aluno);
+    }
+
+    @Test
+    void atualizarFotoPerfilLancaExcecaoQuandoUsuarioNaoEncontrado() {
+        User u = user(30L, UserRole.GERENTE);
+        Authentication auth = new UsernamePasswordAuthenticationToken(u, null, u.getAuthorities());
+        MultipartFile foto = mock(MultipartFile.class);
+
+        doNothing().when(storageService).validateProfilePhoto(foto);
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.empty());
+        when(mensagens.get("usuario.nao.encontrado")).thenReturn("Usuário não encontrado.");
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> userService.atualizarFotoPerfil(foto, auth));
+
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void atualizarFotoPerfilLancaExcecaoQuandoAutenticacaoNula() {
+        MultipartFile foto = mock(MultipartFile.class);
+
+        assertThrows(AccessDeniedException.class,
+                () -> userService.atualizarFotoPerfil(foto, null));
+
+        verify(storageService, never()).validateProfilePhoto(any());
+        verify(storageService, never()).upload(any(), any());
     }
 }

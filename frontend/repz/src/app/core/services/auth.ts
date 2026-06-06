@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Observable, tap, throwError } from 'rxjs';
 import { environment } from '@env/environment';
+import { UserService } from './user';
 
 interface LoginResponse {
   token: string;
@@ -24,6 +25,7 @@ export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/auth`;
+  private readonly userService = inject(UserService);
 
   /** Sessão atual derivada do JWT (reativa). */
   readonly sessao = signal<SessaoUsuario | null>(this.lerSessaoDoToken());
@@ -58,6 +60,11 @@ export class AuthService {
       this.http.post<void>(`${this.base}/logout`, {}).subscribe({ error: () => {} });
     }
     this.limparSessao();
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(ROLE_KEY);
+    this.sessao.set(null);
+    this.userService.resetar();
   }
 
   getToken(): string | null {

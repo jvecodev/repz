@@ -32,7 +32,7 @@ public class FileControllerImpl implements FileController {
     @Override
     public ResponseEntity<String> minhaFoto(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        String url = storageService.getMyPhotoUrl(user);
+        String url = storageService.getMyPhotoUrlString(user);
         return url == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(url);
     }
 }

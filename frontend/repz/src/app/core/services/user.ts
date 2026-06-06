@@ -35,6 +35,7 @@ export interface UserGetResponse {
   lastLogin?: string;
   role: UserRole;
   active: boolean;
+  fotoUrl?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -42,8 +43,12 @@ export class UserService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/users`;
 
+  
+
   private readonly _nomeUsuario = signal<string>('');
   readonly nomeUsuario = computed(() => this._nomeUsuario());
+  private readonly _fotoUrl = signal<string | null>(null);
+  readonly fotoUrl = computed(() => this._fotoUrl());
   private nomeCarregado = false;
 
   criar(req: UserCreateRequest): Observable<void> {
@@ -70,6 +75,7 @@ export class UserService {
     return this.http.get<UserGetResponse>(`${this.base}/me`).pipe(
       tap((u) => {
         this._nomeUsuario.set(u.name ?? '');
+        this._fotoUrl.set(u.fotoUrl ?? null);
         this.nomeCarregado = true;
       }),
     );
@@ -81,6 +87,17 @@ export class UserService {
     );
   }
 
+  uploadFoto(file: File): Observable<UserGetResponse> {
+    const form = new FormData();
+    form.append('foto', file);
+    return this.http.post<UserGetResponse>(`${this.base}/me/foto`, form).pipe(
+      tap((u) => {
+        this._nomeUsuario.set(u?.name ?? '');
+        this._fotoUrl.set(u?.fotoUrl ?? null);
+      }),
+    );
+  }
+
   carregarNomeLogado(): void {
     if (this.nomeCarregado) return;
     this.nomeCarregado = true;
@@ -89,5 +106,15 @@ export class UserService {
         this.nomeCarregado = false;
       },
     });
+  }
+
+  setFotoUrl(url: string | null): void {
+    this._fotoUrl.set(url);
+  }
+
+  resetar(): void {
+    this._nomeUsuario.set('');
+    this._fotoUrl.set(null);
+    this.nomeCarregado = false;
   }
 }

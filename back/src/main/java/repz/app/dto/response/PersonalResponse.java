@@ -21,4 +21,5 @@ public class PersonalResponse {
     private String academiaNome;
     private String especialidade;
     private Boolean ativo;
+    private String fotoUrl;
 }

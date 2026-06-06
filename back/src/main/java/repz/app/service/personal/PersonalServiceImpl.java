@@ -248,7 +248,8 @@ public class PersonalServiceImpl implements PersonalService {
                 personal.getAcademia().getId(),
                 personal.getAcademia().getName(),
                 personal.getEspecialidade(),
-                personal.getAtivo()
+                personal.getAtivo(),
+                personal.getUser().getFotoUrl()
         );
     }
 }
