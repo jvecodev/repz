@@ -17,6 +17,7 @@ import type {
   PersonalResponse,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -44,6 +45,7 @@ interface AcademiaRow {
     CommonModule,
     RouterLink,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     ConfirmDialogModule,
@@ -65,6 +67,7 @@ export class Admin implements OnInit {
   private readonly freqService = inject(FrequenciaService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
 
   readonly carregando = signal(true);
   readonly carregandoTabela = signal(true);
@@ -92,7 +95,7 @@ export class Admin implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os indicadores.');
+        this.erro.set(this.i18n.instant('ADMIN.DASH.LOAD_ERROR'));
       },
     });
 
@@ -163,11 +166,14 @@ export class Admin implements OnInit {
   confirmarToggleAtivo(r: AcademiaRow): void {
     const ativar = !r.active;
     this.confirmation.confirm({
-      header: ativar ? 'Ativar academia' : 'Inativar academia',
-      message: `Tem certeza que deseja ${ativar ? 'ativar' : 'inativar'} a academia "${r.name}"?`,
+      header: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE_GYM' : 'ADMIN.DASH.DEACTIVATE_GYM'),
+      message: this.i18n.instant(
+        ativar ? 'ADMIN.DASH.CONFIRM_ACTIVATE' : 'ADMIN.DASH.CONFIRM_DEACTIVATE',
+        { nome: r.name },
+      ),
       icon: ativar ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle',
-      acceptLabel: ativar ? 'Ativar' : 'Inativar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE' : 'ADMIN.DASH.DEACTIVATE'),
+      rejectLabel: this.i18n.instant('COMMON.CANCEL'),
       acceptButtonStyleClass: ativar ? 'p-button-success' : 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => this.alterarStatus(r, ativar),
@@ -182,7 +188,7 @@ export class Admin implements OnInit {
       next: () => {
         this.toast.add({
           severity: 'success',
-          summary: ativar ? 'Academia ativada' : 'Academia inativada',
+          summary: this.i18n.instant(ativar ? 'ADMIN.DASH.GYM_ACTIVATED' : 'ADMIN.DASH.GYM_DEACTIVATED'),
           life: 3000,
         });
         this.rows.update((rows) =>
@@ -192,7 +198,7 @@ export class Admin implements OnInit {
       error: () => {
         this.toast.add({
           severity: 'error',
-          summary: ativar ? 'Falha ao ativar' : 'Falha ao inativar',
+          summary: this.i18n.instant(ativar ? 'ADMIN.DASH.ACTIVATE_FAIL' : 'ADMIN.DASH.DEACTIVATE_FAIL'),
           life: 3500,
         });
       },

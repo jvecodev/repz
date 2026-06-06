@@ -1,8 +1,8 @@
 <app-shell
   ativo="personais"
-  [crumbs]="isAdmin() ? ['Admin', 'Personais'] : ['Academia', 'Personais']"
+  [crumbs]="[((isAdmin() ? 'ROLES.ADMIN' : 'ROLES.MANAGER') | translate), ('NAV.TRAINERS' | translate)]"
   [nome]="isAdmin() ? 'Administrador' : 'Academia'"
-  [subtitulo]="isAdmin() ? 'Administração' : 'Gestão da academia'"
+  [subtitulo]="(isAdmin() ? 'ADMIN.AREA' : 'ACADEMIA.AREA') | translate"
   [mostrarCta]="false"
 >
   <p-toast />
@@ -10,9 +10,9 @@
 
   <div class="page-header">
     <div>
-      <div class="page-title">Personais</div>
+      <div class="page-title">{{ 'NAV.TRAINERS' | translate }}</div>
       <div class="page-subtitle">
-        {{ isAdmin() ? 'Selecione uma academia para gerenciar seus personais.' : 'Personais vinculados à sua academia.' }}
+        {{ (isAdmin() ? 'MGMT.TRAINERS.SUBTITLE_ADMIN' : 'MGMT.TRAINERS.SUBTITLE_GYM') | translate }}
       </div>
     </div>
     <div class="header-actions">
@@ -23,11 +23,11 @@
         optionValue="id"
         [(ngModel)]="academiaSelecionada"
         (onChange)="trocarAcademia()"
-        placeholder="Selecione academia"
+        [placeholder]="'MGMT.STUDENTS.SELECT_GYM' | translate"
         [style]="{ 'min-width': '240px' }"
       />
       <p-button
-        label="Novo personal"
+        [label]="'MGMT.TRAINERS.NEW_TRAINER' | translate"
         icon="pi pi-plus"
         styleClass="repz-primary"
         (onClick)="novo()"
@@ -38,23 +38,23 @@
 
   <p-card styleClass="repz-card state-card" *ngIf="carregando()">
     <p-progressSpinner strokeWidth="3" animationDuration=".8s" styleClass="state-spinner" />
-    <span>Carregando personais…</span>
+    <span>{{ 'MGMT.TRAINERS.LOADING' | translate }}</span>
   </p-card>
 
   <p-card styleClass="repz-card state-card state-error" *ngIf="!carregando() && erro()">
     <i class="pi pi-exclamation-triangle"></i>
     <span>{{ erro() }}</span>
-    <p-button label="Tentar novamente" icon="pi pi-refresh" (onClick)="carregar()" />
+    <p-button [label]="'ADMIN.GYMS.RETRY' | translate" icon="pi pi-refresh" (onClick)="carregar()" />
   </p-card>
 
   <p-card styleClass="repz-card" *ngIf="!carregando() && !erro()">
     <div class="hist-head">
-      <div class="font-semibold">Personais cadastrados</div>
-      <div class="text-3 text-sm">{{ lista().length }} registro(s)</div>
+      <div class="font-semibold">{{ 'MGMT.TRAINERS.REGISTERED' | translate }}</div>
+      <div class="text-3 text-sm">{{ 'ALUNO.AVAL.N_RECORDS' | translate: { n: lista().length } }}</div>
     </div>
 
     <div class="empty-message text-3 text-sm" *ngIf="lista().length === 0">
-      Nenhum personal cadastrado.
+      {{ 'MGMT.TRAINERS.NONE_FOUND' | translate }}
     </div>
 
     <p-table
@@ -67,11 +67,11 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Nome</th>
-          <th>E-mail</th>
-          <th>Especialidade</th>
-          <th *ngIf="isAdmin()">Academia</th>
-          <th>Status</th>
+          <th>{{ 'PROFILE.NAME' | translate }}</th>
+          <th>{{ 'PROFILE.EMAIL' | translate }}</th>
+          <th>{{ 'PROFILE.SPECIALTY' | translate }}</th>
+          <th *ngIf="isAdmin()">{{ 'PROFILE.GYM' | translate }}</th>
+          <th>{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
           <th style="width: 160px"></th>
         </tr>
       </ng-template>
@@ -83,7 +83,7 @@
           <td *ngIf="isAdmin()">{{ p.academiaNome || '—' }}</td>
           <td>
             <p-tag
-              [value]="p.ativo ? 'Ativo' : 'Inativo'"
+              [value]="(p.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
               [severity]="p.ativo ? 'success' : 'danger'"
             />
           </td>
@@ -111,18 +111,18 @@
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '560px' }"
-    [header]="modo() === 'editar' ? 'Editar personal' : 'Novo personal'"
+    [header]="(modo() === 'editar' ? 'MGMT.TRAINERS.EDIT_TRAINER' : 'MGMT.TRAINERS.NEW_TRAINER') | translate"
     (onHide)="fecharDialog()"
   >
     <form #f="ngForm" (ngSubmit)="salvar(f)" class="form-personal">
       <ng-container *ngIf="modo() === 'criar'">
         <label class="field">
-          <span>Nome *</span>
+          <span>{{ 'ADMIN.GYMS.NAME_REQ' | translate }}</span>
           <input pInputText name="name" [(ngModel)]="form().name" required maxlength="120" />
         </label>
         <div class="grid2">
           <label class="field">
-            <span>E-mail *</span>
+            <span>{{ 'ACADEMIA.STUDENTS.EMAIL_REQ' | translate }}</span>
             <input
               pInputText
               type="email"
@@ -133,7 +133,7 @@
             />
           </label>
           <label class="field">
-            <span>Senha *</span>
+            <span>{{ 'MGMT.STUDENTS.PASSWORD_REQ' | translate }}</span>
             <input
               pInputText
               type="password"
@@ -154,7 +154,7 @@
       </ng-container>
 
       <label class="field">
-        <span>Especialidade {{ modo() === 'criar' ? '' : '*' }}</span>
+        <span>{{ 'PROFILE.SPECIALTY' | translate }} {{ modo() === 'criar' ? '' : '*' }}</span>
         <input
           pInputText
           name="especialidade"
@@ -174,7 +174,7 @@
       <div class="form-actions">
         <p-button
           type="button"
-          label="Cancelar"
+          [label]="'COMMON.CANCEL' | translate"
           severity="secondary"
           text
           [disabled]="salvando()"
@@ -182,7 +182,7 @@
         />
         <p-button
           type="submit"
-          [label]="modo() === 'editar' ? 'Salvar' : 'Criar'"
+          [label]="(modo() === 'editar' ? 'COMMON.SAVE' : 'ADMIN.GYMS.CREATE') | translate"
           icon="pi pi-save"
           [loading]="salvando()"
           [disabled]="salvando()"

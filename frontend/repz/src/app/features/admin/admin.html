@@ -1,8 +1,8 @@
 <app-shell
   ativo="dashboard"
-  [crumbs]="['Admin', 'Dashboard']"
+  [crumbs]="[('ROLES.ADMIN' | translate), ('NAV.DASHBOARD' | translate)]"
   [nome]="userService.nomeUsuario() || 'Administrador'"
-  subtitulo="Administração"
+  [subtitulo]="'ADMIN.AREA' | translate"
   [mostrarCta]="false"
 >
   <p-toast />
@@ -10,18 +10,18 @@
 
   <div class="page-header">
     <div>
-      <div class="page-title">Painel global</div>
-      <div class="page-subtitle">Visão consolidada de todas as academias da plataforma.</div>
+      <div class="page-title">{{ 'ADMIN.DASH.TITLE' | translate }}</div>
+      <div class="page-subtitle">{{ 'ADMIN.DASH.SUBTITLE' | translate }}</div>
     </div>
     <div class="header-actions">
       <p-button
-        label="Gerenciar academias"
+        [label]="'ADMIN.DASH.MANAGE_GYMS' | translate"
         icon="pi pi-building"
         styleClass="repz-ghost"
         routerLink="/admin/academias"
       />
       <p-button
-        label="Gerenciar usuários"
+        [label]="'ADMIN.DASH.MANAGE_USERS' | translate"
         icon="pi pi-users"
         styleClass="repz-primary"
         routerLink="/admin/usuarios"
@@ -44,40 +44,40 @@
     <div class="kpi-grid">
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Academias</span>
+          <span class="kpi-label">{{ 'NAV.GYMS' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-building"></i></span>
         </div>
         <div class="kpi-value">{{ d.totalAcademies }}</div>
         <div class="kpi-sub">
-          {{ d.totalActiveAcademies }} ativas · {{ d.totalInactiveAcademies }} inativas
+          {{ 'ADMIN.DASH.GYM_ACTIVE_INACTIVE' | translate: { a: d.totalActiveAcademies, i: d.totalInactiveAcademies } }}
         </div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Alunos</span>
+          <span class="kpi-label">{{ 'NAV.STUDENTS' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-users"></i></span>
         </div>
         <div class="kpi-value">{{ (d.totalStudents || totalAlunosComputado()) }}</div>
-        <div class="kpi-sub">total na plataforma</div>
+        <div class="kpi-sub">{{ 'ADMIN.DASH.TOTAL_PLATFORM' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Personais</span>
+          <span class="kpi-label">{{ 'NAV.TRAINERS' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-id-card"></i></span>
         </div>
         <div class="kpi-value">{{ (d.totalInstructors || totalPersonaisComputado()) }}</div>
-        <div class="kpi-sub">instrutores ativos</div>
+        <div class="kpi-sub">{{ 'ADMIN.DASH.ACTIVE_INSTRUCTORS' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Média</span>
+          <span class="kpi-label">{{ 'ADMIN.DASH.AVG' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-chart-bar"></i></span>
         </div>
         <div class="kpi-value">{{ mediaAlunos() }}</div>
-        <div class="kpi-sub">alunos por academia</div>
+        <div class="kpi-sub">{{ 'ADMIN.DASH.STUDENTS_PER_GYM' | translate }}</div>
       </p-card>
     </div>
   </ng-container>
@@ -85,9 +85,9 @@
   <p-card styleClass="repz-card">
     <div class="section-head">
       <div>
-        <div class="section-title">Academias da plataforma</div>
+        <div class="section-title">{{ 'ADMIN.DASH.PLATFORM_GYMS' | translate }}</div>
         <div class="section-sub" *ngIf="!carregandoTabela()">
-          {{ totalAcademias() }} cadastrada(s) · {{ ativas() }} ativa(s) · {{ inativas() }} inativa(s)
+          {{ 'ADMIN.DASH.REGISTERED_SUMMARY' | translate: { n: totalAcademias(), a: ativas(), i: inativas() } }}
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@
     </div>
 
     <div class="empty-inline text-3" *ngIf="!carregandoTabela() && rows().length === 0">
-      Nenhuma academia cadastrada ainda.
+      {{ 'ADMIN.DASH.NONE_YET' | translate }}
     </div>
 
     <p-table
@@ -110,12 +110,12 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Academia</th>
-          <th>Alunos ativos</th>
-          <th>Personais ativos</th>
-          <th>Frequência média</th>
-          <th>Status</th>
-          <th class="th-action">Ações</th>
+          <th>{{ 'ADMIN.DASH.COL_GYM' | translate }}</th>
+          <th>{{ 'ADMIN.DASH.COL_ACTIVE_STUDENTS' | translate }}</th>
+          <th>{{ 'ADMIN.DASH.COL_ACTIVE_TRAINERS' | translate }}</th>
+          <th>{{ 'ADMIN.DASH.COL_AVG_FREQ' | translate }}</th>
+          <th>{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
+          <th class="th-action">{{ 'COMMON.ACTIONS' | translate }}</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-r>
@@ -125,7 +125,7 @@
               <div class="avatar avatar-md">{{ inicial(r.name) }}</div>
               <div>
                 <div class="cell-strong">{{ r.name }}</div>
-                <div class="cell-sub">Resp.: {{ r.responsible }}</div>
+                <div class="cell-sub">{{ 'ADMIN.DASH.RESP' | translate }} {{ r.responsible }}</div>
               </div>
             </div>
           </td>
@@ -137,12 +137,12 @@
           </td>
           <td>
             <span class="metric-val">{{ r.frequenciaMedia }}</span>
-            <span class="metric-sub">check-ins/aluno (mês)</span>
+            <span class="metric-sub">{{ 'ADMIN.DASH.CHECKINS_PER_STUDENT' | translate }}</span>
           </td>
           <td>
             <p-tag
               [styleClass]="r.active ? 'repz-tag-success' : 'repz-tag-muted'"
-              [value]="r.active ? 'Ativa' : 'Inativa'"
+              [value]="(r.active ? 'COMMON.ACTIVE_F' : 'COMMON.INACTIVE_F') | translate"
             />
           </td>
           <td class="td-action">
@@ -152,7 +152,7 @@
               [rounded]="true"
               size="small"
               styleClass="repz-icon-button"
-              [title]="r.active ? 'Inativar academia' : 'Ativar academia'"
+              [title]="(r.active ? 'ADMIN.DASH.DEACTIVATE_GYM' : 'ADMIN.DASH.ACTIVATE_GYM') | translate"
               (onClick)="confirmarToggleAtivo(r)"
             />
             <p-button
@@ -161,7 +161,7 @@
               [rounded]="true"
               size="small"
               styleClass="repz-icon-button"
-              title="Editar dados"
+              [title]="'ADMIN.DASH.EDIT_DATA' | translate"
               routerLink="/admin/academias"
             />
           </td>

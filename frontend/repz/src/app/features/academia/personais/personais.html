@@ -1,21 +1,21 @@
 <app-shell
   ativo="personais"
-  [crumbs]="['Academia', 'Personais']"
+  [crumbs]="[('ROLES.MANAGER' | translate), ('NAV.TRAINERS' | translate)]"
   [nome]="userService.nomeUsuario() || 'Gerente'"
-  subtitulo="Gestão da academia"
+  [subtitulo]="'ACADEMIA.AREA' | translate"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Personais</div>
+      <div class="page-title">{{ 'NAV.TRAINERS' | translate }}</div>
       <div class="page-subtitle">
         @if (!carregando()) {
-          {{ personais().length }} personal(is) vinculado(s) à academia
+          {{ 'ACADEMIA.TRAINERS.N_LINKED' | translate: { n: personais().length } }}
         }
       </div>
     </div>
     <p-button
-      label="Adicionar personal"
+      [label]="'ACADEMIA.TRAINERS.ADD_TRAINER' | translate"
       icon="pi pi-plus"
       styleClass="repz-primary"
       (onClick)="abrirCadastro()"
@@ -47,7 +47,7 @@
         <input
           pInputText
           type="text"
-          placeholder="Buscar por nome, e-mail ou especialidade…"
+          [placeholder]="'ACADEMIA.TRAINERS.SEARCH' | translate"
           [ngModel]="busca()"
           (ngModelChange)="busca.set($event)"
           class="search-input"
@@ -58,7 +58,7 @@
     <p-card styleClass="repz-card" *ngIf="personais().length === 0">
       <div class="empty-state">
         <i class="pi pi-id-card empty-icon"></i>
-        <div class="empty-title">Nenhum personal vinculado</div>
+        <div class="empty-title">{{ 'ACADEMIA.TRAINERS.NONE_LINKED' | translate }}</div>
       </div>
     </p-card>
 
@@ -72,9 +72,9 @@
       >
         <ng-template pTemplate="header">
           <tr>
-            <th>Personal</th>
-            <th>Especialidade</th>
-            <th>Status</th>
+            <th>{{ 'ROLES.TRAINER' | translate }}</th>
+            <th>{{ 'PROFILE.SPECIALTY' | translate }}</th>
+            <th>{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
             <th></th>
           </tr>
         </ng-template>
@@ -88,7 +88,7 @@
             <td>
               <p-tag
                 [styleClass]="p.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
-                [value]="p.ativo ? 'Ativo' : 'Inativo'"
+                [value]="(p.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
               />
             </td>
             <td>
@@ -109,7 +109,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="4" class="empty-row">Nenhum personal corresponde à busca.</td>
+            <td colspan="4" class="empty-row">{{ 'ACADEMIA.TRAINERS.NO_MATCH' | translate }}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -117,7 +117,7 @@
   </ng-container>
 
   <p-dialog
-    header="Editar personal"
+    [header]="'ACADEMIA.TRAINERS.EDIT_TRAINER' | translate"
     [visible]="editando() !== null"
     (visibleChange)="$event ? null : fecharEdicao()"
     [modal]="true"
@@ -128,44 +128,44 @@
   >
     <div class="edit-form" *ngIf="editando()">
       <div class="form-group">
-        <label class="form-label">Nome *</label>
+        <label class="form-label">{{ 'ADMIN.GYMS.NAME_REQ' | translate }}</label>
         <input
           pInputText
           [(ngModel)]="formNome"
           class="w-full"
-          placeholder="Nome completo"
+          [placeholder]="'ADMIN.USERS.FULL_NAME' | translate"
         />
       </div>
       <div class="form-group">
-        <label class="form-label">E-mail *</label>
+        <label class="form-label">{{ 'ACADEMIA.STUDENTS.EMAIL_REQ' | translate }}</label>
         <input
           pInputText
           type="email"
           [(ngModel)]="formEmail"
           class="w-full"
-          placeholder="email@exemplo.com"
+          [placeholder]="'PROFILE.EMAIL_PLACEHOLDER' | translate"
         />
       </div>
       <div class="form-group">
-        <label class="form-label">Especialidade</label>
+        <label class="form-label">{{ 'PROFILE.SPECIALTY' | translate }}</label>
         <input
           pInputText
           [(ngModel)]="formEspecialidade"
           class="w-full"
-          placeholder="Ex.: Musculação, Funcional…"
+          [placeholder]="'PROFILE.SPECIALTY_PLACEHOLDER' | translate"
         />
       </div>
     </div>
 
     <ng-template pTemplate="footer">
       <p-button
-        label="Cancelar"
+        [label]="'COMMON.CANCEL' | translate"
         styleClass="repz-ghost"
         (onClick)="fecharEdicao()"
         [disabled]="salvandoEdicao()"
       />
       <p-button
-        label="Salvar"
+        [label]="'COMMON.SAVE' | translate"
         icon="pi pi-check"
         styleClass="repz-primary"
         [loading]="salvandoEdicao()"
@@ -175,7 +175,7 @@
   </p-dialog>
 
   <p-dialog
-    header="Cadastrar personal trainer"
+    [header]="'ACADEMIA.TRAINERS.REGISTER_TRAINER' | translate"
     [visible]="cadastrando()"
     (visibleChange)="$event ? null : fecharCadastro()"
     [modal]="true"
@@ -187,21 +187,21 @@
     <div class="edit-form">
       <div class="form-row-2">
         <div class="form-group">
-          <label class="form-label">Nome completo *</label>
+          <label class="form-label">{{ 'ACADEMIA.STUDENTS.FULL_NAME_REQ' | translate }}</label>
           <input
             pInputText
             [(ngModel)]="cadNome"
-            placeholder="Ex: João Silva"
+            [placeholder]="'ACADEMIA.DASH.NAME_PLACEHOLDER_EX' | translate"
             class="w-full"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">E-mail *</label>
+          <label class="form-label">{{ 'ACADEMIA.STUDENTS.EMAIL_REQ' | translate }}</label>
           <input
             pInputText
             type="email"
             [(ngModel)]="cadEmail"
-            placeholder="joao@email.com"
+            [placeholder]="'ACADEMIA.DASH.EMAIL_PLACEHOLDER_EX' | translate"
             class="w-full"
           />
         </div>
@@ -209,39 +209,39 @@
 
       <div class="form-row-2">
         <div class="form-group">
-          <label class="form-label">CREF</label>
+          <label class="form-label">{{ 'ACADEMIA.TRAINERS.CREF' | translate }}</label>
           <input
             pInputText
             [(ngModel)]="cadCref"
-            placeholder="000000-G/UF"
+            [placeholder]="'ACADEMIA.TRAINERS.CREF_PLACEHOLDER' | translate"
             class="w-full"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Especialidade</label>
+          <label class="form-label">{{ 'PROFILE.SPECIALTY' | translate }}</label>
           <input
             pInputText
             [(ngModel)]="cadEspecialidade"
-            placeholder="Ex: Funcional"
+            [placeholder]="'ACADEMIA.TRAINERS.SPECIALTY_PLACEHOLDER_SHORT' | translate"
             class="w-full"
           />
         </div>
       </div>
 
       <div class="form-hint">
-        Uma senha temporária será gerada automaticamente e exibida após o cadastro.
+        {{ 'ACADEMIA.TRAINERS.TEMP_PWD_HINT' | translate }}
       </div>
     </div>
 
     <ng-template pTemplate="footer">
       <p-button
-        label="Cancelar"
+        [label]="'COMMON.CANCEL' | translate"
         styleClass="repz-ghost"
         (onClick)="fecharCadastro()"
         [disabled]="salvandoCad()"
       />
       <p-button
-        label="Cadastrar"
+        [label]="'ACADEMIA.DASH.REGISTER' | translate"
         icon="pi pi-check"
         styleClass="repz-primary"
         [loading]="salvandoCad()"

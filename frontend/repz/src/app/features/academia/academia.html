@@ -1,27 +1,27 @@
 <app-shell
   ativo="dashboard"
-  [crumbs]="['Gestor da Academia', 'Painel']"
+  [crumbs]="[('ROLES.MANAGER' | translate), ('NAV.PANEL' | translate)]"
   [nome]="userService.nomeUsuario() || 'Gerente'"
-  subtitulo="Gestão da academia"
+  [subtitulo]="'ACADEMIA.AREA' | translate"
   [mostrarCta]="false"
 >
   <div class="page-header">
     <div>
-      <div class="page-title">Painel da academia</div>
+      <div class="page-title">{{ 'ACADEMIA.DASH.TITLE' | translate }}</div>
       <div class="page-subtitle" *ngIf="academia() as a">
-        <strong>{{ a.name }}</strong> · {{ a.address || 'sem endereço' }}
+        <strong>{{ a.name }}</strong> · {{ a.address || ('ACADEMIA.DASH.NO_ADDRESS' | translate) }}
       </div>
     </div>
     <div class="header-actions">
       <p-button
-        label="Editar academia"
+        [label]="'ACADEMIA.DASH.EDIT_GYM' | translate"
         icon="pi pi-pencil"
         styleClass="repz-ghost"
         (onClick)="abrirEdicao()"
         [disabled]="!academia()"
       />
       <p-button
-        label="Ver relatórios"
+        [label]="'ACADEMIA.DASH.VIEW_REPORTS' | translate"
         icon="pi pi-chart-line"
         styleClass="repz-primary"
         routerLink="/academia/relatorios"
@@ -52,44 +52,44 @@
     <div class="kpi-grid">
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Alunos ativos</span>
+          <span class="kpi-label">{{ 'ACADEMIA.DASH.ACTIVE_STUDENTS' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-users"></i></span>
         </div>
         <div class="kpi-value">{{ totalAtivos() }}</div>
         <div class="kpi-sub" *ngIf="totalAlunos() > 0">
-          de {{ totalAlunos() }} ({{ ((totalAtivos() / totalAlunos()) * 100) | number: '1.0-0' }}%)
+          {{ 'ACADEMIA.DASH.OF_N_PCT' | translate: { n: totalAlunos(), pct: ((totalAtivos() / totalAlunos()) * 100) | number: '1.0-0' } }}
         </div>
-        <div class="kpi-sub" *ngIf="totalAlunos() === 0">nenhum aluno na unidade</div>
+        <div class="kpi-sub" *ngIf="totalAlunos() === 0">{{ 'ACADEMIA.DASH.NO_STUDENTS_UNIT' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Personais ativos</span>
+          <span class="kpi-label">{{ 'ACADEMIA.DASH.ACTIVE_TRAINERS' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-id-card"></i></span>
         </div>
         <div class="kpi-value">{{ personaisAtivos() }}</div>
         <div class="kpi-sub" *ngIf="totalPersonais() > 0">
-          de {{ totalPersonais() }} vinculado(s) à unidade
+          {{ 'ACADEMIA.DASH.OF_N_LINKED' | translate: { n: totalPersonais() } }}
         </div>
-        <div class="kpi-sub" *ngIf="totalPersonais() === 0">nenhum personal vinculado</div>
+        <div class="kpi-sub" *ngIf="totalPersonais() === 0">{{ 'ACADEMIA.DASH.NO_TRAINERS' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Frequência média</span>
+          <span class="kpi-label">{{ 'ACADEMIA.DASH.AVG_FREQ' | translate }}</span>
           <span class="kpi-icon"><i class="pi pi-chart-line"></i></span>
         </div>
         <div class="kpi-value">{{ frequenciaMedia() }}</div>
-        <div class="kpi-sub">check-ins por aluno ativo neste mês</div>
+        <div class="kpi-sub">{{ 'ACADEMIA.DASH.CHECKINS_PER_ACTIVE' | translate }}</div>
       </p-card>
 
       <p-card styleClass="repz-card kpi-card">
         <div class="kpi-head">
-          <span class="kpi-label">Ausentes (>14d)</span>
+          <span class="kpi-label">{{ 'ACADEMIA.DASH.ABSENT_14' | translate }}</span>
           <span class="kpi-icon kpi-icon-warn"><i class="pi pi-exclamation-triangle"></i></span>
         </div>
         <div class="kpi-value">{{ ausentes() }}</div>
-        <div class="kpi-sub">{{ ausentes() > 0 ? 'considere contato' : 'tudo em dia' }}</div>
+        <div class="kpi-sub">{{ (ausentes() > 0 ? 'ACADEMIA.DASH.CONSIDER_CONTACT' : 'ACADEMIA.DASH.ALL_GOOD') | translate }}</div>
       </p-card>
     </div>
 
@@ -98,11 +98,11 @@
       <p-card styleClass="repz-card">
         <div class="section-head">
           <div>
-            <div class="section-title">Personais da academia</div>
-            <div class="section-sub">{{ totalPersonais() }} vinculado(s)</div>
+            <div class="section-title">{{ 'ACADEMIA.DASH.GYM_TRAINERS' | translate }}</div>
+            <div class="section-sub">{{ 'ACADEMIA.DASH.N_LINKED' | translate: { n: totalPersonais() } }}</div>
           </div>
           <p-button
-            label="Ver todos"
+            [label]="'ACADEMIA.DASH.VIEW_ALL' | translate"
             size="small"
             styleClass="repz-ghost"
             (onClick)="irParaPersonais()"
@@ -110,7 +110,7 @@
         </div>
 
         <div class="empty-inline text-3" *ngIf="personais().length === 0">
-          Nenhum personal cadastrado ainda.
+          {{ 'ACADEMIA.DASH.NO_TRAINERS_YET' | translate }}
         </div>
 
         <p-table
@@ -121,9 +121,9 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th>Personal</th>
-              <th>Especialidade</th>
-              <th>Status</th>
+              <th>{{ 'ROLES.TRAINER' | translate }}</th>
+              <th>{{ 'PROFILE.SPECIALTY' | translate }}</th>
+              <th>{{ 'PERSONAL.STUDENTS.COL_STATUS' | translate }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-p>
@@ -141,7 +141,7 @@
               <td>
                 <p-tag
                   [styleClass]="p.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
-                  [value]="p.ativo ? 'Ativo' : 'Inativo'"
+                  [value]="(p.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
                 />
               </td>
             </tr>
@@ -150,8 +150,8 @@
       </p-card>
 
       <p-card styleClass="repz-card cadastro-card">
-        <div class="section-title">Cadastro rápido</div>
-        <div class="section-sub">cria aluno ou personal vinculado à sua academia</div>
+        <div class="section-title">{{ 'ACADEMIA.DASH.QUICK_REG' | translate }}</div>
+        <div class="section-sub">{{ 'ACADEMIA.DASH.QUICK_REG_SUB' | translate }}</div>
 
         <div class="cad-tabs">
           <button
@@ -160,7 +160,7 @@
             [class.active]="abaCadastro() === 'aluno'"
             (click)="trocarAba('aluno')"
           >
-            Aluno
+            {{ 'ROLES.STUDENT' | translate }}
           </button>
           <button
             type="button"
@@ -168,34 +168,34 @@
             [class.active]="abaCadastro() === 'personal'"
             (click)="trocarAba('personal')"
           >
-            Personal
+            {{ 'ROLES.TRAINER' | translate }}
           </button>
         </div>
 
         <div class="cad-form">
           <div class="form-group">
-            <label class="form-label">Nome completo</label>
+            <label class="form-label">{{ 'ADMIN.USERS.FULL_NAME' | translate }}</label>
             <input
               pInputText
               [(ngModel)]="cadNome"
-              placeholder="Ex: João Silva"
+              [placeholder]="'ACADEMIA.DASH.NAME_PLACEHOLDER_EX' | translate"
               class="w-full"
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label">E-mail</label>
+            <label class="form-label">{{ 'PROFILE.EMAIL' | translate }}</label>
             <input
               pInputText
               type="email"
               [(ngModel)]="cadEmail"
-              placeholder="joao@email.com"
+              [placeholder]="'ACADEMIA.DASH.EMAIL_PLACEHOLDER_EX' | translate"
               class="w-full"
             />
           </div>
 
           <div class="form-group" *ngIf="abaCadastro() === 'aluno' && planos().length > 0">
-            <label class="form-label">Plano</label>
+            <label class="form-label">{{ 'PROFILE.PLAN' | translate }}</label>
             <select class="form-select" [(ngModel)]="cadPlanoId">
               <option *ngFor="let p of planos()" [ngValue]="p.id">
                 {{ p.nome }} — {{ p.valor | currency: 'BRL' }}
@@ -204,7 +204,7 @@
           </div>
 
           <p-button
-            label="Cadastrar"
+            [label]="'ACADEMIA.DASH.REGISTER' | translate"
             icon="pi pi-plus"
             styleClass="repz-primary w-full"
             [loading]="cadastrando()"
@@ -216,7 +216,7 @@
   </ng-container>
 
   <p-dialog
-    header="Editar dados da academia"
+    [header]="'ACADEMIA.DASH.EDIT_GYM_DATA' | translate"
     [visible]="editando()"
     (visibleChange)="$event ? null : fecharEdicao()"
     [modal]="true"
@@ -228,29 +228,29 @@
     <div class="edit-form">
       <div class="form-row-2">
         <div class="form-group">
-          <label class="form-label">Nome *</label>
+          <label class="form-label">{{ 'ADMIN.GYMS.NAME_REQ' | translate }}</label>
           <input pInputText [(ngModel)]="formNome" class="w-full" />
         </div>
         <div class="form-group">
-          <label class="form-label">CNPJ *</label>
+          <label class="form-label">{{ 'ADMIN.GYMS.CNPJ_REQ' | translate }}</label>
           <input pInputText [(ngModel)]="formCnpj" class="w-full" />
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Endereço *</label>
+        <label class="form-label">{{ 'ADMIN.GYMS.ADDRESS_REQ' | translate }}</label>
         <input pInputText [(ngModel)]="formEndereco" class="w-full" />
       </div>
       <div class="form-group">
-        <label class="form-label">Responsável *</label>
+        <label class="form-label">{{ 'ADMIN.GYMS.RESPONSIBLE_REQ' | translate }}</label>
         <input pInputText [(ngModel)]="formResponsavel" class="w-full" />
       </div>
       <div class="form-row-2">
         <div class="form-group">
-          <label class="form-label">E-mail</label>
+          <label class="form-label">{{ 'PROFILE.EMAIL' | translate }}</label>
           <input pInputText type="email" [(ngModel)]="formEmail" class="w-full" />
         </div>
         <div class="form-group">
-          <label class="form-label">Telefone</label>
+          <label class="form-label">{{ 'PROFILE.PHONE' | translate }}</label>
           <input pInputText [(ngModel)]="formTelefone" class="w-full" />
         </div>
       </div>
@@ -258,13 +258,13 @@
 
     <ng-template pTemplate="footer">
       <p-button
-        label="Cancelar"
+        [label]="'COMMON.CANCEL' | translate"
         styleClass="repz-ghost"
         (onClick)="fecharEdicao()"
         [disabled]="salvando()"
       />
       <p-button
-        label="Salvar"
+        [label]="'COMMON.SAVE' | translate"
         icon="pi pi-check"
         styleClass="repz-primary"
         [loading]="salvando()"

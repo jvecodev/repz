@@ -15,6 +15,7 @@ import {
   UserService,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -61,6 +62,7 @@ const FORM_VAZIO = (): AlunoForm => ({
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     ConfirmDialogModule,
@@ -86,6 +88,7 @@ export class Alunos implements OnInit {
   private readonly academiaService = inject(AcademiaService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
 
   readonly role = computed(() => this.auth.getUserRole());
   readonly isAdmin = computed(() => this.role() === 'ADMIN');
@@ -116,7 +119,7 @@ export class Alunos implements OnInit {
         },
         error: () => {
           this.carregando.set(false);
-          this.erro.set('Não foi possível carregar as academias.');
+          this.erro.set(this.i18n.instant('MGMT.STUDENTS.GYMS_LOAD_ERROR'));
         },
       });
     } else {
@@ -163,7 +166,7 @@ export class Alunos implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os alunos.');
+        this.erro.set(this.i18n.instant('MGMT.STUDENTS.LOAD_ERROR'));
       },
     });
   }
@@ -205,12 +208,12 @@ export class Alunos implements OnInit {
 
     if (this.modo() === 'criar') {
       if (!f.name || !f.email || !f.password || !f.academiaId || !f.planoId) {
-        this.erroForm.set('Nome, e-mail, senha, academia e plano são obrigatórios.');
+        this.erroForm.set(this.i18n.instant('MGMT.STUDENTS.CREATE_REQUIRED'));
         Object.values(formEl.controls).forEach((c) => c.markAsTouched());
         return;
       }
       if (f.password.length < 5) {
-        this.erroForm.set('A senha precisa ter no mínimo 5 caracteres.');
+        this.erroForm.set(this.i18n.instant('MGMT.STUDENTS.PASSWORD_MIN'));
         return;
       }
       this.salvando.set(true);
@@ -227,7 +230,7 @@ export class Alunos implements OnInit {
           next: () => this.aplicarPersonalEObjetivoPosCriacao(f),
           error: (err) => {
             this.salvando.set(false);
-            this.erroForm.set(err?.error?.message || 'Falha ao criar o aluno.');
+            this.erroForm.set(err?.error?.message || this.i18n.instant('MGMT.STUDENTS.CREATE_FAIL'));
           },
         });
     } else {
@@ -242,12 +245,12 @@ export class Alunos implements OnInit {
         next: () => {
           this.salvando.set(false);
           this.dialogAberto.set(false);
-          this.toast.add({ severity: 'success', summary: 'Aluno atualizado', life: 3000 });
+          this.toast.add({ severity: 'success', summary: this.i18n.instant('MGMT.STUDENTS.STUDENT_UPDATED'), life: 3000 });
           this.carregar();
         },
         error: (err) => {
           this.salvando.set(false);
-          this.erroForm.set(err?.error?.message || 'Falha ao atualizar o aluno.');
+          this.erroForm.set(err?.error?.message || this.i18n.instant('MGMT.STUDENTS.UPDATE_FAIL'));
         },
       });
     }
@@ -275,7 +278,7 @@ export class Alunos implements OnInit {
         this.service.atualizar(novo.id, req, f.academiaId).subscribe({
           next: () => this.finalizarCriacao(),
           error: () =>
-            this.finalizarCriacao('Aluno criado, mas falhou ao gravar personal/objetivo.'),
+            this.finalizarCriacao(this.i18n.instant('MGMT.STUDENTS.PARTIAL_WARN')),
         });
       },
       error: () => this.finalizarCriacao(),
@@ -287,7 +290,7 @@ export class Alunos implements OnInit {
     this.dialogAberto.set(false);
     this.toast.add({
       severity: mensagemAviso ? 'warn' : 'success',
-      summary: mensagemAviso ?? 'Aluno criado',
+      summary: mensagemAviso ?? this.i18n.instant('MGMT.STUDENTS.STUDENT_CREATED'),
       life: 3500,
     });
     this.carregar();
@@ -295,21 +298,21 @@ export class Alunos implements OnInit {
 
   confirmarInativar(a: AlunoDetalheResponse): void {
     this.confirmation.confirm({
-      header: 'Inativar aluno',
-      message: `Tem certeza que deseja inativar o aluno "${a.nome}"?`,
+      header: this.i18n.instant('MGMT.STUDENTS.DEACTIVATE_STUDENT'),
+      message: this.i18n.instant('MGMT.STUDENTS.CONFIRM_DEACTIVATE', { nome: a.nome }),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Inativar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.i18n.instant('ADMIN.DASH.DEACTIVATE'),
+      rejectLabel: this.i18n.instant('COMMON.CANCEL'),
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () =>
         this.service.inativar(a.id, this.isAdmin() ? this.academiaSelecionada() : null).subscribe({
           next: () => {
-            this.toast.add({ severity: 'success', summary: 'Aluno inativado', life: 3000 });
+            this.toast.add({ severity: 'success', summary: this.i18n.instant('MGMT.STUDENTS.STUDENT_DEACTIVATED'), life: 3000 });
             this.carregar();
           },
           error: () =>
-            this.toast.add({ severity: 'error', summary: 'Falha ao inativar', life: 3500 }),
+            this.toast.add({ severity: 'error', summary: this.i18n.instant('MGMT.STUDENTS.DEACTIVATE_FAIL'), life: 3500 }),
         }),
     });
   }
@@ -320,21 +323,21 @@ export class Alunos implements OnInit {
    */
   confirmarReativar(a: AlunoDetalheResponse): void {
     this.confirmation.confirm({
-      header: 'Reativar aluno',
-      message: `Tem certeza que deseja reativar o aluno "${a.nome}"?`,
+      header: this.i18n.instant('MGMT.STUDENTS.REACTIVATE_STUDENT'),
+      message: this.i18n.instant('MGMT.STUDENTS.CONFIRM_REACTIVATE', { nome: a.nome }),
       icon: 'pi pi-check-circle',
-      acceptLabel: 'Reativar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.i18n.instant('MGMT.STUDENTS.REACTIVATE_STUDENT'),
+      rejectLabel: this.i18n.instant('COMMON.CANCEL'),
       acceptButtonStyleClass: 'p-button-success',
       rejectButtonStyleClass: 'p-button-text',
       accept: () =>
         this.userService.ativar(a.userId).subscribe({
           next: () => {
-            this.toast.add({ severity: 'success', summary: 'Aluno reativado', life: 3000 });
+            this.toast.add({ severity: 'success', summary: this.i18n.instant('MGMT.STUDENTS.STUDENT_REACTIVATED'), life: 3000 });
             this.carregar();
           },
           error: () =>
-            this.toast.add({ severity: 'error', summary: 'Falha ao reativar', life: 3500 }),
+            this.toast.add({ severity: 'error', summary: this.i18n.instant('MGMT.STUDENTS.REACTIVATE_FAIL'), life: 3500 }),
         }),
     });
   }

@@ -19,6 +19,7 @@ import type {
   UserPutRequest,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
@@ -35,6 +36,7 @@ import { TagModule } from 'primeng/tag';
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     DialogModule,
@@ -53,6 +55,7 @@ export class AcademiaAlunos implements OnInit {
   private readonly personalService = inject(PersonalService);
   private readonly planoService = inject(PlanoService);
   private readonly academiaService = inject(AcademiaService);
+  private readonly i18n = inject(TranslateService);
   private readonly academia = signal<AcademiaResponse | null>(null);
 
   readonly carregando = signal(true);
@@ -114,12 +117,12 @@ export class AcademiaAlunos implements OnInit {
     if (!academia || this.salvandoCad()) return;
     if (!this.cadNome.trim() || !this.cadEmail.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Nome e e-mail são obrigatórios.');
+      this.aviso.set(this.i18n.instant('PROFILE.NAME_EMAIL_REQUIRED'));
       return;
     }
     if (!this.cadPlanoId) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Selecione um plano.');
+      this.aviso.set(this.i18n.instant('ACADEMIA.STUDENTS.SELECT_PLAN'));
       return;
     }
 
@@ -139,14 +142,14 @@ export class AcademiaAlunos implements OnInit {
         this.salvandoCad.set(false);
         this.cadastrando.set(false);
         this.avisoSeverity.set('success');
-        this.aviso.set(`Aluno "${req.name}" cadastrado(a)! Senha temporária: ${senha}`);
+        this.aviso.set(this.i18n.instant('ACADEMIA.STUDENTS.STUDENT_REGISTERED_PWD', { nome: req.name, senha }));
         setTimeout(() => this.aviso.set(null), 6000);
         this.carregar();
       },
       error: (err) => {
         this.salvandoCad.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao cadastrar aluno.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.STUDENTS.REGISTER_ERROR'));
       },
     });
   }
@@ -167,7 +170,7 @@ export class AcademiaAlunos implements OnInit {
       },
       error: () => {
         this.carregando.set(false);
-        this.erro.set('Não foi possível carregar os alunos.');
+        this.erro.set(this.i18n.instant('PERSONAL.STUDENTS.LOAD_ERROR'));
       },
     });
   }
@@ -199,7 +202,7 @@ export class AcademiaAlunos implements OnInit {
     if (!a || this.salvandoEdicao()) return;
     if (!this.formNome.trim() || !this.formEmail.trim()) {
       this.avisoSeverity.set('error');
-      this.aviso.set('Nome e e-mail são obrigatórios.');
+      this.aviso.set(this.i18n.instant('PROFILE.NAME_EMAIL_REQUIRED'));
       return;
     }
     this.salvandoEdicao.set(true);
@@ -242,20 +245,20 @@ export class AcademiaAlunos implements OnInit {
             this.salvandoEdicao.set(false);
             this.editando.set(null);
             this.avisoSeverity.set('success');
-            this.aviso.set(`Dados de "${nome}" atualizados.`);
+            this.aviso.set(this.i18n.instant('ACADEMIA.STUDENTS.DATA_UPDATED', { nome }));
             setTimeout(() => this.aviso.set(null), 3500);
           },
           error: (err) => {
             this.salvandoEdicao.set(false);
             this.avisoSeverity.set('error');
-            this.aviso.set(err?.error?.message ?? 'Erro ao atualizar a matrícula.');
+            this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.STUDENTS.ENROLL_UPDATE_ERROR'));
           },
         });
       },
       error: (err) => {
         this.salvandoEdicao.set(false);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao atualizar os dados do aluno.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.STUDENTS.STUDENT_UPDATE_ERROR'));
       },
     });
   }
@@ -272,13 +275,13 @@ export class AcademiaAlunos implements OnInit {
         );
         this.alterandoId.set(null);
         this.avisoSeverity.set('success');
-        this.aviso.set(`Matrícula de "${a.nome}" inativada.`);
+        this.aviso.set(this.i18n.instant('ACADEMIA.STUDENTS.ENROLL_DEACTIVATED', { nome: a.nome }));
         setTimeout(() => this.aviso.set(null), 3500);
       },
       error: (err) => {
         this.alterandoId.set(null);
         this.avisoSeverity.set('error');
-        this.aviso.set(err?.error?.message ?? 'Erro ao inativar a matrícula.');
+        this.aviso.set(err?.error?.message ?? this.i18n.instant('ACADEMIA.STUDENTS.DEACTIVATE_ERROR'));
       },
     });
   }

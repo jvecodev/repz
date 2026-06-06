@@ -9,6 +9,8 @@ import type {
   FrequenciaRelatorioResponse,
 } from '@core/services';
 import { AppShell } from '@shared/layout';
+import { LanguageService } from '@core/services/language.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
@@ -34,6 +36,7 @@ function parseInputDate(s: string, endOfDay = false): Date {
     CommonModule,
     FormsModule,
     AppShell,
+    TranslatePipe,
     ButtonModule,
     CardModule,
     ChartModule,
@@ -48,6 +51,8 @@ export class AcademiaRelatorios implements OnInit {
   private readonly freqService = inject(FrequenciaService);
   private readonly alunoService = inject(AlunoService);
   private readonly academiaService = inject(AcademiaService);
+  private readonly i18n = inject(TranslateService);
+  private readonly language = inject(LanguageService);
 
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
@@ -71,7 +76,7 @@ export class AcademiaRelatorios implements OnInit {
     const p = this.periodoAplicado();
     if (!p) return '';
     const fmt = (d: Date) =>
-      d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      d.toLocaleDateString(this.language.idioma(), { day: '2-digit', month: '2-digit', year: 'numeric' });
     return `${fmt(p.inicio)} – ${fmt(p.fim)}`;
   });
 
@@ -142,7 +147,7 @@ export class AcademiaRelatorios implements OnInit {
     const cursor = new Date(p.inicio.getFullYear(), p.inicio.getMonth(), 1);
     const limite = new Date(p.fim.getFullYear(), p.fim.getMonth(), 1);
     while (cursor.getTime() <= limite.getTime()) {
-      labels.push(cursor.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
+      labels.push(cursor.toLocaleDateString(this.language.idioma(), { month: 'short', year: '2-digit' }));
       const chave = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
       values.push(porMes[chave] ?? 0);
       cursor.setMonth(cursor.getMonth() + 1);
@@ -193,7 +198,7 @@ export class AcademiaRelatorios implements OnInit {
         this.aplicar();
       },
       error: () => {
-        this.erro.set('Não foi possível carregar a academia.');
+        this.erro.set(this.i18n.instant('ACADEMIA.REPORTS.LOAD_ERROR'));
         this.carregando.set(false);
       },
     });
@@ -201,13 +206,13 @@ export class AcademiaRelatorios implements OnInit {
 
   aplicar(): void {
     if (!this.dataInicio || !this.dataFim) {
-      this.erro.set('Selecione data de início e fim.');
+      this.erro.set(this.i18n.instant('ACADEMIA.REPORTS.SELECT_DATES'));
       return;
     }
     const inicio = parseInputDate(this.dataInicio);
     const fim = parseInputDate(this.dataFim, true);
     if (inicio.getTime() > fim.getTime()) {
-      this.erro.set('A data de início deve ser anterior à data de fim.');
+      this.erro.set(this.i18n.instant('ACADEMIA.REPORTS.START_BEFORE_END'));
       return;
     }
     this.erro.set(null);
