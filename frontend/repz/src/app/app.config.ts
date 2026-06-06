@@ -49,7 +49,7 @@ export const appConfig: ApplicationConfig = {
       fallbackLang: 'pt-BR',
     }),
     provideTranslateHttpLoader({
-      prefix: './assets/i18n/',
+      prefix: '/assets/i18n/',
       suffix: '.json',
     }),
   ],
