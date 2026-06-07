@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
@@ -7,6 +8,16 @@ _ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 class Settings(BaseSettings):
     openrouter_api_key: str
+
+    @field_validator("openrouter_api_key")
+    @classmethod
+    def validate_api_key(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError(
+                "OPENROUTER_API_KEY não está configurada. "
+                "Verifique o arquivo ai-service/.env"
+            )
+        return v.strip()
     base_url: str = "https://openrouter.ai/api/v1"
     request_timeout: float = 90.0
     ai_models: str = (

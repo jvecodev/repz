@@ -1,7 +1,11 @@
 package repz.app.controller.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import repz.app.controller.RelatorioIAController;
 import repz.app.dto.request.RelatorioIAUpdateRequest;
@@ -17,7 +21,9 @@ public class RelatorioIAControllerImpl implements RelatorioIAController {
     private final RelatorioIAService relatorioIAService;
 
     @Override
-    public RelatorioIAResponse iniciar(Long alunoId, Authentication auth) {
+    @PostMapping("/avaliacao/{alunoId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public RelatorioIAResponse iniciar(@PathVariable Long alunoId, Authentication auth) {
         return relatorioIAService.iniciar(alunoId, auth);
     }
 
