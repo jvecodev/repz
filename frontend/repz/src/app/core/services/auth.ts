@@ -60,11 +60,6 @@ export class AuthService {
       this.http.post<void>(`${this.base}/logout`, {}).subscribe({ error: () => {} });
     }
     this.limparSessao();
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_KEY);
-    localStorage.removeItem(ROLE_KEY);
-    this.sessao.set(null);
-    this.userService.resetar();
   }
 
   getToken(): string | null {
@@ -93,6 +88,7 @@ export class AuthService {
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(ROLE_KEY);
     this.sessao.set(null);
+    this.userService.resetar();
   }
 
   private salvarSessao(token: string, refreshToken: string): void {
