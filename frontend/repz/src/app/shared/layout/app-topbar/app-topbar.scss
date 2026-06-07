@@ -40,6 +40,11 @@
   }
 }
 
+.menu-btn-wrap {
+  display: none;
+  flex-shrink: 0;
+}
+
 :host ::ng-deep .menu-btn {
   width: 38px;
   height: 38px;
@@ -64,6 +69,12 @@
   .here {
     color: var(--text);
     font-weight: 500;
+  }
+}
+
+@include mobile {
+  .menu-btn-wrap {
+    display: block;
   }
 }
 

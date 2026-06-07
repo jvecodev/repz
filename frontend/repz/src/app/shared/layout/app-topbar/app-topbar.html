@@ -1,4 +1,13 @@
 <div class="topbar-inner">
+  <div class="menu-btn-wrap">
+    <p-button
+      icon="pi pi-bars"
+      styleClass="menu-btn repz-icon-button"
+      (onClick)="layout.toggleSidebar()"
+      [ariaLabel]="'NAV.TOGGLE_MENU' | translate"
+    />
+  </div>
+
   <div class="crumbs">
     @for (c of crumbs(); track $index; let last = $last) {
       <span [class.here]="last">{{ c }}</span>

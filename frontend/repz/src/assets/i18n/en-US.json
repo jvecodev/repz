@@ -98,7 +98,8 @@
     "PLANS": "Plans",
     "REPORTS": "Reports",
     "PROFILE": "Profile",
-    "LOGOUT": "Log out"
+    "LOGOUT": "Log out",
+    "TOGGLE_MENU": "Toggle menu"
   },
 
   "SIDEBAR": {

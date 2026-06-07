@@ -583,3 +583,26 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Dialogs não transbordam em mobile */
+.p-dialog {
+  max-width: calc(100vw - 24px);
+}
+
+/* Tabelas scrolláveis horizontalmente dentro dos cards */
+.p-card.repz-card .p-card-content {
+  overflow-x: auto;
+}
+
+/* Botão de ação no page-header ocupa largura total em mobile */
+@media (max-width: 720px) {
+  .page-header > p-button,
+  .page-header > .p-button {
+    width: 100%;
+  }
+
+  .page-header > p-button .p-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

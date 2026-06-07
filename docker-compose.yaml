@@ -37,6 +37,7 @@ services:
       - "8080:8080"
     env_file: ./back/.env
     environment:
+      TZ: America/Sao_Paulo
       DB_URL: jdbc:postgresql://postgres:5432/repz
       DB_USER: postgres
       DB_PASSWORD: postgres

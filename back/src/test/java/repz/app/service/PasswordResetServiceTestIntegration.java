@@ -71,7 +71,7 @@ class PasswordResetServiceTestIntegration extends ServiceIntegrationSupport {
         var updatedToken = tokenRepository.findByToken(token.getToken()).orElseThrow();
         assertThat(updatedToken.getUsed()).isTrue();
 
-        var updatedUser = userRepository.findById(user.getId().intValue()).orElseThrow();
+        var updatedUser = userRepository.findById(Long.valueOf(user.getId())).orElseThrow();
         assertThat(updatedUser.getPassword()).isNotEqualTo("{noop}123456");
     }
 
