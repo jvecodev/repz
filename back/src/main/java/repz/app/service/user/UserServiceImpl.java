@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserGetResponse findById(Integer id) {
+    public UserGetResponse findById(Long id) {
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void atualizar(Integer id, UserPutRequest dto) {
+    public void atualizar(Long id, UserPutRequest dto) {
 
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() ->
@@ -237,7 +237,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void desativar(Integer id) {
+    public void desativar(Long id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
@@ -249,7 +249,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void ativar(Integer id) {
+    public void ativar(Long id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->

@@ -13,7 +13,7 @@ import java.util.List;
 public interface UserService {
     List<UserGetResponse> findAll();
 
-    UserGetResponse findById(Integer id);
+    UserGetResponse findById(Long id);
 
     void updateLastLogin(String email);
 
@@ -21,15 +21,15 @@ public interface UserService {
 
     void criarAdmin(AdminCreateRequest dto);
 
-    void atualizar(Integer id, UserPutRequest userPutRequest);
+    void atualizar(Long id, UserPutRequest userPutRequest);
 
     UserGetResponse obterMeuPerfil(Authentication auth);
 
     void atualizarMeuPerfil(UserSelfUpdateRequest request, Authentication auth);
 
-    void desativar(Integer id);
+    void desativar(Long id);
 
-    void ativar(Integer id);
+    void ativar(Long id);
 
     UserGetResponse atualizarFotoPerfil(MultipartFile foto, Authentication auth);
 }

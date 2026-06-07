@@ -59,7 +59,7 @@ class PersonalServiceUnitTest {
 
         when(userRepository.findByEmail(admin.getEmail())).thenReturn(Optional.of(admin));
         when(academiaContextService.resolveRequired(auth(admin.getEmail()), academia.getId())).thenReturn(academia.getId());
-        when(userRepository.findById(Math.toIntExact(personalUser.getId()))).thenReturn(Optional.of(personalUser));
+        when(userRepository.findById(personalUser.getId())).thenReturn(Optional.of(personalUser));
         when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
         when(personalRepository.save(any(Personal.class))).thenAnswer(invocation -> {
             Personal personal = invocation.getArgument(0);

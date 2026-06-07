@@ -46,7 +46,7 @@ public class RelatorioIAService {
             throw new RuntimeException("Acesso negado.");
         }
 
-        User aluno = userRepository.findById(Math.toIntExact(alunoId))
+        User aluno = userRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
 
         RelatorioIA relatorio = new RelatorioIA();

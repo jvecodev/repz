@@ -50,7 +50,7 @@ public interface UserController {
     })
     ResponseEntity<UserGetResponse> findById(
             @Parameter(description = "ID do usuário", example = "1")
-            @PathVariable Integer id);
+            @PathVariable Long id);
 
     @PostMapping
     @Operation(
@@ -111,7 +111,7 @@ public interface UserController {
     })
     ResponseEntity<Void> atualizar(
             @Parameter(description = "ID do usuário", example = "1")
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @RequestBody @Valid UserPutRequest userPutRequest);
 
     @PatchMapping("/{id}/ativar")
@@ -124,7 +124,7 @@ public interface UserController {
     })
     ResponseEntity<Void> ativar(
             @Parameter(description = "ID do usuário", example = "1")
-            @PathVariable Integer id);
+            @PathVariable Long id);
 
     @PatchMapping("/{id}/desativar")
     @Operation(summary = "Desativar usuário", description = "Desativa um usuário por soft delete. Requer perfil ADMIN.")
@@ -136,7 +136,7 @@ public interface UserController {
     })
     ResponseEntity<Void> desativar(
             @Parameter(description = "ID do usuário", example = "1")
-            @PathVariable Integer id);
+            @PathVariable Long id);
 
     @PostMapping(value = "/me/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(

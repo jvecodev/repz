@@ -71,7 +71,7 @@ class FrequenciaServiceUnitTest {
 
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
         when(academiaContextService.resolveRequired(auth(aluno.getEmail()), academia.getId())).thenReturn(academia.getId());
-        when(userRepository.findById(Math.toIntExact(aluno.getId()))).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
         when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
         when(frequenciaRepository.save(any(Frequencia.class))).thenAnswer(invocation -> {
             Frequencia frequencia = invocation.getArgument(0);
@@ -109,7 +109,7 @@ class FrequenciaServiceUnitTest {
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(academiaContextService.resolveRequired(auth(personalUser.getEmail()), academia.getId())).thenReturn(academia.getId());
-        when(userRepository.findById(Math.toIntExact(aluno.getId()))).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
         when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
         when(personalRepository.findById(personal.getId())).thenReturn(Optional.of(personal));
         when(frequenciaRepository.save(any(Frequencia.class))).thenAnswer(invocation -> {

@@ -36,7 +36,7 @@ public class AlunoServiceImpl implements AlunoService {
     public AlunoDetalheResponse matricular(AlunoCreateRequest request, Long academiaHeaderId, Authentication auth) {
         Long academiaId = academiaContextService.resolveRequired(auth, academiaHeaderId);
 
-        User usuario = userRepository.findByIdAndDeletedAtIsNull(Math.toIntExact(request.userId()))
+        User usuario = userRepository.findByIdAndDeletedAtIsNull(request.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensagens.get("usuario.nao.encontrado")));
         if (usuario.getRole() != UserRole.ALUNO) {
             throw new AccessDeniedException(mensagens.get("aluno.usuario.role.invalida"));

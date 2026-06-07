@@ -65,7 +65,7 @@ class AvaliacaoFisicaServiceUnitTest {
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findAll()).thenReturn(List.of(personal));
-        when(userRepository.findById(Math.toIntExact(aluno.getId()))).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
         when(avaliacaoFisicaRepository.save(any(AvaliacaoFisica.class))).thenAnswer(invocation -> {
             AvaliacaoFisica avaliacao = invocation.getArgument(0);
             avaliacao.setId(1L);
@@ -111,7 +111,7 @@ class AvaliacaoFisicaServiceUnitTest {
         AvaliacaoFisica avaliacao = avaliacao(1L, aluno, academia, personal);
 
         when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
-        when(userRepository.findById(Math.toIntExact(aluno.getId()))).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
         when(avaliacaoFisicaRepository.findByAluno_IdOrderByDataAvaliacaoAsc(aluno.getId())).thenReturn(List.of(avaliacao));
 
         var response = service.obterGrafico(aluno.getId(), auth(aluno.getEmail()));

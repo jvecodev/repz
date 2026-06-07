@@ -31,7 +31,7 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<UserGetResponse> findById(Integer id) {
+    public ResponseEntity<UserGetResponse> findById(Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
@@ -60,19 +60,19 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Void> atualizar(Integer id, UserPutRequest userPutRequest) {
+    public ResponseEntity<Void> atualizar(Long id, UserPutRequest userPutRequest) {
         userService.atualizar(id, userPutRequest);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<Void> ativar(Integer id) {
+    public ResponseEntity<Void> ativar(Long id) {
         userService.ativar(id);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<Void> desativar(Integer id) {
+    public ResponseEntity<Void> desativar(Long id) {
         userService.desativar(id);
         return ResponseEntity.ok().build();
     }

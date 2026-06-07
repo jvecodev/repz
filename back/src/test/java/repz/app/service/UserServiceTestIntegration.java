@@ -99,21 +99,21 @@ class UserServiceTestIntegration extends ServiceIntegrationSupport {
     void atualizarDesativarEAtivarUsuario() {
         var user = criarUsuario(UserRole.ALUNO, "usuario-status");
 
-        userService.atualizar(Math.toIntExact(user.getId()), new UserPutRequest(
+        userService.atualizar(user.getId(), new UserPutRequest(
                 "Nome Atualizado",
                 "nao-usado@repz.com",
                 UserRole.ADMIN,
                 false));
-        userService.desativar(Math.toIntExact(user.getId()));
+        userService.desativar(user.getId());
 
-        var desativado = userRepository.findById(Math.toIntExact(user.getId())).orElseThrow();
+        var desativado = userRepository.findById(user.getId()).orElseThrow();
         assertThat(desativado.getName()).isEqualTo("Nome Atualizado");
         assertThat(desativado.getActive()).isFalse();
         assertThat(desativado.getDeletedAt()).isNotNull();
 
-        userService.ativar(Math.toIntExact(user.getId()));
+        userService.ativar(user.getId());
 
-        var reativado = userRepository.findById(Math.toIntExact(user.getId())).orElseThrow();
+        var reativado = userRepository.findById(user.getId()).orElseThrow();
         assertThat(reativado.getActive()).isTrue();
         assertThat(reativado.getDeletedAt()).isNull();
     }
@@ -121,9 +121,9 @@ class UserServiceTestIntegration extends ServiceIntegrationSupport {
     @Test
     void findByIdIgnoraUsuarioDeletado() {
         var user = criarUsuario(UserRole.ALUNO, "usuario-deletado");
-        userService.desativar(Math.toIntExact(user.getId()));
+        userService.desativar(user.getId());
 
-        assertThatThrownBy(() -> userService.findById(Math.toIntExact(user.getId())))
+        assertThatThrownBy(() -> userService.findById(user.getId()))
                 .isInstanceOf(ResponseStatusException.class);
     }
 
