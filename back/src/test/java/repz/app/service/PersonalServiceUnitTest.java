@@ -404,6 +404,59 @@ class PersonalServiceUnitTest {
         assertThat(resp.getEspecialidade()).isEqualTo("Pilates");
     }
 
+    // ─── criar: usuário com role inválida ─────────────────────────────────────
+
+    @Test
+    void criarLancaExcecaoQuandoUsuarioNaoTemRolePersonal() {
+        User admin = user(1L, UserRole.ADMIN);
+        User alunoUser = user(5L, UserRole.ALUNO); // wrong role
+        User acadUser = user(3L, UserRole.GERENTE);
+        Academia academia = academia(10L, acadUser);
+
+        PersonalCreateRequest request = new PersonalCreateRequest(alunoUser.getId(), academia.getId(), "Musculação");
+        when(userRepository.findByEmail(admin.getEmail())).thenReturn(Optional.of(admin));
+        when(academiaContextService.resolveRequired(any(), any())).thenReturn(academia.getId());
+        when(userRepository.findById(alunoUser.getId())).thenReturn(Optional.of(alunoUser));
+        when(mensagens.get(any())).thenReturn("role invalida");
+
+        assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                () -> service.criar(request, null, auth(admin.getEmail())));
+    }
+
+    // ─── gerente tenta alterar personal de outra academia ─────────────────────
+
+    @Test
+    void gerenteNaoPodeAlterarStatusPersonalDeOutraAcademia() {
+        User acadUser = user(3L, UserRole.GERENTE);
+        Academia academia = academia(10L, acadUser);
+        User outraAcadUser = user(4L, UserRole.GERENTE);
+        Academia outraAcademia = academia(20L, outraAcadUser);
+        Personal p = personal(30L, user(2L, UserRole.PERSONAL), outraAcademia);
+
+        when(userRepository.findByEmail(acadUser.getEmail())).thenReturn(Optional.of(acadUser));
+        when(academiaContextService.resolveOptional(auth(acadUser.getEmail()), null)).thenReturn(null);
+        when(personalRepository.findById(30L)).thenReturn(Optional.of(p));
+        when(academiaRepository.findByResponsibleUserId(acadUser.getId())).thenReturn(List.of(academia));
+        when(mensagens.get(any())).thenReturn("nao pode alterar de outra academia");
+
+        assertThrows(RuntimeException.class, () -> service.ativar(30L, null, auth(acadUser.getEmail())));
+    }
+
+    @Test
+    void alunoNaoPodeAlterarStatusPersonal() {
+        User aluno = user(5L, UserRole.ALUNO);
+        User acadUser = user(3L, UserRole.GERENTE);
+        Academia academia = academia(10L, acadUser);
+        Personal p = personal(20L, user(2L, UserRole.PERSONAL), academia);
+
+        when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
+        when(academiaContextService.resolveOptional(auth(aluno.getEmail()), null)).thenReturn(null);
+        when(personalRepository.findById(20L)).thenReturn(Optional.of(p));
+        when(mensagens.get(any())).thenReturn("acesso negado");
+
+        assertThrows(RuntimeException.class, () -> service.ativar(20L, null, auth(aluno.getEmail())));
+    }
+
     // ─── obterMeusAlunos ─────────────────────────────────────────────────────
 
     @Test

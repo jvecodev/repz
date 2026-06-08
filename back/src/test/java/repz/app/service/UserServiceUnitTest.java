@@ -32,6 +32,7 @@ import repz.app.service.storage.StorageService;
 import repz.app.service.user.UserDetailsServiceImpl;
 import repz.app.service.user.UserServiceImpl;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -360,5 +361,187 @@ class UserServiceUnitTest {
 
         assertThrows(org.springframework.web.server.ResponseStatusException.class,
                 () -> userService.criarUsuario(dto, null));
+    }
+
+    // ─── findAll / findById ───────────────────────────────────────────────────
+
+    @Test
+    void findAllRetornaTodosUsuariosNaoDeletados() {
+        User u = user(1L, UserRole.ALUNO);
+        UserGetResponse resp = new UserGetResponse(u.getId(), u.getName(), u.getEmail(), null, u.getRole(), u.getActive(), null);
+        when(userRepository.findByDeletedAtIsNull()).thenReturn(List.of(u));
+        when(userMapper.toResponse(u)).thenReturn(resp);
+
+        List<UserGetResponse> result = userService.findAll();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id()).isEqualTo(1L);
+    }
+
+    @Test
+    void findByIdRetornaUsuario() {
+        User u = user(2L, UserRole.PERSONAL);
+        UserGetResponse resp = new UserGetResponse(u.getId(), u.getName(), u.getEmail(), null, u.getRole(), u.getActive(), null);
+        when(userRepository.findByIdAndDeletedAtIsNull(2L)).thenReturn(Optional.of(u));
+        when(userMapper.toResponse(u)).thenReturn(resp);
+
+        UserGetResponse result = userService.findById(2L);
+
+        assertThat(result.id()).isEqualTo(2L);
+    }
+
+    @Test
+    void findByIdLancaExcecao404QuandoNaoEncontrado() {
+        when(userRepository.findByIdAndDeletedAtIsNull(999L)).thenReturn(Optional.empty());
+        when(mensagens.get(any())).thenReturn("nao encontrado");
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> userService.findById(999L));
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    // ─── atualizar ────────────────────────────────────────────────────────────
+
+    @Test
+    void atualizarUsuarioAlteraNomeERoleEAtivo() {
+        User u = user(5L, UserRole.ALUNO);
+        when(userRepository.findByIdAndDeletedAtIsNull(5L)).thenReturn(Optional.of(u));
+        when(userRepository.save(any())).thenReturn(u);
+
+        userService.atualizar(5L, new repz.app.dto.request.UserPutRequest("Novo Nome", u.getEmail(), UserRole.PERSONAL, false));
+
+        assertThat(u.getName()).isEqualTo("Novo Nome");
+        assertThat(u.getRole()).isEqualTo(UserRole.PERSONAL);
+        assertThat(u.getActive()).isFalse();
+        verify(userRepository).save(u);
+    }
+
+    @Test
+    void atualizarRejeitaEmailJaCadastrado() {
+        User u = user(6L, UserRole.ALUNO);
+        User outro = user(7L, UserRole.ALUNO);
+        outro.setEmail("taken@repz.com");
+        when(userRepository.findByIdAndDeletedAtIsNull(6L)).thenReturn(Optional.of(u));
+        when(userRepository.findByEmail("taken@repz.com")).thenReturn(Optional.of(outro));
+        when(mensagens.get(any())).thenReturn("email ja cadastrado");
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.atualizar(6L, new repz.app.dto.request.UserPutRequest("Nome", "taken@repz.com", null, null)));
+    }
+
+    @Test
+    void atualizarLancaExcecaoQuandoUsuarioNaoEncontrado() {
+        when(userRepository.findByIdAndDeletedAtIsNull(999L)).thenReturn(Optional.empty());
+        when(mensagens.get(any())).thenReturn("nao encontrado");
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.atualizar(999L, new repz.app.dto.request.UserPutRequest("N", "n@r.com", null, null)));
+    }
+
+    // ─── obterMeuPerfil ───────────────────────────────────────────────────────
+
+    @Test
+    void obterMeuPerfilRetornaUsuarioAutenticado() {
+        User u = user(10L, UserRole.ALUNO);
+        Authentication auth = new UsernamePasswordAuthenticationToken(u, null, u.getAuthorities());
+        UserGetResponse resp = new UserGetResponse(u.getId(), u.getName(), u.getEmail(), null, u.getRole(), u.getActive(), null);
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.of(u));
+        when(userMapper.toResponse(u)).thenReturn(resp);
+
+        UserGetResponse result = userService.obterMeuPerfil(auth);
+
+        assertThat(result.id()).isEqualTo(u.getId());
+    }
+
+    @Test
+    void obterMeuPerfilLancaExcecaoQuandoAuthNulo() {
+        when(mensagens.get(any())).thenReturn("nao autenticado");
+        assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                () -> userService.obterMeuPerfil(null));
+    }
+
+    // ─── atualizarMeuPerfil ───────────────────────────────────────────────────
+
+    @Test
+    void atualizarMeuPerfilAlteraNomeESenha() {
+        User u = user(11L, UserRole.ALUNO);
+        Authentication auth = new UsernamePasswordAuthenticationToken(u, null, u.getAuthorities());
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.of(u));
+        when(passwordEncoder.encode("novaSenha")).thenReturn("hashedNova");
+        when(userRepository.save(any())).thenReturn(u);
+
+        userService.atualizarMeuPerfil(new repz.app.dto.request.UserSelfUpdateRequest("Novo", u.getEmail(), "novaSenha"), auth);
+
+        assertThat(u.getName()).isEqualTo("Novo");
+        assertThat(u.getPassword()).isEqualTo("hashedNova");
+        verify(userRepository).save(u);
+    }
+
+    @Test
+    void atualizarMeuPerfilSemSenhaNaoAlteraSenha() {
+        User u = user(12L, UserRole.ALUNO);
+        String senhaOriginal = u.getPassword();
+        Authentication auth = new UsernamePasswordAuthenticationToken(u, null, u.getAuthorities());
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.of(u));
+        when(userRepository.save(any())).thenReturn(u);
+
+        userService.atualizarMeuPerfil(new repz.app.dto.request.UserSelfUpdateRequest("Nome", u.getEmail(), null), auth);
+
+        assertThat(u.getPassword()).isEqualTo(senhaOriginal);
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void atualizarMeuPerfilLancaExcecaoQuandoAuthNulo() {
+        when(mensagens.get(any())).thenReturn("nao autenticado");
+        assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                () -> userService.atualizarMeuPerfil(new repz.app.dto.request.UserSelfUpdateRequest("N", "n@r.com", null), null));
+    }
+
+    // ─── desativar / ativar ───────────────────────────────────────────────────
+
+    @Test
+    void desativarSetaActiveFalseEDeletedAt() {
+        User u = user(20L, UserRole.ALUNO);
+        u.setActive(true);
+        when(userRepository.findById(20L)).thenReturn(Optional.of(u));
+        when(userRepository.save(any())).thenReturn(u);
+
+        userService.desativar(20L);
+
+        assertThat(u.getActive()).isFalse();
+        assertThat(u.getDeletedAt()).isNotNull();
+        verify(userRepository).save(u);
+    }
+
+    @Test
+    void desativarLancaExcecaoQuandoNaoEncontrado() {
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        when(mensagens.get(any())).thenReturn("nao encontrado");
+
+        assertThrows(ResponseStatusException.class, () -> userService.desativar(999L));
+    }
+
+    @Test
+    void ativarSetaActiveTrueELimpaDeletedAt() {
+        User u = user(21L, UserRole.ALUNO);
+        u.setActive(false);
+        u.setDeletedAt(java.time.LocalDateTime.now());
+        when(userRepository.findById(21L)).thenReturn(Optional.of(u));
+        when(userRepository.save(any())).thenReturn(u);
+
+        userService.ativar(21L);
+
+        assertThat(u.getActive()).isTrue();
+        assertThat(u.getDeletedAt()).isNull();
+        verify(userRepository).save(u);
+    }
+
+    @Test
+    void ativarLancaExcecaoQuandoNaoEncontrado() {
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        when(mensagens.get(any())).thenReturn("nao encontrado");
+
+        assertThrows(ResponseStatusException.class, () -> userService.ativar(999L));
     }
 }

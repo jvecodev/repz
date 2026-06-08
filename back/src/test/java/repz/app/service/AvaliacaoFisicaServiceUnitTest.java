@@ -155,6 +155,77 @@ class AvaliacaoFisicaServiceUnitTest {
     }
 
     @Test
+    void criarAvaliacaoComPersonalSucesso() {
+        User academiaUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, academiaUser);
+        User personalUser = user(2L, UserRole.PERSONAL);
+        Personal personal = personal(20L, personalUser, academia);
+        User alunoUser = user(3L, UserRole.ALUNO);
+
+        var req = new AvaliacaoFisicaCreateRequest();
+        req.setAlunoId(alunoUser.getId());
+        req.setPesoKg(80.0);
+        req.setAlturaCm(180.0);
+
+        when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
+        when(personalRepository.findAll()).thenReturn(List.of(personal));
+        when(userRepository.findById(alunoUser.getId())).thenReturn(Optional.of(alunoUser));
+        when(avaliacaoFisicaRepository.save(any())).thenAnswer(inv -> {
+            AvaliacaoFisica a = inv.getArgument(0);
+            a.setId(1L);
+            return a;
+        });
+
+        var resp = service.criar(req, auth(personalUser.getEmail()));
+        assertThat(resp).isNotNull();
+        verify(avaliacaoFisicaRepository).save(any());
+    }
+
+    @Test
+    void criarAvaliacaoRejeitaParaNaoPersonal() {
+        User alunoUser = user(3L, UserRole.ALUNO);
+        when(userRepository.findByEmail(alunoUser.getEmail())).thenReturn(Optional.of(alunoUser));
+        when(mensagens.get(any())).thenReturn("apenas personal");
+
+        assertThrows(RuntimeException.class, () -> service.criar(new AvaliacaoFisicaCreateRequest(), auth(alunoUser.getEmail())));
+    }
+
+    @Test
+    void findAllPersonalVerificaVinculo() {
+        User academiaUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, academiaUser);
+        User personalUser = user(2L, UserRole.PERSONAL);
+        Personal personal = personal(20L, personalUser, academia);
+        User alunoUser = user(3L, UserRole.ALUNO);
+        AvaliacaoFisica av = avaliacao(1L, alunoUser, academia, personal);
+
+        when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
+        when(personalRepository.findAll()).thenReturn(List.of(personal));
+        when(avaliacaoFisicaRepository.findByAluno_IdOrderByDataAvaliacaoDesc(alunoUser.getId()))
+                .thenReturn(List.of(av));
+
+        var result = service.findAll(alunoUser.getId(), auth(personalUser.getEmail()));
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findAllAlunoVeSomentePropriaAvaliacao() {
+        User alunoUser = user(3L, UserRole.ALUNO);
+        User academiaUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, academiaUser);
+        User personalUser = user(2L, UserRole.PERSONAL);
+        Personal personal = personal(20L, personalUser, academia);
+        AvaliacaoFisica av = avaliacao(1L, alunoUser, academia, personal);
+
+        when(userRepository.findByEmail(alunoUser.getEmail())).thenReturn(Optional.of(alunoUser));
+        when(avaliacaoFisicaRepository.findByAluno_IdOrderByDataAvaliacaoDesc(alunoUser.getId()))
+                .thenReturn(List.of(av));
+
+        var result = service.findAll(alunoUser.getId(), auth(alunoUser.getEmail()));
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
     void ativarAtualizaStatusDaAvaliacao() {
         AvaliacaoFisica avaliacao = new AvaliacaoFisica();
         avaliacao.setId(1L);
@@ -179,6 +250,23 @@ class AvaliacaoFisicaServiceUnitTest {
 
         var resp = service.findById(1L);
         assertThat(resp.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void adminListaTodasAvaliacoes() {
+        User adminUser = user(1L, UserRole.ADMIN);
+        User academiaUser = user(2L, UserRole.GERENTE);
+        Academia academia = academia(10L, academiaUser);
+        User aluno = user(3L, UserRole.ALUNO);
+        User personalUser = user(4L, UserRole.PERSONAL);
+        Personal personal = personal(20L, personalUser, academia);
+
+        when(userRepository.findByEmail(adminUser.getEmail())).thenReturn(Optional.of(adminUser));
+        when(academiaContextService.resolveOptional(auth(adminUser.getEmail()), null)).thenReturn(null);
+        when(avaliacaoFisicaRepository.findAll()).thenReturn(List.of(avaliacao(1L, aluno, academia, personal)));
+
+        var resp = service.obterDaUnidade(null, auth(adminUser.getEmail()));
+        assertThat(resp).hasSize(1);
     }
 
     @Test

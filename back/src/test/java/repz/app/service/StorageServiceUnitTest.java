@@ -162,4 +162,22 @@ class StorageServiceUnitTest {
         assertThatThrownBy(() -> storageService.validateProfilePhoto(file))
                 .isInstanceOf(ResponseStatusException.class);
     }
+
+    @Test
+    void getMyPhotoUrlStringRetornaNullQuandoSemArquivo() {
+        User user = user(1L, UserRole.ALUNO);
+        when(arquivoRepository.findByUserId(user.getId())).thenReturn(Optional.empty());
+
+        String result = storageService.getMyPhotoUrlString(user);
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void getMyPhotoUrlStringRetornaNullQuandoSemArquivoCadastrado() {
+        User user = user(2L, UserRole.PERSONAL);
+        when(arquivoRepository.findByUserId(user.getId())).thenReturn(Optional.empty());
+
+        String result = storageService.getMyPhotoUrlString(user);
+        assertThat(result).isNull();
+    }
 }
