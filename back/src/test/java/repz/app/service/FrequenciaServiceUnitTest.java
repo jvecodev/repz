@@ -176,4 +176,95 @@ class FrequenciaServiceUnitTest {
 
         assertThat(response).extracting(AlunoInativoResponse::getAlunoId).containsExactly(alunoInativo.getId());
     }
+
+    @Test
+    void findByIdRetornaFrequencia() {
+        User alunoUser = user(10L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
+        Academia academia = academia(30L, academiaUser);
+        Frequencia f = frequencia(1L, alunoUser, academia, null, LocalDateTime.now());
+
+        when(frequenciaRepository.findById(1L)).thenReturn(Optional.of(f));
+
+        var resp = service.findById(1L);
+        assertThat(resp.getId()).isEqualTo(1L);
+        assertThat(resp.getAlunoId()).isEqualTo(alunoUser.getId());
+    }
+
+    @Test
+    void ativarFrequenciaMudaStatusParaTrue() {
+        User alunoUser = user(10L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
+        Academia academia = academia(30L, academiaUser);
+        Frequencia f = frequencia(1L, alunoUser, academia, null, LocalDateTime.now());
+        f.setAtivo(false);
+
+        when(frequenciaRepository.findById(1L)).thenReturn(Optional.of(f));
+
+        service.ativar(1L);
+        assertThat(f.getAtivo()).isTrue();
+        verify(frequenciaRepository).save(f);
+    }
+
+    @Test
+    void desativarFrequenciaMudaStatusParaFalse() {
+        User alunoUser = user(10L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
+        Academia academia = academia(30L, academiaUser);
+        Frequencia f = frequencia(1L, alunoUser, academia, null, LocalDateTime.now());
+
+        when(frequenciaRepository.findById(1L)).thenReturn(Optional.of(f));
+
+        service.desativar(1L);
+        assertThat(f.getAtivo()).isFalse();
+        verify(frequenciaRepository).save(f);
+    }
+
+    @Test
+    void meuHistoricoRetornaFrequenciasDoAluno() {
+        User alunoUser = user(10L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
+        Academia academia = academia(30L, academiaUser);
+        Frequencia f = frequencia(1L, alunoUser, academia, null, LocalDateTime.now());
+
+        when(userRepository.findByEmail(alunoUser.getEmail())).thenReturn(Optional.of(alunoUser));
+        when(frequenciaRepository.findByAluno_IdOrderByDataHoraDesc(alunoUser.getId())).thenReturn(List.of(f));
+
+        var result = service.meuHistorico(auth(alunoUser.getEmail()));
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void filtrarPorPeriodoRetornaFrequenciasDoAluno() {
+        User alunoUser = user(10L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
+        Academia academia = academia(30L, academiaUser);
+        var inicio = java.time.LocalDateTime.now().minusDays(7);
+        var fim = java.time.LocalDateTime.now();
+        Frequencia f = frequencia(1L, alunoUser, academia, null, fim);
+
+        when(academiaContextService.resolveOptional(auth(alunoUser.getEmail()), academia.getId())).thenReturn(academia.getId());
+        when(frequenciaRepository.findByAlunoIdAndPeriodo(alunoUser.getId(), inicio, fim))
+                .thenReturn(List.of(f));
+
+        var result = service.filtrarPorPeriodo(alunoUser.getId(), academia.getId(), inicio, fim, auth(alunoUser.getEmail()));
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void filtrarPorAcademiaEPeriodoRetornaFrequencias() {
+        User alunoUser = user(10L, UserRole.ALUNO);
+        User academiaUser = user(20L, UserRole.GERENTE);
+        Academia academia = academia(30L, academiaUser);
+        var inicio = java.time.LocalDateTime.now().minusDays(7);
+        var fim = java.time.LocalDateTime.now();
+        Frequencia f = frequencia(1L, alunoUser, academia, null, fim);
+
+        when(academiaContextService.resolveRequired(auth(academiaUser), academia.getId())).thenReturn(academia.getId());
+        when(frequenciaRepository.findByAcademiaIdAndPeriodo(academia.getId(), inicio, fim))
+                .thenReturn(List.of(f));
+
+        var result = service.filtrarPorAcademiaEPeriodo(academia.getId(), inicio, fim, auth(academiaUser));
+        assertThat(result).hasSize(1);
+    }
 }

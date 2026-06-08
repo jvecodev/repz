@@ -47,4 +47,33 @@ class TokenServiceUnitTest {
         assertThat(tokenService.validateRefreshToken(token)).isEqualTo(user.getEmail());
         assertThat(tokenService.validateToken(token)).isNull();
     }
+
+    @Test
+    void validateTokenComTokenInvalidoRetornaNull() {
+        assertThat(tokenService.validateToken("token.invalido.aqui")).isNull();
+    }
+
+    @Test
+    void validateRefreshTokenComTokenInvalidoRetornaNull() {
+        assertThat(tokenService.validateRefreshToken("token.invalido.aqui")).isNull();
+    }
+
+    @Test
+    void tokenContemRoleEIdDoUsuario() {
+        User user = user(42L, UserRole.PERSONAL);
+        String token = tokenService.generateToken(user);
+        assertThat(token).isNotBlank();
+        // token válido e email correto
+        assertThat(tokenService.validateToken(token)).isEqualTo(user.getEmail());
+    }
+
+    @Test
+    void accessTokenNaoValidaComoRefreshEViceVersa() {
+        User user = user(1L, UserRole.GERENTE);
+        String access  = tokenService.generateToken(user);
+        String refresh = tokenService.generateRefreshToken(user);
+
+        assertThat(tokenService.validateRefreshToken(access)).isNull();
+        assertThat(tokenService.validateToken(refresh)).isNull();
+    }
 }

@@ -352,6 +352,58 @@ class PersonalServiceUnitTest {
         assertThat(response.getEspecialidade()).isEqualTo("Yoga");
     }
 
+    // ─── gerente ativa/desativa/atualiza ─────────────────────────────────────
+
+    @Test
+    void gerenteAtivaPersonalDaPropriaAcademia() {
+        User acadUser = user(3L, UserRole.GERENTE);
+        Academia academia = academia(10L, acadUser);
+        Personal p = personal(20L, user(2L, UserRole.PERSONAL), academia);
+        p.setAtivo(false);
+
+        when(userRepository.findByEmail(acadUser.getEmail())).thenReturn(Optional.of(acadUser));
+        when(academiaContextService.resolveOptional(auth(acadUser.getEmail()), null)).thenReturn(null);
+        when(personalRepository.findById(20L)).thenReturn(Optional.of(p));
+        when(academiaRepository.findByResponsibleUserId(acadUser.getId())).thenReturn(List.of(academia));
+        when(personalRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var resp = service.ativar(20L, null, auth(acadUser.getEmail()));
+        assertThat(resp.getAtivo()).isTrue();
+    }
+
+    @Test
+    void gerenteDesativaPersonalDaPropriaAcademia() {
+        User acadUser = user(3L, UserRole.GERENTE);
+        Academia academia = academia(10L, acadUser);
+        Personal p = personal(20L, user(2L, UserRole.PERSONAL), academia);
+
+        when(userRepository.findByEmail(acadUser.getEmail())).thenReturn(Optional.of(acadUser));
+        when(academiaContextService.resolveOptional(auth(acadUser.getEmail()), null)).thenReturn(null);
+        when(personalRepository.findById(20L)).thenReturn(Optional.of(p));
+        when(academiaRepository.findByResponsibleUserId(acadUser.getId())).thenReturn(List.of(academia));
+        when(personalRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var resp = service.desativar(20L, null, auth(acadUser.getEmail()));
+        assertThat(resp.getAtivo()).isFalse();
+    }
+
+    @Test
+    void gerenteAtualizaPersonalDaPropriaAcademia() {
+        User acadUser = user(3L, UserRole.GERENTE);
+        Academia academia = academia(10L, acadUser);
+        Personal p = personal(20L, user(2L, UserRole.PERSONAL), academia);
+
+        when(userRepository.findByEmail(acadUser.getEmail())).thenReturn(Optional.of(acadUser));
+        when(academiaContextService.resolveOptional(auth(acadUser.getEmail()), null)).thenReturn(null);
+        when(personalRepository.findById(20L)).thenReturn(Optional.of(p));
+        when(academiaRepository.findByResponsibleUserId(acadUser.getId())).thenReturn(List.of(academia));
+        when(personalRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var req = new repz.app.dto.request.PersonalUpdateRequest("Pilates", true);
+        var resp = service.atualizar(20L, req, null, auth(acadUser.getEmail()));
+        assertThat(resp.getEspecialidade()).isEqualTo("Pilates");
+    }
+
     // ─── obterMeusAlunos ─────────────────────────────────────────────────────
 
     @Test

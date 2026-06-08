@@ -153,4 +153,50 @@ class AvaliacaoFisicaServiceUnitTest {
         assertThat(avaliacao.getAtivo()).isFalse();
         verify(avaliacaoFisicaRepository).save(avaliacao);
     }
+
+    @Test
+    void ativarAtualizaStatusDaAvaliacao() {
+        AvaliacaoFisica avaliacao = new AvaliacaoFisica();
+        avaliacao.setId(1L);
+        avaliacao.setAtivo(false);
+        when(avaliacaoFisicaRepository.findById(1L)).thenReturn(Optional.of(avaliacao));
+
+        service.ativar(1L);
+
+        assertThat(avaliacao.getAtivo()).isTrue();
+        verify(avaliacaoFisicaRepository).save(avaliacao);
+    }
+
+    @Test
+    void findByIdRetornaAvaliacao() {
+        User academiaUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, academiaUser);
+        User aluno = user(3L, UserRole.ALUNO);
+        User personalUser = user(2L, UserRole.PERSONAL);
+        Personal personal = personal(20L, personalUser, academia);
+        AvaliacaoFisica av = avaliacao(1L, aluno, academia, personal);
+        when(avaliacaoFisicaRepository.findById(1L)).thenReturn(Optional.of(av));
+
+        var resp = service.findById(1L);
+        assertThat(resp.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void obterGraficoRetornaDados() {
+        User personalUser = user(2L, UserRole.PERSONAL);
+        User aluno = user(3L, UserRole.ALUNO);
+        User academiaUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, academiaUser);
+        Personal personal = personal(20L, personalUser, academia);
+        AvaliacaoFisica av = avaliacao(1L, aluno, academia, personal);
+
+        when(userRepository.findByEmail(aluno.getEmail())).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
+        when(avaliacaoFisicaRepository.findByAluno_IdOrderByDataAvaliacaoAsc(aluno.getId()))
+                .thenReturn(List.of(av));
+
+        var resp = service.obterGrafico(aluno.getId(), auth(aluno.getEmail()));
+        assertThat(resp).isNotNull();
+        assertThat(resp.getAlunoId()).isEqualTo(aluno.getId());
+    }
 }
