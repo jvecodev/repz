@@ -84,7 +84,7 @@ class TreinoServiceUnitTest {
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findByUserId(personalUser.getId())).thenReturn(Optional.of(personal));
-        when(userRepository.findById(Math.toIntExact(aluno.getId()))).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
         when(treinoRepository.save(any(Treino.class))).thenAnswer(inv -> {
             Treino t = inv.getArgument(0);
             t.setId(99L);
@@ -141,7 +141,7 @@ class TreinoServiceUnitTest {
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findByUserId(personalUser.getId())).thenReturn(Optional.of(personal));
-        when(userRepository.findById(99)).thenReturn(Optional.empty());
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
         when(mensagens.get(any())).thenReturn("not found");
 
         var req = new TreinoCreateRequest();
@@ -162,7 +162,7 @@ class TreinoServiceUnitTest {
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findByUserId(personalUser.getId())).thenReturn(Optional.of(personal));
-        when(userRepository.findById(Math.toIntExact(outroPersonal.getId()))).thenReturn(Optional.of(outroPersonal));
+        when(userRepository.findById(outroPersonal.getId())).thenReturn(Optional.of(outroPersonal));
         when(mensagens.get(any())).thenReturn("role invalida");
 
         var req = new TreinoCreateRequest();
@@ -189,7 +189,7 @@ class TreinoServiceUnitTest {
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findByUserId(personalUser.getId())).thenReturn(Optional.of(personal));
-        when(userRepository.findById(Math.toIntExact(aluno.getId()))).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
         when(treinoRepository.save(any(Treino.class))).thenAnswer(inv -> {
             Treino t = inv.getArgument(0);
             t.setId(1L);
@@ -418,7 +418,7 @@ class TreinoServiceUnitTest {
 
         when(userRepository.findByEmail(personalUser.getEmail())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findByUserId(personalUser.getId())).thenReturn(Optional.of(personal));
-        when(userRepository.findById(Math.toIntExact(aluno.getId()))).thenReturn(Optional.of(aluno));
+        when(userRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
         when(treinoRepository.save(any(Treino.class))).thenAnswer(inv -> {
             Treino t = inv.getArgument(0);
             t.setId(1L);

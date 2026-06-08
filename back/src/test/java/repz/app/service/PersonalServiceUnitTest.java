@@ -89,7 +89,7 @@ class PersonalServiceUnitTest {
         when(userRepository.findByEmail(academiaUser.getEmail())).thenReturn(Optional.of(academiaUser));
         when(academiaContextService.resolveRequired(auth(academiaUser.getEmail()), academia.getId())).thenReturn(academia.getId());
         when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
-        when(userRepository.findById(Math.toIntExact(personalUser.getId()))).thenReturn(Optional.of(personalUser));
+        when(userRepository.findById(personalUser.getId())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findByUserId(personalUser.getId())).thenReturn(Optional.empty());
         when(personalRepository.save(any(Personal.class))).thenAnswer(inv -> {
             Personal p = inv.getArgument(0);
@@ -139,7 +139,7 @@ class PersonalServiceUnitTest {
 
         when(userRepository.findByEmail(admin.getEmail())).thenReturn(Optional.of(admin));
         when(academiaContextService.resolveRequired(auth(admin.getEmail()), academia.getId())).thenReturn(academia.getId());
-        when(userRepository.findById(Math.toIntExact(personalUser.getId()))).thenReturn(Optional.of(personalUser));
+        when(userRepository.findById(personalUser.getId())).thenReturn(Optional.of(personalUser));
         when(personalRepository.findByUserId(personalUser.getId())).thenReturn(Optional.of(existente));
         when(mensagens.get(any())).thenReturn("ja vinculado");
 
