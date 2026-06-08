@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { vi } from 'vitest';
@@ -15,6 +15,7 @@ describe('personalGuard', () => {
     TestBed.configureTestingModule({
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
+    vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     authService = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);
   });
