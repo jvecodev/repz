@@ -45,7 +45,7 @@ public class TreinoServiceImpl implements TreinoService {
         Personal personal = personalRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("personal.nao.encontrado")));
 
-        User aluno = userRepository.findById(Math.toIntExact(request.getAlunoId()))
+        User aluno = userRepository.findById(request.getAlunoId())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("aluno.nao.encontrado")));
 
         if (aluno.getRole() != UserRole.ALUNO) {

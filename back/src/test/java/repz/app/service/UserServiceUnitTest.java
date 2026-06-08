@@ -255,4 +255,110 @@ class UserServiceUnitTest {
         verify(storageService, never()).validateProfilePhoto(any());
         verify(storageService, never()).upload(any(), any());
     }
+
+    // ─── updateLastLogin ──────────────────────────────────────────────────────
+
+    @Test
+    void updateLastLoginAtualiza() {
+        User u = user(1L, UserRole.ALUNO);
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.of(u));
+        when(userRepository.save(any())).thenReturn(u);
+
+        userService.updateLastLogin(u.getEmail());
+
+        assertThat(u.getLastLogin()).isNotNull();
+        verify(userRepository).save(u);
+    }
+
+    @Test
+    void updateLastLoginIgnoraEmailInexistente() {
+        when(userRepository.findByEmail("x@r.com")).thenReturn(Optional.empty());
+        userService.updateLastLogin("x@r.com");
+        verify(userRepository, never()).save(any());
+    }
+
+    // ─── criarUsuario GERENTE ─────────────────────────────────────────────────
+
+    @Test
+    void criarUsuarioGerente() {
+        User gerenteUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, gerenteUser);
+        var dto = new repz.app.dto.request.UserCreateRequest("Gerente", "g@repz.com", "123456",
+                UserRole.GERENTE, academia.getId(), null);
+
+        when(userRepository.findByEmail("g@repz.com")).thenReturn(Optional.empty());
+        when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
+        when(passwordEncoder.encode("123456")).thenReturn("hash");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(99L);
+            return u;
+        });
+
+        userService.criarUsuario(dto, null);
+
+        verify(academiaRepository).save(academia); // vincula responsible
+    }
+
+    // ─── criarUsuario erros de validação ──────────────────────────────────────
+
+    @Test
+    void criarUsuarioAlunoSemPlanoLancaExcecao() {
+        User gerenteUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, gerenteUser);
+        // planoId = null para ALUNO
+        var dto = new repz.app.dto.request.UserCreateRequest("Aluno", "a@r.com", "123456",
+                UserRole.ALUNO, academia.getId(), null);
+
+        when(userRepository.findByEmail("a@r.com")).thenReturn(Optional.empty());
+        when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
+        when(passwordEncoder.encode("123456")).thenReturn("hash");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(99L);
+            return u;
+        });
+        when(mensagens.get(any())).thenReturn("plano obrigatorio");
+
+        assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> userService.criarUsuario(dto, null));
+    }
+
+    @Test
+    void criarUsuarioAlunoJaMatriculadoLancaExcecao() {
+        User gerenteUser = user(1L, UserRole.GERENTE);
+        Academia academia = academia(10L, gerenteUser);
+        Plano plano = new Plano();
+        plano.setId(5);
+        var dto = new repz.app.dto.request.UserCreateRequest("Aluno", "a@r.com", "123456",
+                UserRole.ALUNO, academia.getId(), plano.getId());
+
+        when(userRepository.findByEmail("a@r.com")).thenReturn(Optional.empty());
+        when(academiaRepository.findById(academia.getId())).thenReturn(Optional.of(academia));
+        when(passwordEncoder.encode("123456")).thenReturn("hash");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(99L);
+            return u;
+        });
+        when(planoRepository.findByIdAndAcademiaId(plano.getId(), academia.getId())).thenReturn(Optional.of(plano));
+        when(alunoRepository.existsByUsuarioIdAndAcademiaId(99L, academia.getId())).thenReturn(true);
+        when(mensagens.get(any())).thenReturn("ja matriculado");
+
+        assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> userService.criarUsuario(dto, null));
+    }
+
+    @Test
+    void criarUsuarioAcademiaNaoExisteLancaExcecao() {
+        var dto = new repz.app.dto.request.UserCreateRequest("U", "u@r.com", "123456",
+                UserRole.ALUNO, 99L, 1);
+
+        when(userRepository.findByEmail("u@r.com")).thenReturn(Optional.empty());
+        when(academiaRepository.findById(99L)).thenReturn(Optional.empty());
+        when(mensagens.get(any())).thenReturn("academia nao encontrada");
+
+        assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> userService.criarUsuario(dto, null));
+    }
 }

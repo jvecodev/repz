@@ -1,4 +1,13 @@
 <div class="topbar-inner">
+  <div class="menu-btn-wrap">
+    <p-button
+      icon="pi pi-bars"
+      styleClass="menu-btn repz-icon-button"
+      (onClick)="layout.toggleSidebar()"
+      [ariaLabel]="'NAV.TOGGLE_MENU' | translate"
+    />
+  </div>
+
   <div class="crumbs">
     @for (c of crumbs(); track $index; let last = $last) {
       <span [class.here]="last">{{ c }}</span>
@@ -10,20 +19,22 @@
 
   <div class="topbar-actions">
     <p-button
-      [label]="language.idioma() === 'pt-BR' ? 'EN' : 'PT'"
       severity="secondary"
       [text]="true"
-      [rounded]="true"
       styleClass="lang-btn repz-icon-button"
       (onClick)="language.alternar()"
       [title]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
       [ariaLabel]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
-    />
+    >
+      <span class="lang-inner">
+        <span class="lang-flag">{{ language.idioma() === 'pt-BR' ? '🇧🇷' : '🇺🇸' }}</span>
+        <span class="lang-label">{{ language.idioma() === 'pt-BR' ? 'PT' : 'EN' }}</span>
+      </span>
+    </p-button>
     <p-button
       [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
       severity="secondary"
       [text]="true"
-      [rounded]="true"
       styleClass="theme-btn repz-icon-button"
       (onClick)="theme.toggleTema()"
       [title]="(theme.tema() === 'dark' ? 'THEME.TO_LIGHT' : 'THEME.TO_DARK') | translate"

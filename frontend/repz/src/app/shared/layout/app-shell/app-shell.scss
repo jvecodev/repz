@@ -38,6 +38,20 @@
     grid-template-columns: 1fr;
   }
 
+  /* Shell body ocupa a viewport inteira e delega o scroll ao .main */
+  .shell-body {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
   .scrim.show {
     display: block;
     position: fixed;

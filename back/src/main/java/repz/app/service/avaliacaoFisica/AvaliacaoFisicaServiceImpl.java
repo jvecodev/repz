@@ -44,7 +44,7 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(mensagens.get("personal.nao.encontrado")));
 
-        User aluno = userRepository.findById(Math.toIntExact(request.getAlunoId()))
+        User aluno = userRepository.findById(request.getAlunoId())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("aluno.nao.encontrado")));
 
         AvaliacaoFisica avaliacao = new AvaliacaoFisica();
@@ -102,7 +102,7 @@ public class AvaliacaoFisicaServiceImpl implements AvaliacaoFisicaService {
             throw new RuntimeException(mensagens.get("avaliacao.usuario.apenas.graficos.proprios"));
         }
 
-        User aluno = userRepository.findById(Math.toIntExact(alunoId))
+        User aluno = userRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException(mensagens.get("aluno.nao.encontrado")));
 
         List<AvaliacaoFisica> avaliacoes = avaliacaoFisicaRepository.findByAluno_IdOrderByDataAvaliacaoAsc(alunoId);

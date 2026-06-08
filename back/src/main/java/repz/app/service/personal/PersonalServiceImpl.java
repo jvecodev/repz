@@ -53,7 +53,7 @@ public class PersonalServiceImpl implements PersonalService {
             throw new RuntimeException(mensagens.get("personal.acesso.criar.negado"));
         }
 
-        User user = userRepository.findById(Math.toIntExact(request.getUserId()))
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("usuario.nao.encontrado")));
         if (user.getRole() != UserRole.PERSONAL) {
             throw new AccessDeniedException(mensagens.get("personal.usuario.role.invalida"));

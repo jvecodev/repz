@@ -12,6 +12,7 @@
       [routerLink]="item.link"
       [queryParams]="item.queryParams"
       [title]="item.labelKey | translate"
+      (click)="layout.fecharMobile()"
     >
       <span class="icon">
         @switch (item.key) {

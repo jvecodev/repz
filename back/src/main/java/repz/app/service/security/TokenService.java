@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 import repz.app.message.Mensagens;
 import repz.app.persistence.entity.User;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -33,7 +32,7 @@ public class TokenService {
                     .withSubject(user.getEmail())
                     .withClaim("role", user.getRole().name())
                     .withClaim("id", user.getId().toString())
-                    .withExpiresAt(LocalDateTime.now().plusMinutes(60).toInstant(ZoneOffset.of("-03:00")))
+                    .withExpiresAt(Instant.now().plusSeconds(3600))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException(mensagens.get("auth.erro.gerar.token"), exception);
@@ -46,7 +45,7 @@ public class TokenService {
             return JWT.create()
                     .withIssuer("repz_refresh")
                     .withSubject(user.getEmail())
-                    .withExpiresAt(LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.of("-03:00")))
+                    .withExpiresAt(Instant.now().plusSeconds(7 * 24 * 3600))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException(mensagens.get("auth.erro.gerar.refresh"), exception);

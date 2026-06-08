@@ -19,6 +19,7 @@ import repz.app.service.email.EmailService;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.HexFormat;
 
 @Slf4j
 @Service
@@ -43,18 +44,19 @@ public class PasswordResetService {
 
             var token = new PasswordResetToken();
             token.setUser(user);
-            token.setToken(String.format("%06d", SECURE_RANDOM.nextInt(1_000_000)));
+            byte[] bytes = new byte[16];
+            SECURE_RANDOM.nextBytes(bytes);
+            token.setToken(HexFormat.of().formatHex(bytes));
             token.setExpiresAt(LocalDateTime.now().plusMinutes(expirationMinutes));
             token.setUsed(false);
             tokenRepository.save(token);
 
-            log.info("[PasswordReset] Token gerado para {}: {}", user.getEmail(), token.getToken());
+            log.debug("[PasswordReset] Token gerado para {}", user.getEmail());
 
             try {
                 emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
             } catch (MailException e) {
-                log.warn("[PasswordReset] Falha ao enviar e-mail para {}. Use o token dos logs: {}",
-                        user.getEmail(), token.getToken(), e);
+                log.warn("[PasswordReset] Falha ao enviar e-mail para {}: {}", user.getEmail(), e.getMessage());
             }
         });
     }

@@ -2,6 +2,7 @@ package repz.app.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,6 +37,9 @@ public class SecurityConfig {
     private final SecurityFilter securityFilter;
     private final Mensagens mensagens;
 
+    @Value("${cors.allowed-origins}")
+    private List<String> allowedOrigins;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
         return httpSecurity
@@ -51,15 +55,18 @@ public class SecurityConfig {
                                 "/v3/api-docs", "/v3/api-docs/**",
                                 "/swagger-resources/**", "/webjars/**").permitAll()
 
-                        .requestMatchers(
-                                "/v3/api-docsativar", "/api/usersativar", "/api/academiasinativar").hasAnyRole("ADMIN", "GERENTE")
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/users/*/ativar", "/api/users/*/desativar",
+                                "/api/academias/*/ativar", "/api/academias/*/desativar").hasAnyRole("ADMIN", "GERENTE")
 
                         .requestMatchers(HttpMethod.POST, "/api/checkins").hasAnyRole("ALUNO", "PERSONAL")
                         .requestMatchers(HttpMethod.GET, "/api/checkins/me").hasRole("ALUNO")
                         .requestMatchers(HttpMethod.GET, "/api/checkins/alunos/inativos").hasAnyRole("PERSONAL", "GERENTE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/checkins/relatorio").hasAnyRole("GERENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/checkinsativar", "/api/checkinsativar", "/api/avaliacoesativar", "/api/treinos/*/desativar")
-                                .hasAnyRole("PERSONAL", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/checkins/*/ativar", "/api/checkins/*/desativar",
+                                "/api/avaliacoes/*/ativar", "/api/avaliacoes/*/desativar",
+                                "/api/treinos/*/ativar", "/api/treinos/*/desativar").hasAnyRole("PERSONAL", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/treinos/**")
                                 .hasAnyRole("PERSONAL", "ALUNO", "GERENTE", "ADMIN")
 
@@ -112,10 +119,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "http://localhost:4200",
-                "http://127.0.0.1:4200"
-        ));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));

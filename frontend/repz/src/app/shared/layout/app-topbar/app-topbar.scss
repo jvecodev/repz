@@ -27,22 +27,58 @@
   gap: 6px;
 }
 
-:host ::ng-deep .theme-btn {
-  width: 38px;
+:host ::ng-deep .theme-btn,
+:host ::ng-deep .lang-btn {
   height: 38px;
-  color: var(--text-3);
+  min-width: 38px;
+  border-radius: var(--r-sm) !important;
   border: 1px solid var(--border);
   background: var(--card);
+  color: var(--text-3);
+  padding: 0 10px;
 
   &:hover {
     background: var(--card-hover);
     color: var(--text);
+    border-color: var(--border-strong);
   }
+
+  .p-button-label { display: none; }
+}
+
+:host ::ng-deep .lang-btn {
+  min-width: 58px;
+  padding: 0 10px;
+}
+
+.lang-inner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.lang-flag {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.lang-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  letter-spacing: 0.03em;
+}
+
+.menu-btn-wrap {
+  display: none;
+  flex-shrink: 0;
 }
 
 :host ::ng-deep .menu-btn {
   width: 38px;
   height: 38px;
+  border-radius: var(--r-sm) !important;
   color: var(--text-2);
   border: 1px solid var(--border);
   background: var(--card);
@@ -64,6 +100,12 @@
   .here {
     color: var(--text);
     font-weight: 500;
+  }
+}
+
+@include mobile {
+  .menu-btn-wrap {
+    display: block;
   }
 }
 

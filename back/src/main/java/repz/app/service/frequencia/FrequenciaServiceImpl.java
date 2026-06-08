@@ -53,7 +53,7 @@ public class FrequenciaServiceImpl implements FrequenciaService {
             throw new RuntimeException(mensagens.get("frequencia.perfil.nao.autorizado.registrar"));
         }
 
-        User aluno = userRepository.findById(Math.toIntExact(request.getAlunoId()))
+        User aluno = userRepository.findById(request.getAlunoId())
                 .orElseThrow(() -> new RuntimeException(mensagens.get("aluno.nao.encontrado")));
         Academia academia = academiaRepository.findById(academiaId)
                 .orElseThrow(() -> new RuntimeException(mensagens.get("academia.nao.encontrada")));

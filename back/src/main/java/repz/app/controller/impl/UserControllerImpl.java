@@ -2,8 +2,11 @@ package repz.app.controller.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import repz.app.controller.UserController;
@@ -28,7 +31,7 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<UserGetResponse> findById(Integer id) {
+    public ResponseEntity<UserGetResponse> findById(Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
@@ -57,25 +60,28 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Void> atualizar(Integer id, UserPutRequest userPutRequest) {
+    public ResponseEntity<Void> atualizar(Long id, UserPutRequest userPutRequest) {
         userService.atualizar(id, userPutRequest);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<Void> ativar(Integer id) {
+    public ResponseEntity<Void> ativar(Long id) {
         userService.ativar(id);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<Void> desativar(Integer id) {
+    public ResponseEntity<Void> desativar(Long id) {
         userService.desativar(id);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<UserGetResponse> atualizarFotoPerfil(MultipartFile foto, Authentication authentication) {
+    @PostMapping(value = "/me/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserGetResponse> atualizarFotoPerfil(
+            @RequestParam("foto") MultipartFile foto,
+            Authentication authentication) {
         return ResponseEntity.ok(userService.atualizarFotoPerfil(foto, authentication));
     }
 }
