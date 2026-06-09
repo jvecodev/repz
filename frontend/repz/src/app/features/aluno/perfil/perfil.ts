@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { AlunoDetalheResponse, AlunoService, AuthService, UserService } from '@core/services';
 import type { AlunoMeUpdateRequest } from '@core/services';
 import { AppShell } from '@shared/layout';
-import { AvatarUpload } from '@shared/avatar-upload';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -20,7 +19,6 @@ import { TagModule } from 'primeng/tag';
     CommonModule,
     FormsModule,
     AppShell,
-    AvatarUpload,
     TranslatePipe,
     ButtonModule,
     CardModule,
