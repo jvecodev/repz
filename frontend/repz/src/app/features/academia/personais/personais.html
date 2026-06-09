@@ -1,7 +1,7 @@
 <app-shell
   ativo="personais"
   [crumbs]="[('ROLES.MANAGER' | translate), ('NAV.TRAINERS' | translate)]"
-  [nome]="userService.nomeUsuario() || 'Gerente'"
+  [nome]="userService.nomeUsuario()"
   [subtitulo]="'ACADEMIA.AREA' | translate"
   [mostrarCta]="false"
 >

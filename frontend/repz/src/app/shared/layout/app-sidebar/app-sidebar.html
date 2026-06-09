@@ -237,7 +237,7 @@
       class="avatar avatar-lg avatar-img"
     />
     <div class="pb-info">
-      <div class="pb-name">{{ nome() }}</div>
+      <div class="pb-name">{{ userService.nomeUsuario() || nome() }}</div>
       @if (academiaNome()) {
         <div class="pb-academia">{{ academiaNome() }}</div>
       } @else {

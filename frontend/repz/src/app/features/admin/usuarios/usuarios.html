@@ -1,7 +1,7 @@
 <app-shell
   ativo="usuarios"
   [crumbs]="[('ROLES.ADMIN' | translate), ('NAV.USERS' | translate)]"
-  [nome]="userService.nomeUsuario() || 'Administrador'"
+  [nome]="userService.nomeUsuario()"
   [subtitulo]="'ADMIN.AREA' | translate"
   [mostrarCta]="false"
 >

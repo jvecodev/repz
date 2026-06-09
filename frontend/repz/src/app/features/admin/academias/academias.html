@@ -1,7 +1,7 @@
 <app-shell
   ativo="academias"
   [crumbs]="[('ROLES.ADMIN' | translate), ('NAV.GYMS' | translate)]"
-  nome="Administrador"
+  [nome]="userService.nomeUsuario()"
   [subtitulo]="'ADMIN.AREA' | translate"
   [mostrarCta]="false"
 >

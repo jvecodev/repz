@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { AcademiaRequest, AcademiaResponse, AcademiaService } from '@core/services';
+import { AcademiaRequest, AcademiaResponse, AcademiaService, UserService } from '@core/services';
 import { validarCNPJ } from '@core/validators/cpf-cnpj';
 import { AppShell } from '@shared/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -54,6 +54,7 @@ const FORM_VAZIO = (): AcademiaForm => ({
   styleUrl: './academias.scss',
 })
 export class AdminAcademias implements OnInit {
+  protected readonly userService = inject(UserService);
   private readonly service = inject(AcademiaService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(MessageService);
