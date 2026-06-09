@@ -1,30 +1,30 @@
+<div class="auth-actions">
+  <p-button
+    severity="secondary"
+    [text]="true"
+    styleClass="auth-lang-btn"
+    (onClick)="language.alternar()"
+    [title]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
+    [ariaLabel]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
+  >
+    <span class="lang-inner">
+      <span class="lang-flag">{{ language.idioma() === 'pt-BR' ? '🇧🇷' : '🇺🇸' }}</span>
+      <span class="lang-label">{{ language.idioma() === 'pt-BR' ? 'PT' : 'EN' }}</span>
+    </span>
+  </p-button>
+  <p-button
+    [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
+    severity="secondary"
+    [text]="true"
+    styleClass="auth-theme-btn"
+    (onClick)="theme.toggleTema()"
+    [title]="(theme.tema() === 'dark' ? 'THEME.TO_LIGHT' : 'THEME.TO_DARK') | translate"
+    [ariaLabel]="(theme.tema() === 'dark' ? 'THEME.ARIA_TO_LIGHT' : 'THEME.ARIA_TO_DARK') | translate"
+  />
+</div>
+
 <div class="auth-wrap">
   <p-card styleClass="auth-card repz-card">
-
-    <div class="auth-topbar">
-      <p-button
-        severity="secondary"
-        [text]="true"
-        styleClass="auth-lang-btn"
-        (onClick)="language.alternar()"
-        [title]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
-        [ariaLabel]="(language.idioma() === 'pt-BR' ? 'LANG.TO_EN' : 'LANG.TO_PT') | translate"
-      >
-        <span class="lang-inner">
-          <span class="lang-flag">{{ language.idioma() === 'pt-BR' ? '🇧🇷' : '🇺🇸' }}</span>
-          <span class="lang-label">{{ language.idioma() === 'pt-BR' ? 'PT' : 'EN' }}</span>
-        </span>
-      </p-button>
-      <p-button
-        [icon]="theme.tema() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
-        severity="secondary"
-        [text]="true"
-        styleClass="auth-theme-btn"
-        (onClick)="theme.toggleTema()"
-        [title]="(theme.tema() === 'dark' ? 'THEME.TO_LIGHT' : 'THEME.TO_DARK') | translate"
-        [ariaLabel]="(theme.tema() === 'dark' ? 'THEME.ARIA_TO_LIGHT' : 'THEME.ARIA_TO_DARK') | translate"
-      />
-    </div>
 
     @switch (etapa()) {
 
