@@ -24,77 +24,72 @@
   />
 
   <div class="perfil-grid" *ngIf="!carregando() && !erro() && perfil()">
+    <div class="perfil-form-col">
+      <p-card styleClass="repz-card">
+        <div class="card-title">{{ 'PROFILE.EDIT_INFO' | translate }}</div>
 
-    <p-card styleClass="repz-card">
-      <div class="card-title">{{ 'PROFILE.EDIT_INFO' | translate }}</div>
+        <div class="form-group">
+          <label class="form-label" for="nome">{{ 'PROFILE.NAME' | translate }}</label>
+          <input id="nome" pInputText [(ngModel)]="nome" class="w-full" [placeholder]="'PROFILE.NAME_PLACEHOLDER_SHORT' | translate" />
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="nome">{{ 'PROFILE.NAME' | translate }}</label>
-        <input id="nome" pInputText [(ngModel)]="nome" class="w-full" [placeholder]="'PROFILE.NAME_PLACEHOLDER_SHORT' | translate" />
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="email">{{ 'PROFILE.EMAIL' | translate }}</label>
+          <input id="email" pInputText type="email" [(ngModel)]="email" class="w-full" [placeholder]="'PROFILE.EMAIL_PLACEHOLDER' | translate" />
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="email">{{ 'PROFILE.EMAIL' | translate }}</label>
-        <input
-          id="email"
-          pInputText
-          type="email"
-          [(ngModel)]="email"
-          class="w-full"
-          [placeholder]="'PROFILE.EMAIL_PLACEHOLDER' | translate"
-        />
-      </div>
+        <div class="form-divider"></div>
+        <div class="form-section-label">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</div>
 
-      <div class="form-divider"></div>
-      <div class="form-section-label">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</div>
+        <div class="form-group">
+          <label class="form-label" for="senha">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
+          <input id="senha" pInputText type="password" [(ngModel)]="novaSenha" class="w-full" [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate" />
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="senha">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
-        <input
-          id="senha"
-          pInputText
-          type="password"
-          [(ngModel)]="novaSenha"
-          class="w-full"
-          [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate"
-        />
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="confirmar">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
+          <input id="confirmar" pInputText type="password" [(ngModel)]="confirmarSenha" class="w-full" [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate" />
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="confirmar">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
-        <input
-          id="confirmar"
-          pInputText
-          type="password"
-          [(ngModel)]="confirmarSenha"
-          class="w-full"
-          [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate"
-        />
-      </div>
+        <p-message *ngIf="aviso()" [severity]="avisoSeverity()" styleClass="w-full mt-3" [text]="aviso()!" />
 
-      <p-message
-        *ngIf="aviso()"
-        [severity]="avisoSeverity()"
-        styleClass="w-full mt-3"
-        [text]="aviso()!"
-      />
+        <div class="form-actions">
+          <p-button
+            [label]="'COMMON.SAVE' | translate"
+            icon="pi pi-check"
+            styleClass="repz-primary"
+            [loading]="salvando()"
+            (onClick)="salvar()"
+          />
+        </div>
+      </p-card>
+    </div>
 
-      <div class="form-actions">
-        <p-button
-          [label]="'COMMON.SAVE' | translate"
-          icon="pi pi-check"
-          styleClass="repz-primary"
-          [loading]="salvando()"
-          (onClick)="salvar()"
-        />
-      </div>
-    </p-card>
-
-    <!-- <div class="perfil-info-col">
+    <div class="perfil-info-col">
       <p-card styleClass="repz-card avatar-card">
-        <app-avatar-upload [iniciais]="(perfil()?.name ?? 'A').charAt(0).toUpperCase()" tamanho="xl" />
+        <div class="avatar-wrap">
+          <div class="avatar avatar-xl" *ngIf="!perfil()?.fotoUrl">
+            {{ (perfil()?.name ?? 'A').charAt(0).toUpperCase() }}
+          </div>
+          <img
+            *ngIf="perfil()?.fotoUrl"
+            [src]="perfil()!.fotoUrl!"
+            class="avatar avatar-xl avatar-img"
+            alt="Foto de perfil"
+          />
+          <button
+            class="avatar-edit-btn"
+            type="button"
+            (click)="fotoInput.click()"
+            [disabled]="uploadandoFoto()"
+            title="Alterar foto"
+          >
+            <i class="pi" [ngClass]="uploadandoFoto() ? 'pi-spin pi-spinner' : 'pi-camera'"></i>
+          </button>
+          <input #fotoInput type="file" accept="image/jpeg,image/png" class="hidden-input" (change)="onFotoSelecionada($event)" />
+        </div>
         <div class="avatar-name">{{ perfil()?.name }}</div>
-        <p-tag styleClass="repz-tag-success" [value]="'PROFILE.ADMINISTRATOR' | translate" />
+        <p-tag styleClass="repz-tag-success" [value]="'ROLES.ADMIN' | translate" />
       </p-card>
 
       <p-card styleClass="repz-card">
@@ -103,11 +98,7 @@
           <span class="info-label">{{ 'PROFILE.EMAIL' | translate }}</span>
           <span class="info-value">{{ perfil()?.email }}</span>
         </div>
-        <div class="info-row" *ngIf="perfil()?.lastLogin">
-          <span class="info-label">{{ 'PROFILE.LAST_LOGIN' | translate }}</span>
-          <span class="info-value">{{ perfil()?.lastLogin }}</span>
-        </div>
       </p-card>
-    </div> -->
+    </div>
   </div>
 </app-shell>

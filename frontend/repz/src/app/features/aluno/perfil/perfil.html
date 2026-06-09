@@ -24,43 +24,6 @@
   />
 
   <div class="perfil-grid" *ngIf="!carregando() && !erro()">
-    <!-- Avatar card -->
-    <p-card styleClass="repz-card avatar-card">
-      <div class="avatar-wrap">
-        <div class="avatar avatar-xl" *ngIf="!aluno()?.fotoUrl">
-          {{ (aluno()?.nome ?? 'A').charAt(0).toUpperCase() }}
-        </div>
-        <img
-          *ngIf="aluno()?.fotoUrl"
-          [src]="aluno()!.fotoUrl!"
-          class="avatar avatar-xl avatar-img"
-          alt="Foto de perfil"
-        />
-        <button
-          class="avatar-edit-btn"
-          type="button"
-          (click)="fotoInput.click()"
-          [disabled]="uploadandoFoto()"
-          title="Alterar foto"
-        >
-          <i class="pi" [ngClass]="uploadandoFoto() ? 'pi-spin pi-spinner' : 'pi-camera'"></i>
-        </button>
-        <input
-          #fotoInput
-          type="file"
-          accept="image/jpeg,image/png"
-          class="hidden-input"
-          (change)="onFotoSelecionada($event)"
-        />
-      </div>
-      <div class="avatar-name">{{ aluno()?.nome }}</div>
-      <p-tag
-        [styleClass]="aluno()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
-        [value]="aluno()?.ativo ? 'Ativo' : 'Inativo'"
-      />
-    </p-card>
-
-    <!-- Coluna esquerda: formulário -->
     <div class="perfil-form-col">
       <p-card styleClass="repz-card">
         <div class="card-title">{{ 'PROFILE.EDIT_INFO' | translate }}</div>
@@ -86,7 +49,7 @@
             pInputText
             phoneMask
             [(ngModel)]="telefone"
-            name="telefone"
+            [disabled]="!editando()"
             placeholder="(11) 99999-9999"
             maxlength="15"
             class="w-full"
@@ -99,81 +62,61 @@
 
           <div class="form-group">
             <label class="form-label" for="senha">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
-            <input
-              id="senha"
-              pInputText
-              type="password"
-              [(ngModel)]="novaSenha"
-              [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate"
-              class="w-full"
-            />
+            <input id="senha" pInputText type="password" [(ngModel)]="novaSenha" [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate" class="w-full" />
           </div>
 
           <div class="form-group">
             <label class="form-label" for="confirmar">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
-            <input
-              id="confirmar"
-              pInputText
-              type="password"
-              [(ngModel)]="confirmarSenha"
-              [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate"
-              class="w-full"
-            />
+            <input id="confirmar" pInputText type="password" [(ngModel)]="confirmarSenha" [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate" class="w-full" />
           </div>
         </ng-container>
 
-        <p-message
-          *ngIf="aviso()"
-          [severity]="avisoSeverity()"
-          styleClass="w-full mt-3"
-          [text]="aviso()!"
-        />
-    </p-card>
+        <p-message *ngIf="aviso()" [severity]="avisoSeverity()" styleClass="w-full mt-3" [text]="aviso()!" />
 
         <div class="form-actions">
           <ng-container *ngIf="!editando()">
-            <p-button
-              [label]="'COMMON.EDIT' | translate"
-              icon="pi pi-pencil"
-              styleClass="repz-primary"
-              (onClick)="abrirEdicao()"
-            />
+            <p-button [label]="'COMMON.EDIT' | translate" icon="pi pi-pencil" styleClass="repz-primary" (onClick)="abrirEdicao()" />
           </ng-container>
           <ng-container *ngIf="editando()">
-            <p-button
-              [label]="'COMMON.CANCEL' | translate"
-              styleClass="repz-ghost"
-              (onClick)="cancelarEdicao()"
-              [disabled]="salvando()"
-            />
-            <p-button
-              [label]="'COMMON.SAVE' | translate"
-              icon="pi pi-check"
-              styleClass="repz-primary"
-              [loading]="salvando()"
-              (onClick)="salvar()"
-            />
+            <p-button [label]="'COMMON.CANCEL' | translate" styleClass="repz-ghost" (onClick)="cancelarEdicao()" [disabled]="salvando()" />
+            <p-button [label]="'COMMON.SAVE' | translate" icon="pi pi-check" styleClass="repz-primary" [loading]="salvando()" (onClick)="salvar()" />
           </ng-container>
         </div>
+      </p-card>
     </div>
 
-    <!-- Coluna direita: avatar + dados de matrícula -->
     <div class="perfil-info-col">
-      <!-- <p-card styleClass="repz-card avatar-card">
-        <app-avatar-upload
-          [iniciais]="(aluno()?.nome ?? 'A').charAt(0).toUpperCase()"
-          tamanho="xl"
-        />
+      <p-card styleClass="repz-card avatar-card">
+        <div class="avatar-wrap">
+          <div class="avatar avatar-xl" *ngIf="!aluno()?.fotoUrl">
+            {{ (aluno()?.nome ?? 'A').charAt(0).toUpperCase() }}
+          </div>
+          <img
+            *ngIf="aluno()?.fotoUrl"
+            [src]="aluno()!.fotoUrl!"
+            class="avatar avatar-xl avatar-img"
+            alt="Foto de perfil"
+          />
+          <button
+            class="avatar-edit-btn"
+            type="button"
+            (click)="fotoInput.click()"
+            [disabled]="uploadandoFoto()"
+            title="Alterar foto"
+          >
+            <i class="pi" [ngClass]="uploadandoFoto() ? 'pi-spin pi-spinner' : 'pi-camera'"></i>
+          </button>
+          <input #fotoInput type="file" accept="image/jpeg,image/png" class="hidden-input" (change)="onFotoSelecionada($event)" />
+        </div>
         <div class="avatar-name">{{ aluno()?.nome }}</div>
         <p-tag
           [styleClass]="aluno()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
-          [value]="(aluno()?.ativo ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate"
+          [value]="aluno()?.ativo ? 'Ativo' : 'Inativo'"
         />
-      </p-card> -->
+      </p-card>
 
       <p-card styleClass="repz-card">
         <div class="card-title">{{ 'PROFILE.INFO' | translate }}</div>
-
         <div class="info-row">
           <span class="info-label">{{ 'PROFILE.EMAIL' | translate }}</span>
           <span class="info-value">{{ aluno()?.email || emailSessao() }}</span>
@@ -193,10 +136,6 @@
         <div class="info-row" *ngIf="aluno()?.objetivo">
           <span class="info-label">{{ 'PROFILE.GOAL' | translate }}</span>
           <span class="info-value">{{ aluno()?.objetivo }}</span>
-        </div>
-        <div class="info-row" *ngIf="aluno()?.telefone">
-          <span class="info-label">{{ 'PROFILE.PHONE' | translate }}</span>
-          <span class="info-value">{{ aluno()?.telefone }}</span>
         </div>
       </p-card>
     </div>

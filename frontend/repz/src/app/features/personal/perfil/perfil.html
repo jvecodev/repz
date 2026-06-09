@@ -24,37 +24,23 @@
   />
 
   <div class="perfil-grid" *ngIf="!carregando() && !erro() && perfil()">
-
     <div class="perfil-form-col">
       <p-card styleClass="repz-card">
         <div class="card-title">{{ 'PROFILE.EDIT_INFO' | translate }}</div>
 
         <div class="form-group">
           <label class="form-label" for="nome">{{ 'PROFILE.NAME' | translate }}</label>
-          <input id="nome" pInputText [(ngModel)]="nome" [placeholder]="'PROFILE.NAME_PLACEHOLDER_SHORT' | translate" class="w-full" />
+          <input id="nome" pInputText [(ngModel)]="nome" class="w-full" [placeholder]="'PROFILE.NAME_PLACEHOLDER_SHORT' | translate" />
         </div>
 
         <div class="form-group">
           <label class="form-label" for="email">{{ 'PROFILE.EMAIL' | translate }}</label>
-          <input
-            id="email"
-            pInputText
-            type="email"
-            [(ngModel)]="email"
-            [placeholder]="'PROFILE.EMAIL_PLACEHOLDER' | translate"
-            class="w-full"
-          />
+          <input id="email" pInputText type="email" [(ngModel)]="email" class="w-full" [placeholder]="'PROFILE.EMAIL_PLACEHOLDER' | translate" />
         </div>
 
         <div class="form-group">
           <label class="form-label" for="especialidade">{{ 'PROFILE.SPECIALTY' | translate }}</label>
-          <input
-            id="especialidade"
-            pInputText
-            [(ngModel)]="especialidade"
-            [placeholder]="'PROFILE.SPECIALTY_PLACEHOLDER' | translate"
-            class="w-full"
-          />
+          <input id="especialidade" pInputText [(ngModel)]="especialidade" class="w-full" [placeholder]="'PROFILE.SPECIALTY_PLACEHOLDER' | translate" />
           <div class="form-hint">{{ 'PROFILE.SPECIALTY_HINT' | translate }}</div>
         </div>
 
@@ -63,34 +49,15 @@
 
         <div class="form-group">
           <label class="form-label" for="senha">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
-          <input
-            id="senha"
-            pInputText
-            type="password"
-            [(ngModel)]="novaSenha"
-            [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate"
-            class="w-full"
-          />
+          <input id="senha" pInputText type="password" [(ngModel)]="novaSenha" class="w-full" [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate" />
         </div>
 
         <div class="form-group">
           <label class="form-label" for="confirmar">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
-          <input
-            id="confirmar"
-            pInputText
-            type="password"
-            [(ngModel)]="confirmarSenha"
-            [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate"
-            class="w-full"
-          />
+          <input id="confirmar" pInputText type="password" [(ngModel)]="confirmarSenha" class="w-full" [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate" />
         </div>
 
-        <p-message
-          *ngIf="aviso()"
-          [severity]="avisoSeverity()"
-          styleClass="w-full mt-3"
-          [text]="aviso()!"
-        />
+        <p-message *ngIf="aviso()" [severity]="avisoSeverity()" styleClass="w-full mt-3" [text]="aviso()!" />
 
         <div class="form-actions">
           <p-button
@@ -105,9 +72,28 @@
     </div>
 
     <div class="perfil-info-col">
-
       <p-card styleClass="repz-card avatar-card">
-        <app-avatar-upload [iniciais]="(perfil()?.userName ?? 'P').charAt(0).toUpperCase()" tamanho="xl" />
+        <div class="avatar-wrap">
+          <div class="avatar avatar-xl" *ngIf="!fotoUrl()">
+            {{ (perfil()?.userName ?? 'P').charAt(0).toUpperCase() }}
+          </div>
+          <img
+            *ngIf="fotoUrl()"
+            [src]="fotoUrl()!"
+            class="avatar avatar-xl avatar-img"
+            alt="Foto de perfil"
+          />
+          <button
+            class="avatar-edit-btn"
+            type="button"
+            (click)="fotoInput.click()"
+            [disabled]="uploadandoFoto()"
+            title="Alterar foto"
+          >
+            <i class="pi" [ngClass]="uploadandoFoto() ? 'pi-spin pi-spinner' : 'pi-camera'"></i>
+          </button>
+          <input #fotoInput type="file" accept="image/jpeg,image/png" class="hidden-input" (change)="onFotoSelecionada($event)" />
+        </div>
         <div class="avatar-name">{{ perfil()?.userName }}</div>
         <p-tag
           [styleClass]="perfil()?.ativo ? 'repz-tag-success' : 'repz-tag-muted'"
@@ -115,9 +101,8 @@
         />
       </p-card>
 
-      <p-card styleClass="repz-card info-card">
+      <p-card styleClass="repz-card">
         <div class="card-title">{{ 'PROFILE.INFO' | translate }}</div>
-
         <div class="info-row">
           <span class="info-label">{{ 'PROFILE.EMAIL' | translate }}</span>
           <span class="info-value">{{ perfil()?.email }}</span>

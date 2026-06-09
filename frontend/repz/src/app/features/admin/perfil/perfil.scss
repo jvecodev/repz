@@ -26,9 +26,20 @@
   gap: 24px;
   align-items: start;
 
-  @media (max-width: 820px) {
+  @media (max-width: 860px) {
     grid-template-columns: 1fr;
+
+    .perfil-info-col {
+      order: -1;
+    }
   }
+}
+
+.perfil-form-col,
+.perfil-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .card-title {
@@ -69,6 +80,7 @@
 .form-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
   margin-top: 8px;
 }
 
@@ -82,12 +94,6 @@
   align-items: center;
   gap: 10px;
   text-align: center;
-}
-
-.perfil-info-col {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 .avatar-xl {
@@ -158,67 +164,12 @@
   color: var(--text);
 }
 
-.avatar-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover .avatar-edit-btn {
-    opacity: 1;
-  }
-}
-
-.avatar-edit-btn {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--mint);
-  color: #fff;
-  border: 2px solid var(--surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 0.15s;
-  padding: 0;
-
-  &:disabled {
-    cursor: wait;
-    opacity: 0.5;
-  }
-
-  i {
-    font-size: 13px;
-  }
-}
-
-.hidden-input {
-  display: none;
-}
-
-.avatar-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.info-rows {
-  width: 100%;
-  margin-top: 8px;
-}
-
 .info-row {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
-  text-align: left;
 
   &:last-child {
     border-bottom: none;
