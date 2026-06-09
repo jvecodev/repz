@@ -11,7 +11,6 @@ import {
 } from '@core/services';
 import { UserService } from '@core/services/user';
 import type { AvaliacaoFisicaResponse, TreinoResponse } from '@core/services';
-import { UserService } from '@core/services/user';
 import { AppShell } from '@shared/layout';
 import { LanguageService } from '@core/services/language.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -55,17 +54,11 @@ export class Aluno implements OnInit {
   private readonly alunoService = inject(AlunoService);
   protected readonly userService = inject(UserService);
   private readonly fichaService = inject(FichaTreinoService);
-  protected readonly userService = inject(UserService);
   private readonly avaliacaoService = inject(AvaliacaoFisicaService);
-  protected readonly userService = inject(UserService);
   private readonly auth = inject(AuthService);
-  protected readonly userService = inject(UserService);
   protected readonly freq = inject(FrequenciaService);
-  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
-  protected readonly userService = inject(UserService);
   private readonly language = inject(LanguageService);
-  protected readonly userService = inject(UserService);
 
   readonly carregando = signal(true);
   readonly fazendoCheckin = signal(false);

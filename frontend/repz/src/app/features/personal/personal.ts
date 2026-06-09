@@ -19,7 +19,6 @@ import type {
   PersonalResponse,
   SolicitacaoFichaResponse,
 } from '@core/services';
-import { UserService } from '@core/services/user';
 import { AppShell } from '@shared/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -90,17 +89,11 @@ export class Personal implements OnInit {
   private readonly solicitacaoService = inject(SolicitacaoFichaService);
   protected readonly userService = inject(UserService);
   private readonly personalService = inject(PersonalService);
-  protected readonly userService = inject(UserService);
   private readonly alunoService = inject(AlunoService);
-  protected readonly userService = inject(UserService);
   private readonly freqService = inject(FrequenciaService);
-  protected readonly userService = inject(UserService);
   private readonly avaliacaoService = inject(AvaliacaoFisicaService);
-  protected readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
-  protected readonly userService = inject(UserService);
 
   readonly perfil = signal<PersonalResponse | null>(null);
   readonly nomePersonal = () => this.perfil()?.userName ?? 'Personal';

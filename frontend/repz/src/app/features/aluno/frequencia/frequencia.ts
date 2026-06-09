@@ -50,11 +50,8 @@ export class Frequencia implements OnInit {
   protected readonly freqService = inject(FrequenciaService);
   protected readonly userService = inject(UserService);
   private readonly alunoService = inject(AlunoService);
-  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
-  protected readonly userService = inject(UserService);
   private readonly language = inject(LanguageService);
-  protected readonly userService = inject(UserService);
 
   readonly carregando = signal(true);
   readonly fazendoCheckin = signal(false);

@@ -52,23 +52,14 @@ export class AvaliacaoFisica implements OnInit, OnDestroy {
   private readonly service = inject(AvaliacaoFisicaService);
   protected readonly userService = inject(UserService);
   protected readonly auth = inject(AuthService);
-  protected readonly userService = inject(UserService);
   protected readonly personalService = inject(PersonalService);
-  protected readonly userService = inject(UserService);
   protected readonly freq = inject(FrequenciaService);
-  protected readonly userService = inject(UserService);
   private readonly relatorioService = inject(RelatorioIAService);
-  protected readonly userService = inject(UserService);
   private readonly route = inject(ActivatedRoute);
-  protected readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  protected readonly userService = inject(UserService);
   private readonly themeService = inject(ThemeService);
-  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
-  protected readonly userService = inject(UserService);
   private readonly sanitizer = inject(DomSanitizer);
-  protected readonly userService = inject(UserService);
 
   private alunoId: number | null = null;
 

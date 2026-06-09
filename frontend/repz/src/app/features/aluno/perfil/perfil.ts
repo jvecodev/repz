@@ -33,7 +33,7 @@ import { TagModule } from 'primeng/tag';
 export class Perfil implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly alunoService = inject(AlunoService);
-  private readonly userService = inject(UserService);
+  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
 
 

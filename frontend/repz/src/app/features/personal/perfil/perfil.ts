@@ -35,7 +35,7 @@ import { TagModule } from 'primeng/tag';
 })
 export class PersonalPerfil implements OnInit {
   private readonly personalService = inject(PersonalService);
-  private readonly userService = inject(UserService);
+  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
 
   readonly carregando = signal(true);

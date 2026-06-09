@@ -9,7 +9,6 @@ import type {
   AlunoDetalheResponse,
   AvaliacaoFisicaResponse,
 } from '@core/services';
-import { UserService } from '@core/services/user';
 import { AppShell } from '@shared/layout';
 import { LanguageService } from '@core/services/language.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -57,17 +56,11 @@ export class PersonalAvaliacaoNova implements OnInit {
   protected readonly personalService = inject(PersonalService);
   protected readonly userService = inject(UserService);
   private readonly alunoService = inject(AlunoService);
-  protected readonly userService = inject(UserService);
   private readonly avaliacaoService = inject(AvaliacaoFisicaService);
-  protected readonly userService = inject(UserService);
   private readonly route = inject(ActivatedRoute);
-  protected readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
-  protected readonly userService = inject(UserService);
   private readonly language = inject(LanguageService);
-  protected readonly userService = inject(UserService);
 
   private userId!: number;
 

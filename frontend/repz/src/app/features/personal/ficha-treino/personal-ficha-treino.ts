@@ -6,7 +6,6 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 import { FichaTreinoService, PersonalService } from '@core/services';
 import { UserService } from '@core/services/user';
 import type { ExercicioCreateRequest, TreinoCreateRequest, TreinoResponse } from '@core/services';
-import { UserService } from '@core/services/user';
 import { AppShell } from '@shared/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -51,13 +50,9 @@ export class PersonalFichaTreino implements OnInit {
   private readonly fichaTreinoService = inject(FichaTreinoService);
   protected readonly userService = inject(UserService);
   protected readonly personalService = inject(PersonalService);
-  protected readonly userService = inject(UserService);
   private readonly route = inject(ActivatedRoute);
-  protected readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
-  protected readonly userService = inject(UserService);
 
   readonly LETRAS = ['A', 'B', 'C', 'D', 'E', 'F'];
 

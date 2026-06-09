@@ -8,7 +8,6 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { AlunoService, FrequenciaService, PersonalService } from '@core/services';
 import { UserService } from '@core/services/user';
 import type { AlunoDetalheResponse, AlunoInativoResponse, FrequenciaResponse } from '@core/services';
-import { UserService } from '@core/services/user';
 import { AppShell } from '@shared/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -74,15 +73,10 @@ export class PersonalAlunos implements OnInit {
   protected readonly personalService = inject(PersonalService);
   protected readonly userService = inject(UserService);
   private readonly alunoService = inject(AlunoService);
-  protected readonly userService = inject(UserService);
   private readonly freqService = inject(FrequenciaService);
-  protected readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  protected readonly userService = inject(UserService);
   private readonly route = inject(ActivatedRoute);
-  protected readonly userService = inject(UserService);
   private readonly i18n = inject(TranslateService);
-  protected readonly userService = inject(UserService);
 
   private readonly foco = toSignal(
     this.route.queryParamMap.pipe(map((p) => p.get('foco') ?? 'alunos')),
